@@ -1,4 +1,4 @@
-#include "judge_analysis.h"
+#include "usart3_judge_analysis.h"
 #include "CRC_check.h"
 
 ext_game_state_t game_state_judge = {0};
@@ -66,7 +66,7 @@ void judgeData_analysis(u8 *pata, u8 len)
 			if(Get_CRC16_Check(&pata[i], 7+Data_len) == CRC16_recive)
 			{
 				/*检查是否在线*/
-				LostCountFeed(&(Error_Check.count[LOST_JUDGE]));
+				LostCountFeed(&(Error_Check.count[LOST_REFEREE]));
 				
 				memcpy(exact_Data, &pata[i+7], Data_len);
 				judge_Process(CmdID, exact_Data, Data_len);			
