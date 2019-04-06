@@ -1,5 +1,6 @@
 #include "yun.h"
 #include "usart1_remote_analysis.h"
+#include "auto_aim.h"
 
 s32 YAW_INIT=YAW_INIT_DEFINE;
 
@@ -45,6 +46,9 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		RC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
 	}
 
+	extern float test_pitch;
+	test_pitch=0;
+	Vision_Task(&yunMotorData.yaw_tarP,&test_pitch);	//控制键位集成再内部
 	
 	
 	if(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP>8192/2)	//过零点

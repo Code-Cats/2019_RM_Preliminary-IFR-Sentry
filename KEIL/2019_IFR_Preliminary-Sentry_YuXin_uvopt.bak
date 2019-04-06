@@ -619,19 +619,6 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ROBOT\BSP\usart2_wifidebug.c</PathWithFileName>
-      <FilenameWithoutPath>usart2_wifidebug.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>29</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <Focus>0</Focus>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\ROBOT\BSP\usart3_judge.c</PathWithFileName>
       <FilenameWithoutPath>usart3_judge.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -639,7 +626,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>30</FileNumber>
+      <FileNumber>29</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -652,7 +639,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>31</FileNumber>
+      <FileNumber>30</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -660,6 +647,19 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ROBOT\BSP\uart7_vision.c</PathWithFileName>
       <FilenameWithoutPath>uart7_vision.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>31</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\ROBOT\BSP\usart2_wifidebug.c</PathWithFileName>
+      <FilenameWithoutPath>usart2_wifidebug.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -908,8 +908,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ROBOT\ANALYSIS\usart2_wifidebug_analysis.c</PathWithFileName>
-      <FilenameWithoutPath>usart2_wifidebug_analysis.c</FilenameWithoutPath>
+      <PathWithFileName>..\ROBOT\ANALYSIS\uart7_vision_analysis.c</PathWithFileName>
+      <FilenameWithoutPath>uart7_vision_analysis.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -921,8 +921,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ROBOT\ANALYSIS\uart7_vision_analysis.c</PathWithFileName>
-      <FilenameWithoutPath>uart7_vision_analysis.c</FilenameWithoutPath>
+      <PathWithFileName>..\ROBOT\ANALYSIS\usart2_wifidebug_analysis.c</PathWithFileName>
+      <FilenameWithoutPath>usart2_wifidebug_analysis.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -86,6 +86,7 @@ void UART7_IRQHandler(void)
 
 	if(USART_GetITStatus(UART7, USART_IT_RXNE) != RESET)
 	{
+//		LostCountFeed(&Error_Check.count[LOST_VISION]);
 		UART7_Res=USART_ReceiveData(UART7);
 
 		VisionData_Receive(UART7_Res);

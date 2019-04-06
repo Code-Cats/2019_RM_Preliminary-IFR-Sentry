@@ -1,4 +1,5 @@
 #include "usart1_remote.h"
+#include "protect.h"
 
 unsigned char sbus_rx_buffer[25];
 /*************************************
@@ -92,7 +93,7 @@ void DMA2_Stream2_IRQHandler(void)
 			
 			//Êý¾Ý½âÂë
 		RemoteData_analysis(sbus_rx_buffer);
-//		LostCountFeed(&Error_Check.count[LOST_DBUS]);
+		LostCountFeed(&Error_Check.count[LOST_DBUS]);
 		}
 }
 

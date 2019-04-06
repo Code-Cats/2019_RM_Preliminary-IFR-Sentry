@@ -19,6 +19,8 @@ void BSP_Init(void)
 	
 	power_ctrl_on(POWER1_CTRL_SWITCH);
 	power_ctrl_on(POWER2_CTRL_SWITCH);
+	power_ctrl_on(POWER3_CTRL_SWITCH);
+	power_ctrl_on(POWER4_CTRL_SWITCH);
 	
 	/********CAN********/
 	CAN1_Motors_Config();

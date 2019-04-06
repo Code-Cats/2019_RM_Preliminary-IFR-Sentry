@@ -31,7 +31,7 @@ void WFDBG_DataSampling(void)	//该函数放在1ms定时器中
 //		Aframe_Data[1]=(char)time_1ms_count;
 //		Aframe_Data[2]=(char)test_countt>>8;
 //		Aframe_Data[3]=(char)test_countt;
-		memcpy(&Aframe_Data[4], &imu.angleV.y, 4);
+		memcpy(&Aframe_Data[4], &imu.angleV.x, 4);
 		memcpy(&Aframe_Data[4], &imu.angleV.z, 4);
 		memcpy((Apack_Data+15+copy_index*FRAME_BYTES), Aframe_Data, FRAME_BYTES);
 		copy_index++;
