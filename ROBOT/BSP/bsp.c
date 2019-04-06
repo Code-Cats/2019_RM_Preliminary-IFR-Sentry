@@ -38,7 +38,7 @@ void BSP_Init(void)
 	USART2_wifidebug_Init(1000000);
 	USART2_DMA_Tx_Init();
 	
-	UART7_Vision_Init(115200);
+	UART7_Vision_Init(576000);
 	
 	/*******MPU********/
 	IMU_SPI5_Init();

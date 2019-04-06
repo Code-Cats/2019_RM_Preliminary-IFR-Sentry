@@ -14,12 +14,12 @@
 #define SENTRY2
 #define DATA_TYPE_DEF "f4.f4"
 #define FRAME_BYTES 8U
-#define INTER_FRAME_TIME 5U
+#define INTER_FRAME_TIME 6U
 /*************************************/
 
 
 
-#define FRAMENUM_IN_PACK (u8)(27/INTER_FRAME_TIME)
+#define FRAMENUM_IN_PACK (u8)(31/INTER_FRAME_TIME)
 void WFDBG_DataSampling(void);	//该函数放在1ms定时器中
 
 #endif

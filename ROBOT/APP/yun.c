@@ -17,6 +17,7 @@ extern	RC_Ctl_t RC_Ctl;
 extern float ZGyroModuleAngle;
 extern IMU_T imu;
 extern u32 time_1ms_count;
+extern VisionDataTypeDef	VisionData;
 
 void Yun_Task(void)	//云台控制任务 
 {
@@ -43,12 +44,14 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	}
 	else if(Yun_Control_RCorPC==RC_CONTROL)
 	{	//RC控制数据
+		if(RC_Ctl.rc.switch_left==RC_SWITCH_UP||VisionData.vision_control_state==0)
 		RC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
 	}
 
 	extern float test_pitch;
 	test_pitch=0;
-	Vision_Task(&yunMotorData.yaw_tarP,&test_pitch);	//控制键位集成再内部
+	if(time_1ms_count%30==0)
+	Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);	//控制键位集成再内部
 	
 	
 	if(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP>8192/2)	//过零点
@@ -96,11 +99,16 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 			yunMotorData.yaw_tarP+=((RC_Ctl.rc.ch2-1024)*45.0/660.0);	//35.0/660.0 图传延时过大 改小
 			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP>1800?yunMotorData.yaw_tarP-3600:yunMotorData.yaw_tarP;	//过零点
 			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP<-1800?yunMotorData.yaw_tarP+3600:yunMotorData.yaw_tarP;	//过零点
+			
+			yunMotorData.pitch_tarP+=((RC_Ctl.rc.ch3-1024)*25.0/660.0);	//35.0/660.0 图传延时过大 改小
+			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP<100?100:yunMotorData.pitch_tarP;
+			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP>1650?1650:yunMotorData.pitch_tarP;
 		}
 		
-		yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*1200.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬	1600-320上-下 2019.3.13 中点1500
-		yunMotorData.pitch_tarP=yunMotorData.pitch_tarP<320?320:yunMotorData.pitch_tarP;
-		yunMotorData.pitch_tarP=yunMotorData.pitch_tarP>1600?1600:yunMotorData.pitch_tarP;
+		
+//		yunMotorData.pitch_tarP=((RC_Ctl.rc.ch3-1024)*1200.0/660.0)+PITCH_INIT;	//-50是因为陀螺仪水平时云台上扬	1600-320上-下 2019.3.13 中点1500
+//		yunMotorData.pitch_tarP=yunMotorData.pitch_tarP<100?100:yunMotorData.pitch_tarP;
+//		yunMotorData.pitch_tarP=yunMotorData.pitch_tarP>1650?1650:yunMotorData.pitch_tarP;
 }
 
 

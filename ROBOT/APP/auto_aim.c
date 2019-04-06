@@ -24,7 +24,7 @@ float Pixel_to_angle(s16 pix_error)	//将像素误差转换成角度
 	float angel_error=0;
 //	angel_error=0.036f*pix_error;
 //	t_yaw_angel_error=atan(pix_error/938.2f)*57.3f;
-angel_error=atan(pix_error/1750.0f)*57.3f;	//arm_atan_f32为DSP	//1855。2是去年的
+angel_error=atan(pix_error/1900.0f)*57.3f;	//arm_atan_f32为DSP	//1855。2是去年的  视觉标定的是1750
 	t_yaw_error=angel_error;
 	return angel_error;
 }
@@ -47,11 +47,11 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 }
 
 
-//#define PITCH_INIT         3098	//2018.7.10	//限位用
-#define YUN_DOWN_VALUELIMIT 2765	//向下限位
-#define YUN_UP_VALUELIMIT 3650	//向上限位
-#define YUN_UP_DISLIMIT 552	//正常的活动范围，UP为正
-#define YUN_DOWN_DISLIMIT 333	//正常的活动范围，DOWN为负
+//#define PITCH_INIT         1330	//2019.4.6
+#define YUN_DOWN_VALUELIMIT 100	//向下限位
+#define YUN_UP_VALUELIMIT 1650	//向上限位
+#define YUN_UP_DISLIMIT 320	//正常的活动范围，UP为正
+#define YUN_DOWN_DISLIMIT 1230	//正常的活动范围，DOWN为负
 
 float yaw_residual_error=0;	//打移动靶时云台跟随静差
 /////////////////
@@ -60,14 +60,14 @@ float t_yaw_angel_v=0;
 float t_target_v=0;
 ////////////////
 u8 sign_count=0;	//第三帧才开始动态识别
-#define VISION_TARX 640//1053//1035是修正安装偏差1020//580	//左上原点	640
-#define VISION_TARY	512//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
+#define VISION_TARX 690//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
+#define VISION_TARY	570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
-	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_sign=0;	//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
+	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_type=0;	//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
 //	t_target_v=t_yaw_angel_v+Gyro_Data
-	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_sign!=0)
+	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_type==1)	//VisionData.armor_sign!=0
 	{
 		VisionData.vision_control_state=1;	//最终控制位
 	}

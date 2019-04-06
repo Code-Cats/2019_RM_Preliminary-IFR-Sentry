@@ -115,7 +115,7 @@ void RC_Control_Shoot(u8* fri_state)
 	{
 //		if(Shoot_Heat_Limit(RobotHeatDataSimu42.heat,RobotHeatDataSimu42.maxheat)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//热量限制
 //		{
-			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
+			if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
 				shoot_Data_Down.count-=2;
 				shoot_Data_Down.last_time=time_1ms_count;
@@ -129,7 +129,7 @@ void RC_Control_Shoot(u8* fri_state)
 
 //		}
 		
-		if(RC_Ctl.rc.switch_left==RC_SWITCH_UP&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_UP)
+		if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_UP)
 		{
 			*fri_state=!*fri_state;
 		}

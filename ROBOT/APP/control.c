@@ -105,7 +105,7 @@ void Work_State_Change(void)
 		}
 		case STOP_STATE:	//ֹͣ״̬
 		{
-			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP)	
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP||RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)	
 			{
 				SetWorkState(NORMAL_STATE);
 			}
@@ -128,6 +128,15 @@ void Work_State_Change(void)
 				time_count=0;
 				NVIC_SystemReset();
 			}
+			break;
+		}
+		case TEST_STATE:	//ֹͣ״̬
+		{
+//			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP||RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)	
+//			{
+//				SetWorkState(NORMAL_STATE);
+//			}
+			SetWorkState(STOP_STATE);
 			break;
 		}
 	}
@@ -231,7 +240,7 @@ void Motor_Send(void)
 		{
 			CAN1_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,Friction_State*8000,Friction_State*-8000);
 			CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output,shoot_Motor_Data_Down.output,0);
-			//CAN1_Yun_SendMsg(yunMotorData.yaw_output,0);	//yaw pitch
+			//CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,0,0,0);	//yaw pitch
 			break;
 		}
 		case ERROR_STATE:	//����ģʽ
