@@ -27,6 +27,7 @@
 	/************USART***********/
 #include "usart1_remote.h"
 #include "usart1_remote_analysis.h"
+#include "usart2_wifidebug.h"
 #include "usart3_judge.h"
 #include "usart6_viceboard.h"
 #include "uart7_vision.h"

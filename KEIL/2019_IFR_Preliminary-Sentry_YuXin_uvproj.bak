@@ -553,6 +553,11 @@
               <FilePath>..\ROBOT\BSP\usart1_remote.c</FilePath>
             </File>
             <File>
+              <FileName>usart2_wifidebug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\BSP\usart2_wifidebug.c</FilePath>
+            </File>
+            <File>
               <FileName>usart3_judge.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\BSP\usart3_judge.c</FilePath>
@@ -566,11 +571,6 @@
               <FileName>uart7_vision.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\BSP\uart7_vision.c</FilePath>
-            </File>
-            <File>
-              <FileName>usart2_wifidebug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\BSP\usart2_wifidebug.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -668,14 +668,14 @@
               <FilePath>..\ROBOT\ANALYSIS\usart1_remote_analysis.c</FilePath>
             </File>
             <File>
-              <FileName>uart7_vision_analysis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ROBOT\ANALYSIS\uart7_vision_analysis.c</FilePath>
-            </File>
-            <File>
               <FileName>usart2_wifidebug_analysis.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\ANALYSIS\usart2_wifidebug_analysis.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart7_vision_analysis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\ANALYSIS\uart7_vision_analysis.c</FilePath>
             </File>
           </Files>
         </Group>

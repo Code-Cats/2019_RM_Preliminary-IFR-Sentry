@@ -2,6 +2,9 @@
 #include "bsp.h"
 
 #include "led_control.h"
+#include "usart2_wifidebug.h"
+#include "usart2_wifidebug_analysis.h"
+#include "wifi_debug.h"
 
 const u16 XinNianHao[30][3]= \
 {\
@@ -326,7 +329,7 @@ int main(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
 
 	BSP_Init();
-
+	
 	for(int i=0;i<40;i++)	//86
 	{
 		if(led_num<8)
@@ -343,6 +346,15 @@ int main(void)
 		}
 	}
 
+	USART_Cmd(USART2, ENABLE);                 //使能串口 
+	USART2_DMA_Send("+++",3);
+	delay_ms(600);
+	while(ESP8266_OSPF_Config(0)==false)
+	{
+		delay_ms(22);
+	}
+	
+	
 	GREEN=0;
 	
 	LED_Blink_Set(1,8);
@@ -355,6 +367,11 @@ while(1)
 		{
 			led_num=8;
 		}
+		
+		ESP8266_ConfigCheck();
+		Wifi_Debug_Main();
+
+		WFDBG_DataSampling();
 		
 	}
 	

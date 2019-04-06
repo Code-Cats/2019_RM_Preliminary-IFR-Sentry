@@ -50,7 +50,7 @@ s32 Get_Str_IndexOf(const char * str1, const char * str2);	//基于strstr()
 
 void WFDBG_ReplyDiscover_Send(void);
 
-bool ESP8266_UDP_Config(char * remoteport,char * localport);	//该函数的运行背景是每隔若干ms运行一次
+bool ESP8266_UDP_Config(const char * remoteIP,char * remoteport,char * localport);	//该函数的运行背景是每隔若干ms运行一次	//TEST OK 2019.4.1
 void ESP8266_ConfigCheck(void);
 void Wifi_Debug_Main(void);//主运行状态机
 bool ESP8266_OSPF_Config(u8 mode);	//设置  OSPF模式为0 外部调用周期应为20ms

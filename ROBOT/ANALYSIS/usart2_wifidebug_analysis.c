@@ -84,6 +84,7 @@ const char FrameData_Type[]= DATA_TYPE_DEF  ;
 //#RM-DT=DATA_INFO:TIM=<tim_interavl>;ABYTES=<byte_numbers>;TYPE=<s2.s2.s2.s2>;#END
 char WFDBUG_DataFormat_INFO[65]={0};
 
+const char WFDBG_BroatCastIP[]="255.255.255.255";
 char WFDBG_LocalIP[]="255.255.255.255";
 char WFDBG_LocalUnicastPort[]="1815";
 char WFDBG_HostUnicastIP[]="255.255.255.255";
@@ -292,12 +293,14 @@ void ESP8266_CIPClose_Send(void)	//TEST OK
 	USART2_DMA_Send(ESP8266_CIPCLOSE_CFG,strlen(ESP8266_CIPCLOSE_CFG));
 }
 
-const char ESP8266_UDPSTART_CFG1[]="AT+CIPSTART=\"UDP\",\"192.168.1.255\",";	//AT+CIPSTART=\"UDP\",\"192.168.1.255\",1813,1815,0\r\n
-//中间插入remoteIP
-const char ESP8266_UDPSTART_CFG2[]=",";
-//中间插入localIP
-const char ESP8266_UDPSTART_CFG3[]=",0\r\n";
-bool ESP8266_UDP_Config(char * remoteport,char * localport)	//该函数的运行背景是每隔若干ms运行一次	//TEST OK 2019.4.1
+const char ESP8266_UDPSTART_CFG1[]="AT+CIPSTART=\"UDP\",\"";	//AT+CIPSTART=\"UDP\",\"192.168.1.255\",1813,1815,0\r\n
+//中间插入remoteIP 192.168.1.255
+const char ESP8266_UDPSTART_CFG2[]="\",";
+//中间插入remotePort
+const char ESP8266_UDPSTART_CFG3[]=",";
+//中间插入localPort
+const char ESP8266_UDPSTART_CFG4[]=",0\r\n";
+bool ESP8266_UDP_Config(const char * remoteIP,char * remoteport,char * localport)	//该函数的运行背景是每隔若干ms运行一次	//TEST OK 2019.4.1
 {
 	static u8 udp_cfg_state=0;	//定义0为未连接，应发送
 	static u32 wait_esp8266_time=0;
@@ -311,12 +314,14 @@ bool ESP8266_UDP_Config(char * remoteport,char * localport)	//该函数的运行背景是
 		}
 		case 1:	//这里大量使用了strlen 不知道耗时怎么样
 		{
-			char cipstart[strlen(ESP8266_UDPSTART_CFG1)+strlen(ESP8266_UDPSTART_CFG2)+strlen(ESP8266_UDPSTART_CFG3)+10];
+			char cipstart[strlen(ESP8266_UDPSTART_CFG1)+strlen(ESP8266_UDPSTART_CFG2)+strlen(ESP8266_UDPSTART_CFG3)+strlen(ESP8266_UDPSTART_CFG4)+26];
 			memcpy(cipstart, ESP8266_UDPSTART_CFG1, strlen(ESP8266_UDPSTART_CFG1)+1);	//!!!这里需要加1，不然最后的\0会没有拷贝进去，导致strcat每次都往后面加，越来越大
-			strcat(cipstart,remoteport);
+			strcat(cipstart,remoteIP);
 			strcat(cipstart,ESP8266_UDPSTART_CFG2);
-			strcat(cipstart,localport);
+			strcat(cipstart,remoteport);
 			strcat(cipstart,ESP8266_UDPSTART_CFG3);
+			strcat(cipstart,localport);
+			strcat(cipstart,ESP8266_UDPSTART_CFG4);
 			USART2_DMA_Send(cipstart,strlen(cipstart));
 			DeleteAllQueue();	//删除所有消息
 			USART2_Software_FIFO.Data_state=0;	//当前有效数据已经读完了
@@ -447,7 +452,7 @@ bool ESP8266_GetLocalIP(void)	//获取本地IP	//放在每10ms运行一次的函数里  WFDBG_L
 
 /**     开机对ESP8266进行检查     **/
 const char ESP8266_CWJAP_ASK[]="AT+CWJAP?\r\n";
-const char ESP8266_CWJAP_OK[]="+CWJAP:\"IFR_ROBOT\"";
+const char ESP8266_CWJAP_OK[]="+CWJAP:\"ROBOT-4D130F\"";
 void ESP8266_ConfigCheck(void)
 {
 	static u32 time_last=0;
@@ -471,6 +476,11 @@ void ESP8266_ConfigCheck(void)
 							DeleteAllQueue();
 							USART2_Software_FIFO.Data_state=0;	//当前有效数据已经读完了
 							Esp8266ConfigState=Wait_ConnectWIFI;
+							/////////////////////////////////////////////////////////////////////////////////修改WIFI配置
+							char cwjap[]="AT+CWJAP_DEF=\"ROBOT-4D130F\",\"ifr-robot\"\r\n";
+							USART2_DMA_Send(cwjap,strlen(cwjap));
+							delay_ms(500);
+							time_last=time_1ms_count;	//重新计时
 						}
 					}
 				}
@@ -518,7 +528,7 @@ void ESP8266_ConfigCheck(void)
 			}
 			case Wait_MonitorUDP:
 			{
-				if(ESP8266_UDP_Config("1813","1815"))	//向广播信道发送信息
+				if(ESP8266_UDP_Config(WFDBG_BroatCastIP,"1813","1815"))	//向广播信道发送信息
 				{
 					Esp8266ConfigState=ESP8266_OK;
 					USART2_Software_FIFO.Data_state=0;	//当前有效数据已经读完了
@@ -867,7 +877,7 @@ void Wifi_Debug_Main(void)//主运行状态机 放在while中
 				if(time_1ms_count-time_record>=22)
 				{
 					time_record=time_1ms_count;
-					if(ESP8266_UDP_Config(WFDBG_HostUnicastPort, WFDBG_LocalUnicastPort))	//连接到单播端口
+					if(ESP8266_UDP_Config(WFDBG_HostUnicastIP, WFDBG_HostUnicastPort, WFDBG_LocalUnicastPort))	//连接到单播端口
 					{
 						WifidebugConnectState=Wait_OSPF1;
 					}
