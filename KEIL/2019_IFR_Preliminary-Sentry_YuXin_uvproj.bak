@@ -673,6 +673,11 @@
               <FilePath>..\ROBOT\ANALYSIS\usart2_wifidebug_analysis.c</FilePath>
             </File>
             <File>
+              <FileName>usart3_judge_analysis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\ANALYSIS\usart3_judge_analysis.c</FilePath>
+            </File>
+            <File>
               <FileName>uart7_vision_analysis.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\ANALYSIS\uart7_vision_analysis.c</FilePath>

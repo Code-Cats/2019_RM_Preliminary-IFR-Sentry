@@ -22,7 +22,7 @@ extern u32 time_1ms_count;
 extern KeyBoardTypeDef KeyBoardData[KEY_NUMS];
 
 //extern RobotHeatDataSimuTypeDef RobotHeatDataSimu42;
-extern tGameRobotState         testGameRobotState;      //比赛机器人状态
+//extern tGameRobotState         testGameRobotState;      //比赛机器人状态
 extern u8 Robot_Level;
 
 u8 Friction_State=0;	//初始化不开启

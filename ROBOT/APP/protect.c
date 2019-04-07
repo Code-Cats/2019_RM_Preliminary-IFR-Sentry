@@ -40,9 +40,28 @@ u8 LostCountCheck(u16 lostcount,u8* statu,const u16 cycle)	//无需改变
 	return *statu;
 }
 
+void DeviceFpsFeed(u8 device_id)	//设备FPS记录
+{
+	Error_Check.fps_count[device_id]++;
+}
+
+void DeviceFpsRecoed(void)	//1s cycle
+{
+	for(int i=0;i<LOST_TYPE_NUM;i++)	//无需改变
+	{
+		Error_Check.fps[i]=Error_Check.fps_count[i];
+		Error_Check.fps_count[i]=0;
+	}
+}
+
 s32 test_error_Satrt=0;
 void Check_Task(void)
 {
+	if(time_1ms_count%1000==0)
+	{
+		DeviceFpsRecoed();
+	}
+	
 	for(int i=0;i<LOST_TYPE_NUM;i++)	//无需改变
 	{
 		LostCountAdd(&Error_Check.count[i]);

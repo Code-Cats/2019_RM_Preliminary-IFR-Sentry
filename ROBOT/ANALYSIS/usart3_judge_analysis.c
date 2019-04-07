@@ -1,5 +1,6 @@
 #include "usart3_judge_analysis.h"
 #include "CRC_check.h"
+#include "protect.h"
 
 ext_game_state_t game_state_judge = {0};
 ext_game_result_t game_result_judge = {0};
@@ -27,7 +28,7 @@ static void judge_Process(u16 CmdID, u8 *Data, u8 len)
 		case EventDataId 		: memcpy(&event_data_judge, Data, 4); break;
 		case SupplyActionId	 	: memcpy(&supply_action_judge, Data, 3);break;
 		case RobotStateId	 	: memcpy(&robot_state_judge, Data, 14);robot_state_judge.mains_power_gimbal_output = Data[14]&0x01;robot_state_judge.mains_power_chassis_output = (Data[14]>>1)&0x01;robot_state_judge.mains_power_shooter_output = (Data[14]>>2)&0x01;break;
-		case RobotHeatDataId	: memcpy(&heat_data_judge, Data, 14); break;
+		case RobotHeatDataId	: memcpy(&heat_data_judge, Data, 14); DeviceFpsFeed(LOST_REFEREE); break;
 		case RobotPosId	 		: memcpy(&robot_pos_judge, Data, 16); break;
 		case BuffMuskId	 		: memcpy(&buff_musk_judge, Data, 1); break;
 		case RobotHurtId	 	: robot_hurt_judge.armor_id = Data[0] & 0x0F;robot_hurt_judge.hurt_type = (Data[0]>>4) & 0x0F;break;
@@ -107,5 +108,5 @@ void SendJudge_client_custom(void)
 	sendclientJudgeData[27] = CRC16&0xFF;
 	sendclientJudgeData[28] = (CRC16>>8)&0xFF;
 	
-	Judge_DMA_Send(sendclientJudgeData, 29);
+//	Judge_DMA_Send(sendclientJudgeData, 29);
 }

@@ -149,7 +149,7 @@ void USART2_DMA_Send(const uint8_t *data,uint16_t size)
     DMA_SetCurrDataCounter(DMA1_Stream6,size);  
     /* 打开DMA,开始发送 */  
     DMA_Cmd(DMA1_Stream6,ENABLE);  
-} 
+}
 
 void DMA1_Stream6_IRQHandler(void)
 {

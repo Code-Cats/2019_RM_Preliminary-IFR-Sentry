@@ -702,6 +702,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\ALGO\quaternion.c</FilePath>
             </File>
+            <File>
+              <FileName>CRC_check.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\ALGO\CRC_check.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

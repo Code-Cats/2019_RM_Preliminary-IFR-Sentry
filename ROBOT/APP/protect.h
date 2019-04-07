@@ -26,6 +26,8 @@ typedef struct
 	const u16 cycle[LOST_TYPE_NUM];
 	u16 count[LOST_TYPE_NUM];
 	u8 statu[LOST_TYPE_NUM];
+	u16 fps[LOST_TYPE_NUM];
+	u16 fps_count[LOST_TYPE_NUM];
 }Error_check_t;
 
 extern Error_check_t Error_Check;
@@ -48,6 +50,8 @@ extern Error_check_t Error_Check;
 void LostCountAdd(u16* lostcount);
 void LostCountFeed(u16* lostcoun);
 	u8 LostCountCheck(u16 lostcoun,u8* statu,const u16 cycle);
+
+void DeviceFpsFeed(u8 device_id);	//Éè±¸FPS¼ÇÂ¼
 
 void Check_Task(void);	//control.c
 
