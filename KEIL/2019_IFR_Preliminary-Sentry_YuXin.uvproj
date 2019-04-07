@@ -477,6 +477,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\wifi_debug.c</FilePath>
             </File>
+            <File>
+              <FileName>friction_wheel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\APP\friction_wheel.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

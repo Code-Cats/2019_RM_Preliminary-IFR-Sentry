@@ -71,14 +71,14 @@ void Check_Task(void)
 	
 	if(Error_check_workstate==1)	//工作状态
 	{
-		if(Error_Check.statu[LOST_IMU]==1&&time_1ms_count>2000)
+		if(Error_Check.statu[LOST_IMU2]==1&&time_1ms_count>2000)
 		{
 			test_error_Satrt=1;
-			t_error_record=LOST_IMU;
+			t_error_record=LOST_IMU2;
 			SetWorkState(ERROR_STATE);
 		}
 //		
-		for(int i=7;i<=9;i++)	//电机比控更重要
+		for(int i=LOST_CM1;i<=LOST_FM_LEFT;i++)	//电机比控更重要
 		{
 			if(Error_Check.statu[i]==1)	//&&i!=LOST_BULLETROTATE1
 			{

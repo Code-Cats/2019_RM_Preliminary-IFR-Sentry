@@ -5,7 +5,8 @@
 
 enum LOST_TYPES
 {
-	LOST_IMU,
+	LOST_IMU1,
+	LOST_IMU2,
 	LOST_DBUS,
 	LOST_VICEBOARD,
 	LOST_REFEREE,
@@ -35,10 +36,12 @@ extern Error_check_t Error_Check;
 #define LOST_CYCLE \
 {\
 	4,\
+	4,\
 	17,\
 	4,\
 	10,\
 	10,\
+	4,\
 	4,\
 	4,\
 	4,\

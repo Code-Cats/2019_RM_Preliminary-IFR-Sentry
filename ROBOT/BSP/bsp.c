@@ -14,6 +14,7 @@ void BSP_Init(void)
 	
 	/********GPIO*******/
 	LED_Init();
+	Laser_Init();
 	Power_Ctrl_Init();	//电源管理
 	delay_ms(100);
 	
@@ -25,7 +26,7 @@ void BSP_Init(void)
 	/********CAN********/
 	CAN1_Motors_Config();
 	CAN2_Motors_Config();
-	delay_ms(100);
+	delay_ms(2000);
 	
 	/************PWM************/
 	Pwm_Buzzer_Init(10-1,pre_calc(0,0));

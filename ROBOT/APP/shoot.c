@@ -31,8 +31,8 @@ u16 FRICTION_SHOOT=1660;//1640白天;//1470;//1540;	//发弹的PWM	在检录处测的射速13
 u16 Friction_Send=FRICTION_INIT;
 void Shoot_Task(void)	//定时频率：1ms
 { 
-
-	LASER_SWITCH=Friction_State; 
+LASER_SWITCH=1; 
+	//LASER_SWITCH=Friction_State; 
 	Shoot_Instruction();
 	shoot_Motor_Data_Down.tarP=(s32)shoot_Data_Down.motor_tarP;
 //	shoot_Motor_Data_Up.tarP=(s32)shoot_Data_Up.motor_tarP;

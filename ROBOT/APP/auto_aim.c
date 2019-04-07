@@ -19,13 +19,22 @@ float t_yaw_error=0;	//临时测试
 float t_gravity_ballistic_set_angel=0;	//重力补偿角度
 s16 t_gravity_ballistic_set_angel_10=0;
 	
+	
+void aim_Pos_Recoed()
+{
+	
+}	
+
+	
 float Pixel_to_angle(s16 pix_error)	//将像素误差转换成角度
 {
 	float angel_error=0;
-//	angel_error=0.036f*pix_error;
-//	t_yaw_angel_error=atan(pix_error/938.2f)*57.3f;
-angel_error=atan(pix_error/1900.0f)*57.3f;	//arm_atan_f32为DSP	//1855。2是去年的  视觉标定的是1750
-	t_yaw_error=angel_error;
+//////angel_error=atan(pix_error/1900.0f)*57.3f;	//arm_atan_f32为DSP	//1855。2是去年的  视觉标定的是1750
+//////	t_yaw_error=angel_error;
+	
+	//30.79
+	angel_error=pix_error/30.79f;
+	
 	return angel_error;
 }
 
@@ -60,7 +69,7 @@ float t_yaw_angel_v=0;
 float t_target_v=0;
 ////////////////
 u8 sign_count=0;	//第三帧才开始动态识别
-#define VISION_TARX 690//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
+#define VISION_TARX 710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
 #define VISION_TARY	570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {

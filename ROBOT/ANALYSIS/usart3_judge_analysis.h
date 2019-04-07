@@ -123,7 +123,7 @@ typedef __packed struct
 16，蓝方空中机器人； 
 17，蓝方哨兵机器人
 */
-typedef __packed struct 
+typedef struct	//__packed 
 {   
 	uint16_t chassis_volt;    
 	uint16_t chassis_current;    

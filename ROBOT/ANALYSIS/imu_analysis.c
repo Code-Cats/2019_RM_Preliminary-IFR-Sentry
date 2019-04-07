@@ -382,7 +382,7 @@ void MPU_get_Data(void)
     imu.angleV.z = mpu_data.gyro.z / 16.384f; 
 	
 	if(!(mpu_data.acceler.x==0&&mpu_data.acceler.y&&mpu_data.acceler.z&&mpu_data.gyro.x&&mpu_data.gyro.y&&mpu_data.gyro.z))
-		LostCountFeed(&(Error_Check.count[LOST_IMU]));
+		LostCountFeed(&(Error_Check.count[LOST_IMU1]));
 	
 	if(Flag_bspOK)
 		imu_attitude_update();

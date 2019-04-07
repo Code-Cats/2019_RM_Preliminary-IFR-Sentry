@@ -44,6 +44,7 @@ void VisionData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 //		t_vision_count++;
 		LostCountFeed(&Error_Check.count[LOST_VISION]);
 		VisionData_Deal(VisionReceiveData.databuffer);
+		DeviceFpsFeed(LOST_VISION);
 	}
 	
 }

@@ -29,72 +29,80 @@ extern CHASSIS_DATA chassis_Data;
 *******************************************/
 void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 {		
-		CAN_Receive(CAN1, CAN_FIFO0, rx_message);//读取数据	
-		switch(rx_message->StdId)
+	CAN_Receive(CAN1, CAN_FIFO0, rx_message);//读取数据	
+	switch(rx_message->StdId)
+	{
+		case 0x201:	//右
 		{
-			case 0x201:	//右
-			 {
-			 
-				Speed_Data_deal(&chassis_Data.lf_wheel_fdbV,rx_message);
-//				Position_Data_deal_DIV81(&BulletRotate_Data[BULLETROTATE_RIGHT].fdbP,&bulletrotate_position_encoder[BULLETROTATE_RIGHT],rx_message);
-//				BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-=BulletRotate_Data[BULLETROTATE_RIGHT].offsetP;
-				LostCountFeed(&Error_Check.count[LOST_CM1]);
-				 break;
-			 }
-			 case 0x202:	//左
-			 {
 
-				 Speed_Data_deal(&chassis_Data.rf_wheel_fdbV,rx_message);
-//				 Position_Data_deal_DIV81(&BulletRotate_Data[BULLETROTATE_LEFT].fdbP,&bulletrotate_position_encoder[BULLETROTATE_LEFT],rx_message);
-//			   BulletRotate_Data[BULLETROTATE_LEFT].fdbP-=BulletRotate_Data[BULLETROTATE_LEFT].offsetP;
-			   LostCountFeed(&Error_Check.count[LOST_CM2]);
-				 break;
-			 }
-			 case 0x203:	//shoot 上
-			 {
-
-//				 Shoot_Feedback_Deal(&shoot_Data_Up,&shoot_Motor_Data_Up,rx_message);	//临时用
-				 Speed_Data_deal(&sm1_speed,rx_message);
-				 
-				 break;
-			 }
-			 case 0x204:	//空
-			 {
-
-				 Speed_Data_deal(&sm2_speed,rx_message);
-//				 Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
-//				 LostCountFeed(&Error_Check.count[LOST_SM_DOWN]);
-				 break;
-			 }
-			 case 0x205:	//yaw
-			 {
-
-				 yunMotorData.yaw_fdbP=((rx_message->Data[0]<<8)|rx_message->Data[1])&0xffff;  //机械角度
-				 yunMotorData.yaw_fdbV=(s16)((rx_message->Data[2]<<8)|rx_message->Data[3]);  //转速
-				 LostCountFeed(&Error_Check.count[LOST_YAW]);
-				 break;
-			 }
-			 case 0x206:	//pitch
-			 {
-
-				 yunMotorData.pitch_fdbP=((rx_message->Data[0]<<8)|rx_message->Data[1])&0xffff;  //机械角度
-				 yunMotorData.pitch_fdbV=(s16)((rx_message->Data[2]<<8)|rx_message->Data[3]);  //转速
-				 LostCountFeed(&Error_Check.count[LOST_PITCH]);
-				 break;
-			 }
-			 case 0x207:	//pitch
-			 {
-
-				 Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
-//				 yunMotorData.pitch_fdbP=((rx_message->Data[0]<<8)|rx_message->Data[1])&0xffff;  //机械角度
-//				 yunMotorData.pitch_fdbV=(s16)((rx_message->Data[2]<<8)|rx_message->Data[3]);  //转速
-//				 LostCountFeed(&Error_Check.count[LOST_PITCH]);
-				 LostCountFeed(&Error_Check.count[LOST_SM]);
-				 break;
-			 }
-			default:
+			Speed_Data_deal(&chassis_Data.lf_wheel_fdbV,rx_message);
+			//				Position_Data_deal_DIV81(&BulletRotate_Data[BULLETROTATE_RIGHT].fdbP,&bulletrotate_position_encoder[BULLETROTATE_RIGHT],rx_message);
+			//				BulletRotate_Data[BULLETROTATE_RIGHT].fdbP-=BulletRotate_Data[BULLETROTATE_RIGHT].offsetP;
+			LostCountFeed(&Error_Check.count[LOST_CM1]);
+			DeviceFpsFeed(LOST_CM1);
 			break;
 		}
+		case 0x202:	//左
+		{
+
+			Speed_Data_deal(&chassis_Data.rf_wheel_fdbV,rx_message);
+			//				 Position_Data_deal_DIV81(&BulletRotate_Data[BULLETROTATE_LEFT].fdbP,&bulletrotate_position_encoder[BULLETROTATE_LEFT],rx_message);
+			//			   BulletRotate_Data[BULLETROTATE_LEFT].fdbP-=BulletRotate_Data[BULLETROTATE_LEFT].offsetP;
+			LostCountFeed(&Error_Check.count[LOST_CM2]);
+			DeviceFpsFeed(LOST_CM2);
+		break;
+		}
+		case 0x203:	//shoot 上
+		{
+
+			//				 Shoot_Feedback_Deal(&shoot_Data_Up,&shoot_Motor_Data_Up,rx_message);	//临时用
+			Speed_Data_deal(&sm1_speed,rx_message);	//LOST_FM_RIGHT
+			LostCountFeed(&Error_Check.count[LOST_FM_RIGHT]);
+			DeviceFpsFeed(LOST_FM_RIGHT);
+		break;
+		}
+		case 0x204:	//空
+		{
+
+			Speed_Data_deal(&sm2_speed,rx_message);
+			//Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
+			//LostCountFeed(&Error_Check.count[LOST_SM_DOWN]);
+			LostCountFeed(&Error_Check.count[LOST_FM_LEFT]);
+			DeviceFpsFeed(LOST_FM_LEFT);
+		break;
+		}
+		case 0x205:	//yaw
+		{
+
+			yunMotorData.yaw_fdbP=((rx_message->Data[0]<<8)|rx_message->Data[1])&0xffff;  //机械角度
+			yunMotorData.yaw_fdbV=(s16)((rx_message->Data[2]<<8)|rx_message->Data[3]);  //转速
+			LostCountFeed(&Error_Check.count[LOST_YAW]);
+			DeviceFpsFeed(LOST_YAW);
+		break;
+		}
+		case 0x206:	//pitch
+		{
+
+			yunMotorData.pitch_fdbP=((rx_message->Data[0]<<8)|rx_message->Data[1])&0xffff;  //机械角度
+			yunMotorData.pitch_fdbV=(s16)((rx_message->Data[2]<<8)|rx_message->Data[3]);  //转速
+			LostCountFeed(&Error_Check.count[LOST_PITCH]);
+			DeviceFpsFeed(LOST_PITCH);
+		break;
+		}
+		case 0x207:	//shoot
+		{
+
+			Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
+			//				 yunMotorData.pitch_fdbP=((rx_message->Data[0]<<8)|rx_message->Data[1])&0xffff;  //机械角度
+			//				 yunMotorData.pitch_fdbV=(s16)((rx_message->Data[2]<<8)|rx_message->Data[3]);  //转速
+			//				 LostCountFeed(&Error_Check.count[LOST_PITCH]);
+			LostCountFeed(&Error_Check.count[LOST_SM]);
+			DeviceFpsFeed(LOST_SM);
+			break;
+		}
+		default:
+		break;
+	}
 }
 
 

@@ -12,9 +12,9 @@
 
 *************该区域为自定义区域*****************/
 #define SENTRY2
-#define DATA_TYPE_DEF "f4.f4"
-#define FRAME_BYTES 8U
-#define INTER_FRAME_TIME 6U
+#define DATA_TYPE_DEF "f4.f4.u2"
+#define FRAME_BYTES 10U
+#define INTER_FRAME_TIME 7U
 /*************************************/
 
 

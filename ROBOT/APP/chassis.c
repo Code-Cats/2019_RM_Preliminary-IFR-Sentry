@@ -1,6 +1,7 @@
 #include "chassis.h"
 #include "control.h"
 #include "protect.h"
+#include "usart3_judge_analysis.h"
 
 CHASSIS_DATA chassis_Data={0};
 
@@ -13,6 +14,7 @@ s16 Chassis_Vx=0;
 /************************Íâ²¿Êý¾ÝÒýÓÃ**************************/
 extern RC_Ctl_t RC_Ctl;	//Ò£¿ØÊý¾Ý
 extern u32 time_1ms_count;
+extern ext_power_heat_data_t heat_data_judge;
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 /*************************************************************/
@@ -33,7 +35,7 @@ void Remote_Task(void)
 }
 
 
-
+float chassis_limit_k=0;
 /******************************************************/
 void Chassis_Control_External_Solution(void)	//ÍÓÂÝÒÇÕý³£µÄµ×ÅÌ½â¾ö·½°¸
 {
@@ -62,28 +64,27 @@ void Chassis_Control_External_Solution(void)	//ÍÓÂÝÒÇÕý³£µÄµ×ÅÌ½â¾ö·½°¸
 	chassis_Data.lf_wheel_output=PID_General(chassis_Data.lf_wheel_tarV,chassis_Data.lf_wheel_fdbV,&PID_Chassis_Speed[LF]);
 	chassis_Data.rf_wheel_output=PID_General(chassis_Data.rf_wheel_tarV,chassis_Data.rf_wheel_fdbV,&PID_Chassis_Speed[RF]);
 
-	
-	
-//	{	//¹¦ÂÊÏÞÖÆ¿é
-//		float limit_k=Limit_Power(testPowerHeatData.chassisPower,testPowerHeatData.chassisPowerBuffer);	//testPowerHeatData.chassisPowerBuffer
-//		float output_limit_lf=chassis_Data.lf_wheel_output*limit_k;
-//		float output_limit_rf=chassis_Data.rf_wheel_output*limit_k;
+		
+	{	//¹¦ÂÊÏÞÖÆ¿é
+		chassis_limit_k=Limit_Power(heat_data_judge.chassis_power,heat_data_judge.chassis_power_buffer);	//testPowerHeatData.chassisPowerBuffer
+		float output_limit_lf=chassis_Data.lf_wheel_output*chassis_limit_k;
+		float output_limit_rf=chassis_Data.rf_wheel_output*chassis_limit_k;
 //		float output_limit_lb=chassis_Data.lb_wheel_output*limit_k;
 //		float output_limit_rb=chassis_Data.rb_wheel_output*limit_k;
-//		chassis_Data.lf_wheel_output=(s32)output_limit_lf;
-//		chassis_Data.rf_wheel_output=(s32)output_limit_rf;
+		chassis_Data.lf_wheel_output=(s32)output_limit_lf;
+		chassis_Data.rf_wheel_output=(s32)output_limit_rf;
 //		chassis_Data.lb_wheel_output=(s32)output_limit_lb;
 //		chassis_Data.rb_wheel_output=(s32)output_limit_rb;
-//		
-//	if(chassis_Data.lf_wheel_output>10000)	chassis_Data.lf_wheel_output=10000;
-//	if(chassis_Data.lf_wheel_output<-10000)	chassis_Data.lf_wheel_output=-10000;
-//	if(chassis_Data.rf_wheel_output>10000)	chassis_Data.rf_wheel_output=10000;
-//	if(chassis_Data.rf_wheel_output<-10000)	chassis_Data.rf_wheel_output=-10000;
-//	if(chassis_Data.lb_wheel_output>10000)	chassis_Data.lb_wheel_output=10000;
-//	if(chassis_Data.lb_wheel_output<-10000)	chassis_Data.lb_wheel_output=-10000;
-//	if(chassis_Data.rb_wheel_output>10000)	chassis_Data.rb_wheel_output=10000;
-//	if(chassis_Data.rb_wheel_output<-10000)	chassis_Data.rb_wheel_output=-10000;
-//	}
+
+		if(chassis_Data.lf_wheel_output>10000)	chassis_Data.lf_wheel_output=10000;
+		if(chassis_Data.lf_wheel_output<-10000)	chassis_Data.lf_wheel_output=-10000;
+		if(chassis_Data.rf_wheel_output>10000)	chassis_Data.rf_wheel_output=10000;
+		if(chassis_Data.rf_wheel_output<-10000)	chassis_Data.rf_wheel_output=-10000;
+//		if(chassis_Data.lb_wheel_output>10000)	chassis_Data.lb_wheel_output=10000;
+//		if(chassis_Data.lb_wheel_output<-10000)	chassis_Data.lb_wheel_output=-10000;
+//		if(chassis_Data.rb_wheel_output>10000)	chassis_Data.rb_wheel_output=10000;
+//		if(chassis_Data.rb_wheel_output<-10000)	chassis_Data.rb_wheel_output=-10000;
+	}
 }
 /******************************************************/
 
@@ -123,13 +124,13 @@ void RC_Control_Chassis(void)
 
 
 
-#define POWER_LIMIT_K 0.8f/50.0f	//¼´ÄÜÁ¿²Û¿ÕÊ±0.2£¬50Ê±¿ªÊ¼ÏÞÖÆ
-#define POWER_LIMIT_B	0.21f
+#define POWER_LIMIT_K 0.9f/120//0.8f/50.0f	//¼´ÄÜÁ¿²Û¿ÕÊ±0.2£¬50Ê±¿ªÊ¼ÏÞÖÆ
+#define POWER_LIMIT_B	0.1f//0.21f
 u8 limit_power_statu=0;
 extern u8 SuperC_Output_Enable;	//µçÈÝÊÇ·ñÄÜ·Åµç
 extern Error_check_t Error_Check;
-#define POWERLIMIT 120 	//120w¹¦ÂÊÏÞÖÆ
-#define POWERBUFFER 60	//60J¹¦ÂÊ»º³å
+#define POWERLIMIT 20 	//20w¹¦ÂÊÏÞÖÆ
+#define POWERBUFFER 200	//200J¹¦ÂÊ»º³å
 float Limit_Power(float power,float powerbuffer)	//Ó¢ÐÛ120JÈÈÁ¿ÏÞÖÆ£¬Ö±½ÓÏÞÖÆ×ÜÊä³ö
 {
 	float limit_k=1;
@@ -155,15 +156,20 @@ float Limit_Power(float power,float powerbuffer)	//Ó¢ÐÛ120JÈÈÁ¿ÏÞÖÆ£¬Ö±½ÓÏÞÖÆ×ÜÊ
 ////////////		limit_k=limit_k<0.1f?0.1f:limit_k;
 ////////////	}
 
-	
-	limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4
-	limit_k=limit_k>1?1:limit_k;
-	limit_k=limit_k<0.1f?0.1f:limit_k;
-	
 	if(Error_Check.statu[LOST_REFEREE]==1)	//²ÃÅÐlost
 	{
 		limit_power_statu=3;
 		limit_k=0.6;
+	}
+	else
+	{
+		powerbuffer-=30;
+		//if(power>15)
+		//{
+			limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4
+			limit_k=limit_k>1?1:limit_k;
+			limit_k=limit_k<0.05f?0.05f:limit_k;
+		//}
 	}
 	
 	return limit_k;

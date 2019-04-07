@@ -3,6 +3,7 @@
 #include "usart2_wifidebug.h"
 #include "delay.h"
 #include "yun.h"
+#include "usart3_judge_analysis.h"
 
 
 extern u32 time_1ms_count;
@@ -16,6 +17,10 @@ u16 test_FRAMENUM_IN_PACK=FRAMENUM_IN_PACK;
 extern YUN_MOTOR_DATA 			yunMotorData;
 extern float ZGyroModuleAngle;
 extern IMU_T imu;
+extern float chassis_limit_k;
+
+extern ext_power_heat_data_t heat_data_judge;
+
 u32 test_countt=0;
 u16 copy_index=0;
 void WFDBG_DataSampling(void)	//该函数放在1ms定时器中
@@ -31,8 +36,10 @@ void WFDBG_DataSampling(void)	//该函数放在1ms定时器中
 //		Aframe_Data[1]=(char)time_1ms_count;
 //		Aframe_Data[2]=(char)test_countt>>8;
 //		Aframe_Data[3]=(char)test_countt;
-		memcpy(&Aframe_Data[0], &imu.angleV.x, 4);
-		memcpy(&Aframe_Data[4], &imu.angleV.z, 4);
+		memcpy(&Aframe_Data[0], &chassis_limit_k, 4);
+		memcpy(&Aframe_Data[4], &heat_data_judge.chassis_power, 4);
+		Aframe_Data[9]=(u8)heat_data_judge.chassis_power_buffer>>8;
+		Aframe_Data[8]=(u8)heat_data_judge.chassis_power_buffer;
 		memcpy((Apack_Data+15+copy_index*FRAME_BYTES), Aframe_Data, FRAME_BYTES);
 		copy_index++;
 		if(copy_index>=FRAMENUM_IN_PACK)
