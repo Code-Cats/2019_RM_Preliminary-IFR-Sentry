@@ -67,7 +67,7 @@ void CAN1_Motors_Config(void)
     NVIC_Init(&NVIC_InitStructure);
 }
 
-/****************************
+/**************************** iu
 函数名：CAN1_RX0_IRQHandler
 函数功能：接收CAN数据并解析得到
           yunMotorData.Fire_Cp yunMotorData.Fire_Cv

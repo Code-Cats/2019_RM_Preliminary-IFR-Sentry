@@ -68,8 +68,8 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 			Speed_Data_deal(&frictionWheel_Data.r_wheel_fdbV,rx_message);
 			//Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//¡Ÿ ±”√
 			//LostCountFeed(&Error_Check.count[LOST_SM_DOWN]);
-			LostCountFeed(&Error_Check.count[LOST_FM_LEFT]);
-			DeviceFpsFeed(LOST_FM_LEFT);
+			LostCountFeed(&Error_Check.count[LOST_FM_RIGHT]);
+			DeviceFpsFeed(LOST_FM_RIGHT);
 		break;
 		}
 		case 0x205:	//yaw

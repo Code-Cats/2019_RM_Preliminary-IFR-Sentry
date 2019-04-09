@@ -3,6 +3,8 @@
 #include "protect.h"
 #include "usart3_judge_analysis.h"
 
+#include "auto_move.h"
+
 CHASSIS_DATA chassis_Data={0};
 
 PID_GENERAL PID_Chassis_Speed[2]={PID_CHASSIS_SPEED_DEFAULT,PID_CHASSIS_SPEED_DEFAULT};
@@ -56,6 +58,10 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		RC_Control_Chassis();
 	}
 	
+	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)
+	{
+		Auto_Move_Task();
+	}
 				
 	chassis_Data.lf_wheel_tarV=(Chassis_Vx)*K_SPEED;
 	chassis_Data.rf_wheel_tarV=(-Chassis_Vx)*K_SPEED;

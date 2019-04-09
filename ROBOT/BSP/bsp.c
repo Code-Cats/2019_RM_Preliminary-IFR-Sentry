@@ -41,6 +41,8 @@ void BSP_Init(void)
 	
 	USART3_Configuration(115200);
 	
+	USART6_ViceBoard_Init(256000);
+	
 	UART7_Vision_Init(576000);
 	
 	/*******MPU********/

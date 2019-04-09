@@ -337,7 +337,7 @@ int main(void)
 		
 		buzzer_on(TIM12->ARR/50);
 		Buzzer_SetFre(10-1,pre_calc(Star_Sky[i][0],Star_Sky[i][1]));
-		delay_ms(Star_Sky[i][2]);
+		delay_ms(Star_Sky[i][2]/2);
 		buzzer_off();
 		delay_ms(30);
 		if((i+1)%4==1)
@@ -349,10 +349,10 @@ int main(void)
 	USART_Cmd(USART2, ENABLE);                 //Ê¹ÄÜ´®¿Ú 
 	USART2_DMA_Send("+++",3);
 	delay_ms(600);
-	while(ESP8266_OSPF_Config(0)==false)
-	{
-		delay_ms(22);
-	}
+//	while(ESP8266_OSPF_Config(0)==false)
+//	{
+//		delay_ms(22);
+//	}
 	
 	
 	GREEN=0;

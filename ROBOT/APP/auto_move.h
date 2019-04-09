@@ -3,7 +3,7 @@
 
 #include "sys.h"
 
-
+void Auto_Move_Task(void);
 
 
 #endif
