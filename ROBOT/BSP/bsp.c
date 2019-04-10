@@ -26,6 +26,7 @@ void BSP_Init(void)
 	/********CAN********/
 	CAN1_Motors_Config();
 	CAN2_Motors_Config();
+	RM_ADI_IMU_Cali();
 	delay_ms(2000);
 	
 	/************PWM************/

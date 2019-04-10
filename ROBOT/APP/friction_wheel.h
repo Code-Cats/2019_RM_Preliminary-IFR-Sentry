@@ -60,6 +60,9 @@ typedef struct
 	
 }FRICTIONWHEEL_DATA;	//CAN1
 
+void Friction_Speed_Set(s16 bullet_speed);	//设置射速，射速到摩擦轮速度的转换
+void Friction_Task(void);	//3510摩擦轮调速控制
 
+extern FRICTIONWHEEL_DATA frictionWheel_Data;
 
 #endif

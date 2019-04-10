@@ -58,10 +58,10 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 		RC_Control_Chassis();
 	}
 	
-	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)
-	{
-		Auto_Move_Task();
-	}
+//	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)	//挪到control.c中
+//	{
+//		Auto_Move_Task(0,0);
+//	}
 				
 	chassis_Data.lf_wheel_tarV=(Chassis_Vx)*K_SPEED;
 	chassis_Data.rf_wheel_tarV=(-Chassis_Vx)*K_SPEED;

@@ -481,6 +481,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\friction_wheel.c</FilePath>
             </File>
+            <File>
+              <FileName>brain.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\APP\brain.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -2,6 +2,8 @@
 #include "yun.h"
 #include "chassis.h"
 #include "protect.h"
+#include "friction_wheel.h"
+#include "brain.h"
 
 WorkState_e workState=PREPARE_STATE;
 
@@ -105,9 +107,13 @@ void Work_State_Change(void)
 		}
 		case STOP_STATE:	//停止状态
 		{
-			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP||RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)	
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP)	
 			{
 				SetWorkState(NORMAL_STATE);
+			}
+			else if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)
+			{
+				SetWorkState(AUTO_STATE);
 			}
 			
 			break;
@@ -130,13 +136,12 @@ void Work_State_Change(void)
 			}
 			break;
 		}
-		case TEST_STATE:	//停止状态
+		case AUTO_STATE:	//停止状态
 		{
-//			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP||RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)	
-//			{
-//				SetWorkState(NORMAL_STATE);
-//			}
-			SetWorkState(STOP_STATE);
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE)	
+			{
+				SetWorkState(STOP_STATE);
+			}
 			break;
 		}
 	}
@@ -188,6 +193,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		{
 			Yun_Task();	//开启云台处理
 			Shoot_Task();
+			Friction_Task();
 			Remote_Task();
 			break;
 		}
@@ -206,6 +212,16 @@ void Work_Execute(void)	//工作执行2018.7.1
 //////			Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
 			Yun_Task();	//开启云台
 		//	Vision_Task(&t_yaw_error,&t_pitch_error);
+			break;
+		}
+		case AUTO_STATE:	//停止状态
+		{
+			Auto_Operation();	//自动运行
+			
+			Yun_Task();	//开启云台处理
+			Shoot_Task();
+			Friction_Task();
+			Remote_Task();
 			break;
 		}
 	}
@@ -238,7 +254,7 @@ void Motor_Send(void)
 		}
 		case NORMAL_STATE:	//正常操作模式
 		{
-			CAN1_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,Friction_State*8000,Friction_State*-8000);
+			CAN1_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,frictionWheel_Data.l_wheel_output,frictionWheel_Data.r_wheel_output);	//Friction_State*8000,Friction_State*-8000
 			CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output,shoot_Motor_Data_Down.output,0);
 			//CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,0,0,0);	//yaw pitch
 			break;
@@ -253,6 +269,12 @@ void Motor_Send(void)
 		{
 			CAN1_Chassis_SendMsg(0,0,0,0);
 			CAN1_Yun_Shoot_SendMsg(0,0,0,0);	//yaw pitch
+			break;
+		}
+		case AUTO_STATE:	//停止状态
+		{
+			CAN1_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,frictionWheel_Data.l_wheel_output,frictionWheel_Data.r_wheel_output);
+			CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output,shoot_Motor_Data_Down.output,0);
 			break;
 		}
 		default:

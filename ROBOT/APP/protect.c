@@ -78,16 +78,20 @@ void Check_Task(void)
 			SetWorkState(ERROR_STATE);
 		}
 //		
-		for(int i=LOST_CM1;i<=LOST_FM_LEFT;i++)	//电机比控更重要
+		if(GetWorkState()!=AUTO_STATE)	//自动模式不检测
 		{
-			if(Error_Check.statu[i]==1)	//&&i!=LOST_BULLETROTATE1
+			for(int i=LOST_CM1;i<=LOST_FM_LEFT;i++)	//电机比控更重要
 			{
-				test_error_Satrt=-1;
-				t_error_record=i;
-				SetWorkState(ERROR_STATE);
+				if(Error_Check.statu[i]==1)	//&&i!=LOST_BULLETROTATE1
+				{
+					test_error_Satrt=-1;
+					t_error_record=i;
+					SetWorkState(ERROR_STATE);
+				}
+					
 			}
-				
 		}
+		
 
 	}
 	
@@ -98,7 +102,7 @@ void Check_Task(void)
 		{
 			SetWorkState(LOST_STATE);	//启动时没有遥控信号的选择
 		}
-		else
+		else if(GetWorkState()!=AUTO_STATE)	//自动模式不检测
 		{
 			SetWorkState(LOST_STATE);
 		}

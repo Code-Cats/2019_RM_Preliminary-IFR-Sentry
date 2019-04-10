@@ -17,7 +17,7 @@ ext_shoot_data_t shoot_data_judge = {0};
 ext_student_interactive_header_data_t interactive_data_send = {0};
 client_custom_data_t custom_data_send = {0};
 robot_interactive_data_t interactive_data_judge = {0};
-
+//5000 16£¬16.3£¬15.7£¬16.5	£»7000 25 6000 21.08 20.97
 static void judge_Process(u16 CmdID, u8 *Data, u8 len)
 {
 	switch(CmdID)
