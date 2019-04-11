@@ -486,6 +486,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\brain.c</FilePath>
             </File>
+            <File>
+              <FileName>heat_limit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\APP\heat_limit.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

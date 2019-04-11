@@ -1,7 +1,9 @@
 #include "brain.h"
 #include "auto_aim.h"
 #include "auto_move.h"
+#include "friction_wheel.h"
 
+s16 bulletSpeedSet=0;
 /***************************
 哨兵大脑1.0
 哨兵模式划分：

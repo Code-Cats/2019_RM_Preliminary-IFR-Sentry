@@ -1,6 +1,7 @@
 #include "usart3_judge_analysis.h"
 #include "CRC_check.h"
 #include "protect.h"
+#include "heat_limit.h"
 
 ext_game_state_t game_state_judge = {0};
 ext_game_result_t game_result_judge = {0};
@@ -32,7 +33,7 @@ static void judge_Process(u16 CmdID, u8 *Data, u8 len)
 		case RobotPosId	 		: memcpy(&robot_pos_judge, Data, 16); break;
 		case BuffMuskId	 		: memcpy(&buff_musk_judge, Data, 1); break;
 		case RobotHurtId	 	: robot_hurt_judge.armor_id = Data[0] & 0x0F;robot_hurt_judge.hurt_type = (Data[0]>>4) & 0x0F;break;
-		case ShootDataId	 	: memcpy(&shoot_data_judge, Data, 6); break;
+		case ShootDataId	 	: memcpy(&shoot_data_judge, Data, 6);BulletNum_Simu_ADD(); break;
 		case RobotInteractiveId	: memcpy(&interactive_data_judge, Data, len); break;
 		default:break;
 	}

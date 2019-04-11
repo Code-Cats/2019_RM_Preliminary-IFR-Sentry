@@ -4,6 +4,7 @@
 #include "protect.h"
 #include "friction_wheel.h"
 #include "brain.h"
+#include "heat_limit.h"
 
 WorkState_e workState=PREPARE_STATE;
 
@@ -34,6 +35,8 @@ void Control_Task()
 	//{
 		MPU_get_Data();
 	//}
+	if(time_1ms_count%10==0)
+	Heat_Simulating();
 	
 	Check_Task();
 	
@@ -102,6 +105,10 @@ void Work_State_Change(void)
 			if(RC_Ctl.key.v_h!=0||RC_Ctl.key.v_l!=0||abs(RC_Ctl.mouse.x)>3)	//退出该模式
 			{
 				SetWorkState(NORMAL_STATE);
+			}
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)
+			{
+				SetWorkState(AUTO_STATE);
 			}
 			break;
 		}

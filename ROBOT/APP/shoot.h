@@ -124,10 +124,6 @@ void Shoot_Task(void);
 void Shoot_Feedback_Deal(SHOOT_DATA *shoot_data,SHOOT_MOTOR_DATA *shoot_motor_data,CanRxMsg *msg);
 void Prevent_Jam_Down(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data);	//防卡弹程序	//同时包含防鸡蛋的功能	//放在tarP计算出之后
 //void Prevent_Jam_Up(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Data);	//防卡弹程序	//同时包含防鸡蛋的功能	//放在tarP计算出之后
-void Shoot_Frequency_Limit(int* ferquency,u16 rate,u16 heat);	//m/s为单位
-
-u8 Shoot_Heat_Limit(u16 heat,u16 maxheat);	//还应当限制射频
-u8 Shoot_Heat_Lost_Fre_Limit(void);	//裁判lost情况对射频的限制，反返回1是OK
 
 //void Friction_Adjust_DependOn_fdbV(u16* friction_shoot,float bullet_fdbV);	//放在裁判反馈中断中
 #endif

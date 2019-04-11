@@ -2,19 +2,20 @@
 #include "math.h"
 #include "pid.h"
 #include "friction_wheel.h"
+#include "heat_limit.h"
 //#include "vision.h"
 
 SHOOT_DATA shoot_Data_Down=SHOOT_DATA_INIT;
 SHOOT_MOTOR_DATA shoot_Motor_Data_Down ={0};
 
-SHOOT_DATA shoot_Data_Up=SHOOT_DATA_INIT;
-SHOOT_MOTOR_DATA shoot_Motor_Data_Up ={0};
+//SHOOT_DATA shoot_Data_Up=SHOOT_DATA_INIT;
+//SHOOT_MOTOR_DATA shoot_Motor_Data_Up ={0};
 
 PID_GENERAL   PID_Shoot_Down_Position=PID_SHOOT_POSITION_DEFAULT;
 PID_GENERAL   PID_Shoot_Down_Speed=PID_SHOOT_SPEED_DEFAULT;
 
-PID_GENERAL   PID_Shoot_Up_Position=PID_SHOOT_POSITION_DEFAULT;
-PID_GENERAL   PID_Shoot_Up_Speed=PID_SHOOT_SPEED_DEFAULT;
+//PID_GENERAL   PID_Shoot_Up_Position=PID_SHOOT_POSITION_DEFAULT;
+//PID_GENERAL   PID_Shoot_Up_Speed=PID_SHOOT_SPEED_DEFAULT;
 
 extern RC_Ctl_t RC_Ctl;
 
@@ -53,7 +54,7 @@ LASER_SWITCH=1;
 	Friction_Send=FRICTION_INIT-(FRICTION_INIT-FRICTION_SHOOT)*Friction_State;	//1888对应射速20,1800-14	1830-14.7	1840-15.1（5.14）	1850最高16，最低15		//经过观察，可能和电压有关系，满电时1860为17.7，空电为15.7
 
 	shoot_Motor_Data_Down.output=PID_General(shoot_Motor_Data_Down.tarV,shoot_Motor_Data_Down.fdbV,&PID_Shoot_Down_Speed);//down
-	shoot_Motor_Data_Up.output=PID_General(shoot_Motor_Data_Up.tarV,shoot_Motor_Data_Up.fdbV,&PID_Shoot_Up_Speed);//Up
+
 	SetFrictionWheelSpeed(Friction_Send);	//摩擦轮数值发送
 
 }
@@ -109,7 +110,7 @@ void Shoot_Instruction(void)	//发弹指令模块
 	shoot_Data_Down.motor_tarP=((float)shoot_Data_Down.count*SINGLE_INCREMENT);	//新2006
 //	shoot_Data_Up.motor_tarP=((float)shoot_Data_Up.count*SINGLE_INCREMENT);	//新2006
 	
-	shoot_Motor_Data_Up.tarV=-3500;
+
 	
 	Prevent_Jam_Down(&shoot_Data_Down,&shoot_Motor_Data_Down);
 //	Prevent_Jam_Up(&shoot_Data_Up,&shoot_Motor_Data_Up);
@@ -123,11 +124,11 @@ void RC_Control_Shoot(u8* fri_state)
 	static u8 swicth_Last_state=0;	//右拨杆
 	if(Shoot_RC_Control_State==1)
 	{
-//		if(Shoot_Heat_Limit(RobotHeatDataSimu42.heat,RobotHeatDataSimu42.maxheat)==1&&Shoot_Heat_Lost_Fre_Limit()==1&&*fri_state==1)	//热量限制
-//		{
+		if(Shoot_Heat_Limit()==1&&*fri_state==1)	//热量限制
+		{
 			if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
-				shoot_Data_Down.count-=2;
+				shoot_Data_Down.count-=1;
 				shoot_Data_Down.last_time=time_1ms_count;
 			}
 			
@@ -137,7 +138,7 @@ void RC_Control_Shoot(u8* fri_state)
 				shoot_Data_Down.last_time=time_1ms_count;
 			}
 
-//		}
+		}
 		
 		if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_UP)
 		{
@@ -181,38 +182,6 @@ void Shoot_Frequency_Set()
 {
 	
 }
-
-
-
-/*********************************
-Shoot_Frequency_Limit	//老版的V^2已弃用
-用于自动打击
-*********************************/
-#define UPPER_LIMIT_OF_HEAT 4500	//热量上限
-#define COOLING_PER_SECOND 1500	//每秒冷却
-void Shoot_Frequency_Limit(int* ferquency,u16 rate,u16 heat)	//m/s为单位
-{
-	u16 heating=rate*rate;
-	s16 ferquency_safe=(s16)(COOLING_PER_SECOND/heating);
-	if(*ferquency!=0)
-	{
-		if(heat<5*heating&&heat>=2*heating)	//4倍余量时开始缓冲，以防超出
-		{
-			*ferquency=(u16)ferquency_safe+1;
-		}
-		else if(heat<=heating)	//单发余量触发保护
-		{
-			*ferquency=0;
-		}
-		else if(heat>=heating&&heat<2*heating)
-		{
-			*ferquency=(u16)((ferquency_safe-1)>0?(ferquency_safe-1):0);
-		}
-	}
-
-}
-
-
 
 
 s32 jam_DownfdbP_record;	//这里必须是s32不然在开始时卡单会死循环
