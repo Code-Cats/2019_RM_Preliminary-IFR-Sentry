@@ -1,7 +1,8 @@
 #include "auto_move.h"
 #include "math.h"
 
-#define CHASSIS_POS_KP 200
+#define CHASSIS_POS_KP 2
+#define CHASSIS_MIN_SPEED 40
 
 extern s16 ViceBoard_Position;	//0-2690	//正方向与速度一致
 
@@ -19,13 +20,13 @@ void Auto_Move_Task(s16 tar_pos,s16 speed_max)
 	else if(tar_pos>ViceBoard_Position)
 	{
 		Chassis_Vx=(tar_pos-ViceBoard_Position)*CHASSIS_POS_KP;
-		Chassis_Vx=Chassis_Vx<50?50:Chassis_Vx;
+		Chassis_Vx=Chassis_Vx<CHASSIS_MIN_SPEED?CHASSIS_MIN_SPEED:Chassis_Vx;
 		Chassis_Vx=Chassis_Vx>speed_max?speed_max:Chassis_Vx;
 	}
 	else if(tar_pos<ViceBoard_Position)
 	{
 		Chassis_Vx=(tar_pos-ViceBoard_Position)*CHASSIS_POS_KP;
-		Chassis_Vx=Chassis_Vx>-50?-50:Chassis_Vx;
+		Chassis_Vx=Chassis_Vx>-CHASSIS_MIN_SPEED?-CHASSIS_MIN_SPEED:Chassis_Vx;
 		Chassis_Vx=Chassis_Vx<-speed_max?-speed_max:Chassis_Vx;
 	}
 	

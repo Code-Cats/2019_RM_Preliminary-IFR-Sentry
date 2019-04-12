@@ -330,12 +330,12 @@ int main(void)
 
 	BSP_Init();
 	
-	for(int i=0;i<40;i++)	//86
+	for(int i=0;i<22;i++)	//40//86
 	{
 		if(led_num<8)
 		led_num+=3;
 		
-		buzzer_on(TIM12->ARR/50);
+		buzzer_on(TIM12->ARR/3);
 		Buzzer_SetFre(10-1,pre_calc(Star_Sky[i][0],Star_Sky[i][1]));
 		delay_ms(Star_Sky[i][2]/2);
 		buzzer_off();

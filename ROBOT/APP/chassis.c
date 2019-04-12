@@ -4,6 +4,7 @@
 #include "usart3_judge_analysis.h"
 
 #include "auto_move.h"
+#include "brain.h"
 
 CHASSIS_DATA chassis_Data={0};
 
@@ -128,7 +129,7 @@ void RC_Control_Chassis(void)
 	
 }
 
-
+extern AUTO_OperationStateTypeDef AutoOperationState;
 
 #define POWER_LIMIT_K 0.9f/120//0.8f/50.0f	//¼´ÄÜÁ¿²Û¿ÕÊ±0.2£¬50Ê±¿ªÊ¼ÏÞÖÆ
 #define POWER_LIMIT_B	0.1f//0.21f
@@ -169,7 +170,27 @@ float Limit_Power(float power,float powerbuffer)	//Ó¢ÐÛ120JÈÈÁ¿ÏÞÖÆ£¬Ö±½ÓÏÞÖÆ×ÜÊ
 	}
 	else
 	{
-		powerbuffer-=30;
+		switch(AutoOperationState)
+		{
+			case NO_ENEMY:
+			{
+				powerbuffer-=100;
+				break;
+			}
+			case FIND_INFANTRY:
+			{
+				powerbuffer-=30;
+				break;
+			}
+			case FINE_HERO:
+			{
+				powerbuffer-=30;
+				break;
+			}
+			default:powerbuffer-=30;
+				break;
+		}
+		//powerbuffer-=30;
 		//if(power>15)
 		//{
 			limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4

@@ -3,6 +3,8 @@
 
 #include "bsp.h"
 
+#define MAX
+
 void Auto_Operation(void);
 
 typedef enum
