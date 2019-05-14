@@ -3,7 +3,7 @@
 
 #include "bsp.h"
 
-#define MAX
+#define MAX_STROKE 2700
 
 void Auto_Operation(void);
 
@@ -21,5 +21,7 @@ typedef struct
 }LastEnemyPoint2fTypeDef;
 
 void Auto_Operation(void);
+
+extern u8 hurt_num;
 
 #endif

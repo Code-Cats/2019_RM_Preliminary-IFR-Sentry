@@ -4,6 +4,8 @@
 #include "friction_wheel.h"
 #include "yun.h"
 
+u8 hurt_num=0;
+u32 no_hurt_time=0;
 
 s16 bulletSpeedSet=0;
 /***************************
@@ -20,7 +22,7 @@ extern s16 ViceBoard_Position;	//0-2690	//正方向与速度一致
 u8 no_enemy_move_state=0;
 AUTO_OperationStateTypeDef AutoOperationState=NO_ENEMY;
 
-void Auto_Operation(void)
+void Auto_Operation(void)	//运行频率1000hz
 {
 	static u8 armor_sign_last=0;
 	Friction_Speed_Set(21);
@@ -42,14 +44,28 @@ void Auto_Operation(void)
 	
 	armor_sign_last=VisionData.armor_sign;
 	
+	
+	if(hurt_num!=0)
+	{
+		AutoOperationState=FIND_INFANTRY;
+		no_hurt_time++;
+	}
+	
+	if(no_hurt_time>2000)
+	{
+		no_hurt_time=0;
+		hurt_num=0;
+		AutoOperationState=NO_ENEMY;
+	}
+	
 	switch(AutoOperationState)
 	{
 		case NO_ENEMY:
 		{
 			if(no_enemy_move_state==1)
 			{
-				Auto_Move_Task(2690-40,400);
-				if(ViceBoard_Position>2690-60)
+				Auto_Move_Task(MAX_STROKE-40,360);
+				if(ViceBoard_Position>MAX_STROKE-60)
 				{
 					no_enemy_move_state=0;
 					
@@ -58,7 +74,7 @@ void Auto_Operation(void)
 			}
 			else
 			{
-				Auto_Move_Task(40,400);
+				Auto_Move_Task(40,360);
 				if(ViceBoard_Position<60)
 				{
 					no_enemy_move_state=1;
@@ -69,6 +85,25 @@ void Auto_Operation(void)
 		}
 		case FIND_INFANTRY:
 		{
+			if(no_enemy_move_state==1)
+			{
+				Auto_Move_Task(MAX_STROKE-40,460);
+				if(ViceBoard_Position>MAX_STROKE-60)
+				{
+					no_enemy_move_state=0;
+					
+				}
+				
+			}
+			else
+			{
+				Auto_Move_Task(40,460);
+				if(ViceBoard_Position<60)
+				{
+					no_enemy_move_state=1;
+					
+				}
+			}
 			break;
 		}
 		case FINE_HERO:

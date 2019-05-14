@@ -491,6 +491,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\APP\heat_limit.c</FilePath>
             </File>
+            <File>
+              <FileName>buzzer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\APP\buzzer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -585,6 +590,11 @@
               <FileName>uart7_vision.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ROBOT\BSP\uart7_vision.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio_ws2812.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\BSP\gpio_ws2812.c</FilePath>
             </File>
           </Files>
         </Group>

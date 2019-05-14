@@ -19,6 +19,8 @@
 void LED_Blink_Run(void);
 void LED_Blink_Set(u8 frequency_green,u8 frequency_red);	//2s内闪烁次数//LED闪烁运行函数10h处理频率
 
-
-
+void WS2812_Run(void);
+void WS2812_SetStart(void);	//调用周期100ms
+void WS2812_SetNormal(void);
+void WS2812_SetError(void);
 #endif

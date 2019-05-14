@@ -66,11 +66,13 @@ void ViceData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 			ReceiveData.valid_state=1;
 			ReceiveData.headOK_state=0;
 			ReceiveData.count=0;	//重置count
+			//////////////////////////////这里放数据解析函数-->解析为真实数据
+			SensorData_Deal(ReceiveData.databuffer);
+			DeviceFpsFeed(LOST_VICEBOARD);
 		}
 	}
 	
-	//////////////////////////////这里放数据解析函数-->解析为真实数据
-	SensorData_Deal(ReceiveData.databuffer);
+	
 }
 
 void SensorData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧

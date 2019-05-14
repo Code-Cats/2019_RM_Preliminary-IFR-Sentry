@@ -10,8 +10,8 @@
 //#define PWM5  TIM14->CCR1   //µ¯²Ö¸Ç¶æ»ú
 
 #define SetFrictionWheelSpeed(x) \
-        PWM3_3 = x;                \
-        PWM3_4 = x;
+        PWM5_1 = x;                \
+        PWM5_2 = x;
 				
 				
 #define PWM5_1 TIM5->CCR1

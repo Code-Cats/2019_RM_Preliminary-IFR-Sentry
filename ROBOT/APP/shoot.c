@@ -29,8 +29,9 @@ extern u8 Robot_Level;
 
 u8 Friction_State=0;	//初始化不开启
 //const u16 FRICTION_INIT=800;
-u16 FRICTION_SHOOT=1660;//1640白天;//1470;//1540;	//发弹的PWM	在检录处测的射速13米每秒
-u16 Friction_Send=FRICTION_INIT;
+u16 FRICTION_SHOOT=1300;//1640白天;//1470;//1540;	//发弹的PWM	在检录处测的射速13米每秒
+u16 Friction_Send=FRICTION_INIT;\
+u16 Fri_SendEnd=1000;
 void Shoot_Task(void)	//定时频率：1ms
 { 
 LASER_SWITCH=1; 
@@ -38,10 +39,12 @@ LASER_SWITCH=1;
 	if(Friction_State==1)
 	{
 		Friction_Speed_Set(21);
+		//SetFrictionWheelSpeed(FRICTION_SHOOT);
 	}
 	else
 	{
 		Friction_Speed_Set(0);
+		SetFrictionWheelSpeed(1000);
 	}
 	
 	Shoot_Instruction();
@@ -55,7 +58,16 @@ LASER_SWITCH=1;
 
 	shoot_Motor_Data_Down.output=PID_General(shoot_Motor_Data_Down.tarV,shoot_Motor_Data_Down.fdbV,&PID_Shoot_Down_Speed);//down
 
-	SetFrictionWheelSpeed(Friction_Send);	//摩擦轮数值发送
+	if(Fri_SendEnd-Friction_Send>=1)
+	{
+		Fri_SendEnd--;
+	}
+	else if(Fri_SendEnd-Friction_Send<=-1)
+	{
+		Fri_SendEnd++;
+	}
+	
+	SetFrictionWheelSpeed(Fri_SendEnd);	//摩擦轮数值发送
 
 }
 

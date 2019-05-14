@@ -174,7 +174,7 @@ float Limit_Power(float power,float powerbuffer)	//”¢–€120J»»¡øœﬁ÷∆£¨÷±Ω”œﬁ÷∆◊‹ 
 		{
 			case NO_ENEMY:
 			{
-				powerbuffer-=100;
+				powerbuffer-=140;
 				break;
 			}
 			case FIND_INFANTRY:

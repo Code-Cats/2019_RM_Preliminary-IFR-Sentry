@@ -5,6 +5,7 @@
 #include "friction_wheel.h"
 #include "brain.h"
 #include "heat_limit.h"
+#include "led_control.h"
 
 WorkState_e workState=PREPARE_STATE;
 
@@ -29,8 +30,14 @@ extern float ZGyroModuleAngle;
 extern RC_Ctl_t RC_Ctl;
 extern SHOOT_MOTOR_DATA shoot_Motor_Data_Down;
 
+
 void Control_Task()
 {
+	if(time_1ms_count%10==0)
+	{
+		WS2812_Run();
+	}
+	
 	//if(IMU_Read==1)
 	//{
 		MPU_get_Data();
@@ -168,7 +175,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 				if(1)	//selfcheck标志
 				{
 					SetWorkState(PREPARE_STATE);	//此步意味自检通过，一切硬件模块正常
-					//数据初始化↓
+				  	//数据初始化↓
 					yunMotorData.pitch_tarP=PITCH_INIT;	//	//陀螺仪正方向云台向下
 					yunMotorData.yaw_tarP=(ZGyroModuleAngle*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
 				}

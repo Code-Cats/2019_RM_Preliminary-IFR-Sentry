@@ -12,7 +12,8 @@
 #include "gpio_led.h"
 #include "gpio_key.h"
 #include "gpio_power.h"
-	
+#include "gpio_ws2812.h"
+
 	/********CAN********/
 #include "can1.h"
 #include "can2.h"

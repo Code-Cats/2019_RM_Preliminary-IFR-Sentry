@@ -19,10 +19,10 @@ void IMU_SPI5_Init(void)
 	GPIO_PinAFConfig(GPIOF, GPIO_PinSource8, GPIO_AF_SPI5);
 	GPIO_PinAFConfig(GPIOF, GPIO_PinSource9, GPIO_AF_SPI5);
 	
-	gpio.GPIO_Pin = GPIO_Pin_6;
+	gpio.GPIO_Pin = GPIO_Pin_6; 
 	gpio.GPIO_Mode = GPIO_Mode_OUT;
 	gpio.GPIO_OType = GPIO_OType_PP;
-	gpio.GPIO_PuPd = GPIO_PuPd_UP;
+	 gpio.GPIO_PuPd = GPIO_PuPd_UP;
 	gpio.GPIO_Speed = GPIO_Speed_100MHz;
 	
 	GPIO_Init(GPIOF, &gpio);
@@ -34,8 +34,8 @@ void IMU_SPI5_Init(void)
 	spi.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
 	spi.SPI_NSS = SPI_NSS_Soft;
 	spi.SPI_FirstBit = SPI_FirstBit_MSB;
-	spi.SPI_CPHA = SPI_CPHA_1Edge;
-	spi.SPI_CPOL = SPI_CPOL_Low;
+	spi.SPI_CPHA = SPI_CPHA_2Edge;
+	spi.SPI_CPOL = SPI_CPOL_High;
 	spi.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32;
 	spi.SPI_CRCPolynomial = 10;
 	

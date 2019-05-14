@@ -73,10 +73,10 @@ u8 sign_count=0;	//第三帧才开始动态识别
 #define VISION_TARY	570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
-	if(Error_Check.statu[LOST_VISION]==1)	VisionData.armor_type=0;	//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
+	if(Error_Check.statu[LOST_VISION]==1){	VisionData.armor_type=0;VisionData.armor_sign=0;	}//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
 //	t_target_v=t_yaw_angel_v+Gyro_Data
-	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_type==1)	//VisionData.armor_sign!=0
+	if((RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_sign==1)||(RC_Ctl.mouse.press_r==1&&VisionData.armor_sign==1))	//VisionData.armor_sign!=0
 	{
 		VisionData.vision_control_state=1;	//最终控制位
 	}
@@ -127,7 +127,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 //		{
 			if(VisionData.armor_dis<40)	//只预测4m以内
 			{
-				Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//预测 待调节
+				//Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//预测 待调节
 			}
 //		}
 		

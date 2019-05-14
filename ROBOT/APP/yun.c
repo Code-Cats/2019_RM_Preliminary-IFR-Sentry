@@ -37,7 +37,6 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 {
 //////	static WorkState_e State_Record=CHECK_STATE;
 
-
 	if(Yun_Control_RCorPC==PC_CONTROL)
 	{	//PC控制数据
 //				PC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);

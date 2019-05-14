@@ -16,7 +16,10 @@ void BSP_Init(void)
 	LED_Init();
 	Laser_Init();
 	Power_Ctrl_Init();	//电源管理
+		PWM_Config();
 	delay_ms(100);
+	//WS2812_Init();
+	//WS2812_TIM5_3_DMA_Init();
 	
 	power_ctrl_on(POWER1_CTRL_SWITCH);
 	power_ctrl_on(POWER2_CTRL_SWITCH);
@@ -27,22 +30,23 @@ void BSP_Init(void)
 	CAN1_Motors_Config();
 	CAN2_Motors_Config();
 	RM_ADI_IMU_Cali();
-	delay_ms(2000);
 	
 	/************PWM************/
 	Pwm_Buzzer_Init(10-1,pre_calc(0,0));
-	PWM_Config();
+
 	PWM_Heat_Init();	//陀螺仪加热电阻
+	delay_ms(2000);
 	
 	/************USART***********/
 	USART1_DMA_Config(100000);
 	
+#if (WIFI_DEBUG_ENABLE == 1)
 	USART2_wifidebug_Init(1000000);
 	USART2_DMA_Tx_Init();
-	
+#endif
 	USART3_Configuration(115200);
 	
-	USART6_ViceBoard_Init(256000);
+	USART6_ViceBoard_Init(115200);
 	
 	UART7_Vision_Init(576000);
 	

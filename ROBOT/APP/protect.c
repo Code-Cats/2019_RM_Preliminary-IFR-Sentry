@@ -75,18 +75,18 @@ void Check_Task(void)
 		{
 			test_error_Satrt=1;
 			t_error_record=LOST_IMU2;
-			SetWorkState(ERROR_STATE);
+			//SetWorkState(ERROR_STATE);
 		}
 //		
 		if(GetWorkState()!=AUTO_STATE)	//自动模式不检测
 		{
-			for(int i=LOST_CM1;i<=LOST_FM_LEFT;i++)	//电机比控更重要
+			for(int i=LOST_YAW;i<=LOST_FM_LEFT;i++)	//电机比控更重要
 			{
 				if(Error_Check.statu[i]==1)	//&&i!=LOST_BULLETROTATE1
 				{
 					test_error_Satrt=-1;
 					t_error_record=i;
-					SetWorkState(ERROR_STATE);
+					//SetWorkState(ERROR_STATE);
 				}
 					
 			}

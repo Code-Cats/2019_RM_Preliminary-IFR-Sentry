@@ -44,7 +44,7 @@ void PWM_Config(void)
 	
     tim.TIM_Prescaler = 84-1;
     tim.TIM_CounterMode = TIM_CounterMode_Up;
-    tim.TIM_Period = 20000;   //20ms
+    tim.TIM_Period = 10000;   //20ms
     tim.TIM_ClockDivision = TIM_CKD_DIV1;
  //   TIM_TimeBaseInit(TIM3,&tim);
 		
@@ -57,7 +57,7 @@ void PWM_Config(void)
 		    /* TIM5 */
 		tim.TIM_Prescaler = 84-1;
     tim.TIM_CounterMode = TIM_CounterMode_Up;
-    tim.TIM_Period = 20000;   //20ms
+    tim.TIM_Period = 10000;   //20ms
     tim.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM5,&tim);
 		
