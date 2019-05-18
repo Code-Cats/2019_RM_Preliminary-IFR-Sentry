@@ -31,20 +31,18 @@ u8 Friction_State=0;	//初始化不开启
 //const u16 FRICTION_INIT=800;
 u16 FRICTION_SHOOT=1300;//1640白天;//1470;//1540;	//发弹的PWM	在检录处测的射速13米每秒
 u16 Friction_Send=FRICTION_INIT;\
-u16 Fri_SendEnd=1000;
+
 void Shoot_Task(void)	//定时频率：1ms
-{ 
-LASER_SWITCH=1; 
+{
+	LASER_SWITCH=1; 
 	//LASER_SWITCH=Friction_State; 
 	if(Friction_State==1)
 	{
 		Friction_Speed_Set(21);
-		//SetFrictionWheelSpeed(FRICTION_SHOOT);
 	}
 	else
 	{
 		Friction_Speed_Set(0);
-		SetFrictionWheelSpeed(1000);
 	}
 	
 	Shoot_Instruction();
@@ -57,17 +55,6 @@ LASER_SWITCH=1;
 	Friction_Send=FRICTION_INIT-(FRICTION_INIT-FRICTION_SHOOT)*Friction_State;	//1888对应射速20,1800-14	1830-14.7	1840-15.1（5.14）	1850最高16，最低15		//经过观察，可能和电压有关系，满电时1860为17.7，空电为15.7
 
 	shoot_Motor_Data_Down.output=PID_General(shoot_Motor_Data_Down.tarV,shoot_Motor_Data_Down.fdbV,&PID_Shoot_Down_Speed);//down
-
-	if(Fri_SendEnd-Friction_Send>=1)
-	{
-		Fri_SendEnd--;
-	}
-	else if(Fri_SendEnd-Friction_Send<=-1)
-	{
-		Fri_SendEnd++;
-	}
-	
-	SetFrictionWheelSpeed(Fri_SendEnd);	//摩擦轮数值发送
 
 }
 
@@ -98,7 +85,7 @@ u16 shoot_time_measure(const s16 tarP,const s16 fbdP,const u8 last_mouse_press_l
 
 
 #define SINGLE_INCREMENT_OLD_2006 196.608f	//8192*96/4/1000	一圈的累加值8192*96除上一圈7个子弹除以编码器转换倍数=发射一颗子弹的位置增量
-#define SINGLE_INCREMENT_NEW_2006 29.1271f//65.536f		//8192*32/4/1000  8192*32/9/1000=29.1271f
+#define SINGLE_INCREMENT_NEW_2006 18.432f//65.536f		//8192*32/4/1000  8192*36/16/1000=18.432f
 #define SINGLE_INCREMENT SINGLE_INCREMENT_NEW_2006	//5.11少
 //输出为发弹量，单位颗
 //注：应当在本函数或者另一指令解析函数中设置逻辑：切换状态就重置发弹指令（以免突发情况使程序具有滞后性）
@@ -123,31 +110,46 @@ void Shoot_Instruction(void)	//发弹指令模块
 //	shoot_Data_Up.motor_tarP=((float)shoot_Data_Up.count*SINGLE_INCREMENT);	//新2006
 	
 
-	
-	Prevent_Jam_Down(&shoot_Data_Down,&shoot_Motor_Data_Down);
+	////////////////////////////Prevent_Jam_Down(&shoot_Data_Down,&shoot_Motor_Data_Down);
 //	Prevent_Jam_Up(&shoot_Data_Up,&shoot_Motor_Data_Up);
 	
 //	State_Record=GetWorkState();
 }
 
+
+u8 HeatLimitState=0;
 u8 Shoot_RC_Control_State=1;	//当进行按键操作后，进行RC屏蔽
 void RC_Control_Shoot(u8* fri_state)
 {
 	static u8 swicth_Last_state=0;	//右拨杆
 	if(Shoot_RC_Control_State==1)
 	{
-		if(Shoot_Heat_Limit()==1&&*fri_state==1)	//热量限制
+		HeatLimitState=Shoot_Heat_Limit();
+		if(HeatLimitState==1&&*fri_state==1)	//热量限制	Shoot_Heat_Limit()==1&&
 		{
 			if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
-				shoot_Data_Down.count-=1;
-				shoot_Data_Down.last_time=time_1ms_count;
+				AddBulletToShootingSystem();
+				//shoot_Data_Down.count+=1;
+				//shoot_Data_Down.count_float=shoot_Data_Down.count;
+				//shoot_Data_Down.last_time=time_1ms_count;
 			}
 			
-			if(time_1ms_count%40==0&&RC_Ctl.rc.switch_left==RC_SWITCH_UP&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
+			if(time_1ms_count%35==0&&RC_Ctl.rc.switch_left==RC_SWITCH_UP&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
-				shoot_Data_Down.count-=(s16)(abs(RC_Ctl.rc.ch1-1024))/300;//2;
-				shoot_Data_Down.last_time=time_1ms_count;
+//////				if(abs(RC_Ctl.rc.ch1-1024)>100)	//测试最高射频
+//////				{
+//////					shoot_Data_Down.count_float+=1;//2;
+//////				}
+				//shoot_Data_Down.count_float+=(abs(RC_Ctl.rc.ch1-1024))/400.0f;//2;
+				//shoot_Data_Down.count=(s16)shoot_Data_Down.count_float;
+				
+				if(abs(RC_Ctl.rc.ch1-1024)>100)	//测试最高射频
+				{
+					AddBulletToShootingSystem();
+				}
+				
+				//shoot_Data_Down.last_time=time_1ms_count;
 			}
 
 		}
@@ -162,7 +164,15 @@ void RC_Control_Shoot(u8* fri_state)
 
 extern s16 Auto_Shoot_Interval_Time;
 
-
+void AddBulletToShootingSystem(void)
+{
+	if(shoot_Data_Down.count-shoot_Data_Down.count_fdb<2)
+	{
+		shoot_Data_Down.count+=1;
+		shoot_Data_Down.count_float=shoot_Data_Down.count;
+		shoot_Data_Down.last_time=time_1ms_count;
+	}
+}
 
 #define G 9.80151f
 /**********************************
@@ -257,6 +267,7 @@ void Prevent_Jam_Down(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Dat
 					shoot_data->Jam.sign=0;	//Reset
 					jam_deal_state=0;	//
 					shoot_data->count=shoot_data->count_fdb;	//重置子弹数据，防止鸡蛋	//？是否需要+-1？
+					shoot_data->count_float=shoot_data->count;
 					shoot_data->Jam.count=0;	//重置卡弹检测数据，防止误检测
 					break;
 				}

@@ -11,7 +11,7 @@ typedef struct
 {
 	uint16_t bullet_num;	//发弹量	直接放在射速中断中自加
 //	float bullet_speed;	//当前射速
-	s16 heat;
+	float heat;
 	u16 maxheat;
 }RobotHeatDataSimuTypeDef;	//机器热量仿真-基于射速更新
 

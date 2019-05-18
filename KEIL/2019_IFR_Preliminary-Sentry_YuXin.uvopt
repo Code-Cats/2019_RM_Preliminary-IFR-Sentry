@@ -173,7 +173,7 @@
           <Type>0</Type>
           <LineNumber>18</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134256670</Address>
+          <Address>134252790</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -182,7 +182,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\ROBOT\ANALYSIS\uart7_vision_analysis.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\2019_IFR_Preliminary_Sentry_YuXin\../ROBOT/ANALYSIS/uart7_vision_analysis.c\18</Expression>
+          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -296,6 +296,36 @@
           <WinNumber>1</WinNumber>
           <ItemText>((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0C00))-&gt;CCR1</ItemText>
         </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Esp8266ConfigState</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>shoot_Motor_Data_Down,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>shoot_Data_Down,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>25</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>time_1ms_count</ItemText>
+        </Ww>
+        <Ww>
+          <count>26</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>PID_Shoot_Down_Position,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>27</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>PID_Shoot_Down_Speed,0x0A</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -361,40 +391,35 @@
         <Ww>
           <count>12</count>
           <WinNumber>2</WinNumber>
-          <ItemText>frictionWheel_Data.l_wheel_fdbV,0x0A</ItemText>
+          <ItemText>ViceBoard_Position,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>2</WinNumber>
-          <ItemText>ViceBoard_Position,0x0A</ItemText>
+          <ItemText>shoot_data_judge,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>2</WinNumber>
-          <ItemText>shoot_data_judge,0x0A</ItemText>
+          <ItemText>Chassis_Vx,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Chassis_Vx,0x0A</ItemText>
+          <ItemText>AutoOperationState</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>2</WinNumber>
-          <ItemText>AutoOperationState</ItemText>
+          <ItemText>pf0</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>2</WinNumber>
-          <ItemText>pf0</ItemText>
-        </Ww>
-        <Ww>
-          <count>18</count>
-          <WinNumber>2</WinNumber>
           <ItemText>pf1</ItemText>
         </Ww>
         <Ww>
-          <count>19</count>
+          <count>18</count>
           <WinNumber>2</WinNumber>
           <ItemText>hurt_num</ItemText>
         </Ww>

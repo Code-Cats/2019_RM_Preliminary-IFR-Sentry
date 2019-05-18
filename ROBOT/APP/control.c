@@ -35,14 +35,14 @@ void Control_Task()
 {
 	if(time_1ms_count%10==0)
 	{
-		WS2812_Run();
+		//WS2812_Run();
 	}
 	
 	//if(IMU_Read==1)
 	//{
 		MPU_get_Data();
 	//}
-	if(time_1ms_count%10==0)
+	if(time_1ms_count%5==0)
 	Heat_Simulating();
 	
 	Check_Task();
@@ -123,10 +123,12 @@ void Work_State_Change(void)
 		{
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP)	
 			{
+				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//重置云台目标位置
 				SetWorkState(NORMAL_STATE);
 			}
 			else if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)
 			{
+				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//重置云台目标位置
 				SetWorkState(AUTO_STATE);
 			}
 			
@@ -207,7 +209,6 @@ void Work_Execute(void)	//工作执行2018.7.1
 		{
 			Yun_Task();	//开启云台处理
 			Shoot_Task();
-			Friction_Task();
 			Remote_Task();
 			break;
 		}
@@ -234,7 +235,6 @@ void Work_Execute(void)	//工作执行2018.7.1
 			
 			Yun_Task();	//开启云台处理
 			Shoot_Task();
-			Friction_Task();
 			Remote_Task();
 			break;
 		}
@@ -261,7 +261,6 @@ void Motor_Send(void)
 		}
 		case CALI_STATE:	//标定模式
 		{
-//			SetFrictionWheelSpeed(FRICTION_INIT);
 			CAN1_Chassis_SendMsg(0,0,0,0);
 			CAN1_Yun_Shoot_SendMsg(0,0,0,0);	//yaw pitch
 			break;

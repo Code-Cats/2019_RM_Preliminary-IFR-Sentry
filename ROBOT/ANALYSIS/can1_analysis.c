@@ -8,9 +8,7 @@
 //LIFT_POSITION_ENCODER bulletrotate_position_encoder[2]={0};	//取弹旋转电机
 //extern BULLETROTATE_DATA BulletRotate_Data[2];
 
-
 extern FRICTIONWHEEL_DATA frictionWheel_Data;	//3510屁股摩擦轮
-
 
 extern YUN_MOTOR_DATA	yunMotorData;	//云台挂载在CAN1上，因为CAN2预留了6pin接口，云台不需要该接口，为不浪费，故接CAN1
 
@@ -57,7 +55,7 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 		{
 
 			//				 Shoot_Feedback_Deal(&shoot_Data_Up,&shoot_Motor_Data_Up,rx_message);	//临时用
-			Speed_Data_deal(&frictionWheel_Data.l_wheel_fdbV,rx_message);	//LOST_FM_RIGHT
+//			Speed_Data_deal(&frictionWheel_Data.l_wheel_fdbV,rx_message);	//LOST_FM_RIGHT
 			LostCountFeed(&Error_Check.count[LOST_FM_LEFT]);
 			DeviceFpsFeed(LOST_FM_LEFT);
 		break;
@@ -65,7 +63,7 @@ void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 		case 0x204:	//空
 		{
 
-			Speed_Data_deal(&frictionWheel_Data.r_wheel_fdbV,rx_message);
+//			Speed_Data_deal(&frictionWheel_Data.r_wheel_fdbV,rx_message);
 			//Shoot_Feedback_Deal(&shoot_Data_Down,&shoot_Motor_Data_Down,rx_message);	//临时用
 			//LostCountFeed(&Error_Check.count[LOST_SM_DOWN]);
 			LostCountFeed(&Error_Check.count[LOST_FM_RIGHT]);

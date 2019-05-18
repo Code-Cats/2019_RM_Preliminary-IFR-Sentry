@@ -16,7 +16,6 @@ void BSP_Init(void)
 	LED_Init();
 	Laser_Init();
 	Power_Ctrl_Init();	//电源管理
-		PWM_Config();
 	delay_ms(100);
 	//WS2812_Init();
 	//WS2812_TIM5_3_DMA_Init();
@@ -33,7 +32,8 @@ void BSP_Init(void)
 	
 	/************PWM************/
 	Pwm_Buzzer_Init(10-1,pre_calc(0,0));
-
+	PWM4_Config();
+	PWM5_Config();
 	PWM_Heat_Init();	//陀螺仪加热电阻
 	delay_ms(2000);
 	

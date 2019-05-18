@@ -7,7 +7,7 @@
 ////原参数：20 0 0 10890 12000 12000
 ////速度环：1 0.01 0 12000 8000 4900
 //位置反馈变小，位置环计算参数变大，输入限制变小，输出不表，速度环不变
-#define SHOOT_POSITION_PID_KP            100//80//120
+#define SHOOT_POSITION_PID_KP            180//160//100//80//120
 #define SHOOT_POSITION_PID_KI            0.01f
 #define SHOOT_POSITION_PID_KD            0.014f	//0
 #define SHOOT_POSITION_PID_MER					10000//max error
@@ -15,11 +15,11 @@
 #define SHOOT_POSITION_PID_MAXIN        60000
 #define SHOOT_POSITION_MAXOUT           12000	//12000
 
-#define SHOOT_SPEED_PID_KP           2	//0.32
+#define SHOOT_SPEED_PID_KP           3//2	//0.32
 #define SHOOT_SPEED_PID_KI           0.01f	//0.002
 #define SHOOT_SPEED_PID_KD           0.0f 
 #define SHOOT_SPEED_PID_MER					7000	//4000
-#define SHOOT_SPEED_PID_I_MAX 			3000.0f/SHOOT_SPEED_PID_KI//3000.0f/SHOOT_SPEED_PID_KI
+#define SHOOT_SPEED_PID_I_MAX 			1500.0f/SHOOT_SPEED_PID_KI//3000.0f/SHOOT_SPEED_PID_KI
 #define SHOOT_SPEED_PID_MAXIN       12000
 #define SHOOT_SPEED_MAXOUT      	  8000
 
@@ -66,6 +66,7 @@
 typedef struct
 {
 	s16 count;
+	float count_float;
 	s16 count_fdb;
 	u32 last_time;	//上一次射击时间，以此可以限制射频
 	u16 cycle;
@@ -93,7 +94,8 @@ typedef struct
 	0,\
 	0,\
 	0,\
-	0\
+	0,\
+	0,\
 }
 
 typedef struct
@@ -118,6 +120,8 @@ typedef struct
 }SHOOT_MOTOR_DATA;
 
 void RC_Control_Shoot(u8* fri_state);
+
+void AddBulletToShootingSystem(void);	//添加一个子弹
 
 void Shoot_Instruction(void);	//发弹指令模块
 void Shoot_Task(void); 

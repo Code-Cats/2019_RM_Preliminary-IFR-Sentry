@@ -38,7 +38,7 @@ void Auto_Operation(void)	//ÔËÐÐÆµÂÊ1000hz
 	}
 	else
 	{
-		yunMotorData.pitch_tarP=900;
+		yunMotorData.pitch_tarP=6800;
 		yunMotorData.yaw_tarP=ZGyroModuleAngle*10+450;
 	}
 	

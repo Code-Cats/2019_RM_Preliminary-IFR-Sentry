@@ -82,8 +82,8 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 
 	
 	
-	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,-imu.angleV.x,&PID_PITCH_SPEED);
-	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,-imu.angleV.z,&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
+	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,-imu.angleV.y,&PID_PITCH_SPEED);
+	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,imu.angleV.z,&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
 	
 //	State_Record=GetWorkState();
 }
@@ -100,8 +100,8 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP<-1800?yunMotorData.yaw_tarP+3600:yunMotorData.yaw_tarP;	//过零点
 			
 			yunMotorData.pitch_tarP+=((RC_Ctl.rc.ch3-1024)*25.0/660.0);	//35.0/660.0 图传延时过大 改小
-			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP<100?100:yunMotorData.pitch_tarP;
-			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP>1650?1650:yunMotorData.pitch_tarP;
+			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP<6000?6000:yunMotorData.pitch_tarP;
+			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP>PITCH_INIT?PITCH_INIT:yunMotorData.pitch_tarP;
 		}
 		
 		

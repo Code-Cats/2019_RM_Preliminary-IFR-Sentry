@@ -59,9 +59,11 @@
 ////	return limit_state;
 ////}
 
+extern ext_power_heat_data_t heat_data_judge;
 extern ext_shoot_data_t shoot_data_judge;
 extern u32 time_1ms_count;
 
+u16 robot_heat17_int=0;
 RobotHeatDataSimuTypeDef RobotHeatDataSimu17={0};	//高尔夫
 //哨兵没有等级
 	
@@ -71,7 +73,7 @@ void Heat_Simulating(void)	//热量仿真//运行频率10-100HZ
 	
 	if(RobotHeatDataSimu17.bullet_num!=bulletnum_last)	//我不认为10ms内能射出两发
 	{
-		RobotHeatDataSimu17.heat+=(s16)shoot_data_judge.bullet_speed;
+		RobotHeatDataSimu17.heat+=shoot_data_judge.bullet_speed;
 	}
 //	if(level>0&&level<4)
 //	{
@@ -79,7 +81,7 @@ void Heat_Simulating(void)	//热量仿真//运行频率10-100HZ
 //	}
 	
 	
-	if(time_1ms_count%100==0)	//结算频率10HZ
+	if(time_1ms_count%110==0)	//结算频率10HZ
 	{
 		if(RobotHeatDataSimu17.heat>2*RobotHeatDataSimu17.maxheat)
 		{
@@ -90,6 +92,12 @@ void Heat_Simulating(void)	//热量仿真//运行频率10-100HZ
 		
 		RobotHeatDataSimu17.heat=RobotHeatDataSimu17.heat<0?0:RobotHeatDataSimu17.heat;
 		
+		if(heat_data_judge.shooter_heat17-RobotHeatDataSimu17.heat>=10)
+		{
+			RobotHeatDataSimu17.heat=heat_data_judge.shooter_heat17;
+		}
+		
+		robot_heat17_int=RobotHeatDataSimu17.heat;
 //		switch(level)
 //		{
 //			case 1:
@@ -164,18 +172,30 @@ u8 Shoot_Heat_Limit(void)
 {
 	if(Error_Check.statu[LOST_REFEREE]==0)	//裁判未丢失
 	{
-		s16 feq_low=(s16)(SENTRY_HEAT_COOLING/bulletSpeedSet)-1;	//-1为了保护
-		s16 feq_high=12;//(s16)(SENTRY_HEAT_MAX/bulletSpeedSet)
-		s16 feq_now=RobotHeatDataSimu17.heat*(feq_high-feq_low)/SENTRY_HEAT_MAX+feq_low;
-		if(RobotHeatDataSimu17.heat<6*bulletSpeedSet)
-		{
-			feq_now=0;
-		}
-		s16 tick_now=(s16)(1000/feq_now);
-		if(time_1ms_count-shoot_Data_Down.last_time>=tick_now)
+//		s16 feq_low=(s16)(SENTRY_HEAT_COOLING/bulletSpeedSet);	//-1为了保护////////////////////////////////////
+//		s16 feq_high=12;//(s16)(SENTRY_HEAT_MAX/bulletSpeedSet)
+//		s16 feq_now=RobotHeatDataSimu17.heat*(feq_high-feq_low)/SENTRY_HEAT_MAX+feq_low;
+//		if(RobotHeatDataSimu17.heat<6*bulletSpeedSet)
+//		{
+//			feq_now=0;
+//		}
+//		s16 tick_now=(s16)(1000/feq_now);
+//		if(time_1ms_count-shoot_Data_Down.last_time>=tick_now)
+//		{
+//			return 1;
+//		}
+		
+		/////////////////////////////////////////////////
+		if(SENTRY_HEAT_MAX-RobotHeatDataSimu17.heat>2*bulletSpeedSet)
 		{
 			return 1;
 		}
+		else
+		{
+			shoot_Data_Down.count=shoot_Data_Down.count_fdb;	//重置子弹数据，防止鸡蛋	//？是否需要+-1？
+			shoot_Data_Down.count_float=shoot_Data_Down.count;
+		}
+		
 	}
 	else	//裁判丢失
 	{

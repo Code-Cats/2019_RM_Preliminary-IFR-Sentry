@@ -26,7 +26,7 @@ extern ext_power_heat_data_t heat_data_judge;
 
 /*************************************************************/
 
-#define K_SPEED 10
+#define K_SPEED 15
 
 float t_Vx_k=0;
 u8 Chassis_Control_RCorPC=RC_CONTROL;
