@@ -135,7 +135,7 @@ void RC_Control_Shoot(u8* fri_state)
 				//shoot_Data_Down.last_time=time_1ms_count;
 			}
 			
-			if(time_1ms_count%35==0&&RC_Ctl.rc.switch_left==RC_SWITCH_UP&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
+			if(time_1ms_count%35==0&&RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
 //////				if(abs(RC_Ctl.rc.ch1-1024)>100)	//╡БйтвН╦ъиДф╣
 //////				{

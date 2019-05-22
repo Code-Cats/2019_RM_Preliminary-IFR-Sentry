@@ -123,12 +123,12 @@ void Work_State_Change(void)
 		{
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP)	
 			{
-				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//重置云台目标位置
+				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10);	//重置云台目标位置
 				SetWorkState(NORMAL_STATE);
 			}
 			else if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN)
 			{
-				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//重置云台目标位置
+				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10);	//重置云台目标位置
 				SetWorkState(AUTO_STATE);
 			}
 			
@@ -140,7 +140,7 @@ void Work_State_Change(void)
 			time_count++;
 			if(Error_Check.statu[LOST_DBUS]==0&&abs(RC_Ctl.rc.ch0+RC_Ctl.rc.ch1+RC_Ctl.rc.ch2+RC_Ctl.rc.ch3-1024*4)<10)
 			{
-				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//重置云台目标位置
+				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10);	//重置云台目标位置
 				SetWorkState(NORMAL_STATE);
 				time_count=0;
 			}
@@ -179,7 +179,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 					SetWorkState(PREPARE_STATE);	//此步意味自检通过，一切硬件模块正常
 				  	//数据初始化↓
 					yunMotorData.pitch_tarP=PITCH_INIT;	//	//陀螺仪正方向云台向下
-					yunMotorData.yaw_tarP=(ZGyroModuleAngle*10+(YAW_INIT-yunMotorData.yaw_fdbP)*3600/8192);	//反馈放大10倍并将目标位置置为中点
+					yunMotorData.yaw_tarP=(ZGyroModuleAngle*10);	//反馈放大10倍并将目标位置置为中点
 				}
 			}
 			break;

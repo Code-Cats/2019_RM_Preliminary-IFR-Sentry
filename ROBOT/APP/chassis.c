@@ -31,7 +31,6 @@ extern ext_power_heat_data_t heat_data_judge;
 float t_Vx_k=0;
 u8 Chassis_Control_RCorPC=RC_CONTROL;
 
-
 void Remote_Task(void)
 {
 	Chassis_Control_External_Solution();
@@ -52,7 +51,6 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 			PID_Chassis_Speed[i].i_sum_max=CHASSIS_SPEED_I_MAX;
 		}
 	}
-
 	
 	if(GetWorkState()==NORMAL_STATE)
 	{
@@ -65,7 +63,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 //	}
 				
 	chassis_Data.lf_wheel_tarV=(Chassis_Vx)*K_SPEED;
-	chassis_Data.rf_wheel_tarV=(-Chassis_Vx)*K_SPEED;
+	chassis_Data.rf_wheel_tarV=(Chassis_Vx)*K_SPEED;	///////////////////////////////////同侧轮异侧轮
 
 	
 	chassis_Data.lf_wheel_output=PID_General(chassis_Data.lf_wheel_tarV,chassis_Data.lf_wheel_fdbV,&PID_Chassis_Speed[LF]);

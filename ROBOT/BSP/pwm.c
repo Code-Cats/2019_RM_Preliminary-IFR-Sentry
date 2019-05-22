@@ -100,7 +100,7 @@ void PWM4_Config(void)
 	/* TIM4 */
 	tim.TIM_Prescaler = 84-1;
     tim.TIM_CounterMode = TIM_CounterMode_Up;
-    tim.TIM_Period = 10000;   //10ms
+    tim.TIM_Period = 8300;   //7ms
     tim.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM4,&tim);
 		

@@ -29,11 +29,11 @@ void aim_Pos_Recoed()
 float Pixel_to_angle(s16 pix_error)	//将像素误差转换成角度
 {
 	float angel_error=0;
-//////angel_error=atan(pix_error/1900.0f)*57.3f;	//arm_atan_f32为DSP	//1855。2是去年的  视觉标定的是1750
-//////	t_yaw_error=angel_error;
+angel_error=atan(pix_error/1460.0f)*57.3f;	//arm_atan_f32为DSP	//1855。2是去年的  视觉标定的是1750
+	t_yaw_error=angel_error;
 	
 	//30.79
-	angel_error=pix_error/30.79f;
+	//angel_error=pix_error/30.79f;
 	
 	return angel_error;
 }
@@ -56,11 +56,11 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 }
 
 
-//#define PITCH_INIT         1330	//2019.4.6
-#define YUN_DOWN_VALUELIMIT 100	//向下限位
-#define YUN_UP_VALUELIMIT 1650	//向上限位
-#define YUN_UP_DISLIMIT 320	//正常的活动范围，UP为正
-#define YUN_DOWN_DISLIMIT 1230	//正常的活动范围，DOWN为负
+//#define PITCH_INIT         7197	//2019.5.22
+#define YUN_DOWN_VALUELIMIT 6500	//向下限位
+#define YUN_UP_VALUELIMIT 7350	//向上限位
+#define YUN_UP_DISLIMIT 100	//正常的活动范围，UP为正
+#define YUN_DOWN_DISLIMIT 1500	//正常的活动范围，DOWN为负
 
 float yaw_residual_error=0;	//打移动靶时云台跟随静差
 /////////////////
@@ -69,8 +69,8 @@ float t_yaw_angel_v=0;
 float t_target_v=0;
 ////////////////
 u8 sign_count=0;	//第三帧才开始动态识别
-#define VISION_TARX 710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
-#define VISION_TARY	570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
+#define VISION_TARX 990//1035//710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
+#define VISION_TARY	580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
 	if(Error_Check.statu[LOST_VISION]==1){	VisionData.armor_type=0;VisionData.armor_sign=0;	}//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
@@ -119,9 +119,10 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		
 //		t_yaw_error=(float)Gyro_Data.angle[2]*10-Pixel_to_angle((s16)(VisionData.error_x-VISION_TARX))*10;
 //		t_pitch_error=(float)yunMotorData.pitch_fdbP+Pixel_to_angle((s16)(VisionData.error_y-VISION_TARY))*8192/360;
-		*yaw_tarP=(float)ZGyroModuleAngle*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10;
+		float offset_x_angle=atan(9.0f/VisionData.armor_dis)*573;
+		*yaw_tarP=(float)ZGyroModuleAngle*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
-/////////////////////		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis/10.0f));	//重力补偿
+		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis_filter/100.0f));	//重力补偿
 		
 //		if(GetWorkState()!=WAIST_STATE)
 //		{
@@ -131,7 +132,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 			}
 //		}
 		
-		t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
+		//t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
 		
 		*pitch_tarP=*pitch_tarP>(PITCH_INIT+YUN_UP_DISLIMIT)?(PITCH_INIT+YUN_UP_DISLIMIT):*pitch_tarP;	//限制行程
 		*pitch_tarP=*pitch_tarP<(PITCH_INIT-YUN_DOWN_DISLIMIT)?(PITCH_INIT-YUN_DOWN_DISLIMIT):*pitch_tarP;	//限制行程
@@ -141,14 +142,14 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	
 }
 
-#define SHOOT_V	15.5f	//14M/s
+#define SHOOT_V	21.5f//15.5f	//14M/s
 #define SHOOT_V_2 (SHOOT_V*SHOOT_V)
 #define G	9.8f	//重力加速度
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//重力补偿坐标系中，向下为正
 {
-	if(dis_m>4.6f)	dis_m=4.6f;
+	if(dis_m>8)	dis_m=8;
 	
-	dis_m+=0.15f;	//临时加的，因为经常打到装甲下方
+	//dis_m+=0.15f;	//临时加的，因为经常打到装甲下方
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//弧度制简化计算2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;

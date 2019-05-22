@@ -2,6 +2,9 @@
 #include "usart1_remote_analysis.h"
 #include "auto_aim.h"
 
+void pitch_Feedforward_to_distinguish(void);
+float Pitch_Offset2019(float tarp);
+
 s32 YAW_INIT=YAW_INIT_DEFINE;
 
 
@@ -52,6 +55,8 @@ void Yun_Control_External_Solution(void)	//Õ‚÷√∑¥¿°∑Ω∞∏
 	if(time_1ms_count%30==0)
 	Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);	//øÿ÷∆º¸ŒªºØ≥…‘Ÿƒ⁄≤ø
 	
+	//«∞¿°±Ê± –Ë“™±Ê ∂ ±‘Ÿ”√
+	//pitch_Feedforward_to_distinguish();
 	
 	if(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP>8192/2)	//π˝¡„µ„
 	{
@@ -85,6 +90,7 @@ void Yun_Control_External_Solution(void)	//Õ‚÷√∑¥¿°∑Ω∞∏
 	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,-imu.angleV.y,&PID_PITCH_SPEED);
 	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,imu.angleV.z,&PID_YAW_SPEED);	//≤…”√Õ‚ΩÁÕ”¬›“«◊ˆ∑¥¿°
 	
+	yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP);
 //	State_Record=GetWorkState();
 }
 
@@ -100,8 +106,8 @@ void RC_Control_Yun(float * yaw_tarp,float * pitch_tarp)	//1000Hz
 			yunMotorData.yaw_tarP=yunMotorData.yaw_tarP<-1800?yunMotorData.yaw_tarP+3600:yunMotorData.yaw_tarP;	//π˝¡„µ„
 			
 			yunMotorData.pitch_tarP+=((RC_Ctl.rc.ch3-1024)*25.0/660.0);	//35.0/660.0 Õº¥´—” ±π˝¥Û ∏ƒ–°
-			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP<6000?6000:yunMotorData.pitch_tarP;
-			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP>PITCH_INIT?PITCH_INIT:yunMotorData.pitch_tarP;
+			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP<PITCH_DOWNLIMIT?PITCH_DOWNLIMIT:yunMotorData.pitch_tarP;
+			yunMotorData.pitch_tarP=yunMotorData.pitch_tarP>PITCH_UPLIMIT?PITCH_UPLIMIT:yunMotorData.pitch_tarP;
 		}
 		
 		
@@ -249,5 +255,76 @@ s16 Pitch_output_offset(s32 pitch_tarP)	//øÀ∑˛‘∆Ã®pitch÷·∑«œﬂ–‘¡¶º∞∑«∂‘≥∆–‘µƒ≤π≥
 }
 
 
+////œ¬5810-…œ7250	//40µ›Ω¯
+//«∞¿°±Ê ∂
+#define AVRNUMS 600
+u8 Feedforward_startflag=0;
+u8 Feedforward_state=0;
+const u16 tapi=5800;
+u16 record_i=0;
+float fdbpi[40]={0};
+float outputi[40]={0};
+void pitch_Feedforward_to_distinguish(void)
+{
+	static u32 timecount=0;
+	if(Feedforward_startflag==1)
+	{
+		
+		switch(Feedforward_state)
+		{
+			case 0:
+			{
+				yunMotorData.pitch_tarP=tapi+record_i*40;
+				if(yunMotorData.pitch_fdbV==0)
+				{
+					timecount++;
+				}
+				else
+				{
+					timecount=0;
+				}
+				if(timecount>=300)
+				{
+					timecount=0;
+					Feedforward_state=1;
+				}
+				break;
+			}
+			case 1:
+			{
+				fdbpi[record_i]+=yunMotorData.pitch_fdbP;
+				outputi[record_i]+=yunMotorData.pitch_output;
+				timecount++;
+				if(timecount>=AVRNUMS)
+				{
+					timecount=0;
+					Feedforward_state=2;
+					fdbpi[record_i]/=AVRNUMS;
+					outputi[record_i]/=AVRNUMS;
+				}
+				break;
+			}
+			case 2:
+			{
+				if(record_i<35)
+				{
+					record_i++;
+					Feedforward_state=0;
+				}
+				else
+				{
+					Feedforward_startflag=0;
+					record_i=0;
+					return;
+				}
+				break;
+			}
+			
+		}
+	}
+}
 
-
+float Pitch_Offset2019(float tarp)
+{
+	return 7.473f*tarp-48330;
+}

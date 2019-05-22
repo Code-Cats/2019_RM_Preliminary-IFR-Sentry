@@ -38,8 +38,8 @@ void Auto_Operation(void)	//ÔËÐÐÆµÂÊ1000hz
 	}
 	else
 	{
-		yunMotorData.pitch_tarP=6800;
-		yunMotorData.yaw_tarP=ZGyroModuleAngle*10+450;
+		//yunMotorData.pitch_tarP=6800;
+		//yunMotorData.yaw_tarP=ZGyroModuleAngle*10+450;
 	}
 	
 	armor_sign_last=VisionData.armor_sign;
