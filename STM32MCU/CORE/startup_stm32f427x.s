@@ -1,15 +1,16 @@
 ;******************** (C) COPYRIGHT 2014 STMicroelectronics ********************
-;* File Name          : startup_stm32f427_437xx.s
+;* File Name          : startup_stm32f427x.s
 ;* Author             : MCD Application Team
 ;* @version           : V1.4.0
 ;* @date              : 04-August-2014
 ;* Description        : STM32F427xx/437xx devices vector table for MDK-ARM toolchain. 
+;*                      Same as startup_stm32f427_437xx.s and maintained for legacy purpose 
 ;*                      This module performs:
 ;*                      - Set the initial SP
 ;*                      - Set the initial PC == Reset_Handler
 ;*                      - Set the vector table entries with the exceptions ISR address
 ;*                      - Configure the system clock and the external SRAM/SDRAM mounted  
-;*                        on STM324x7I-EVAL board to be used as data memory  
+;*                        on STM324x9I-EVAL/STM324x7I-EVALs board to be used as data memory  
 ;*                        (optional, to be enabled by user)
 ;*                      - Branches to __main in the C library (which eventually
 ;*                        calls main()).
@@ -172,7 +173,7 @@ __Vectors       DCD     __initial_sp               ; Top of Stack
                 DCD     SPI5_IRQHandler                   ; SPI5
                 DCD     SPI6_IRQHandler                   ; SPI6
                 DCD     SAI1_IRQHandler                   ; SAI1
-                DCD     0                                 ; Reserved                               
+                DCD     0                                 ; Reserved 
                 DCD     0                                 ; Reserved 
                 DCD     DMA2D_IRQHandler                  ; DMA2D
                                          

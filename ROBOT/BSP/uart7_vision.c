@@ -20,14 +20,14 @@ void UART7_Vision_Init(uint32_t baud_rate)	//´ýÐÞ¸Ä
 	gpio.GPIO_Mode = GPIO_Mode_AF;
 	gpio.GPIO_OType = GPIO_OType_PP;
 	gpio.GPIO_Speed = GPIO_Speed_100MHz;
-	gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	gpio.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOE,&gpio);
 
 	gpio.GPIO_Pin = GPIO_Pin_8;
 	gpio.GPIO_Mode = GPIO_Mode_AF;
 	gpio.GPIO_OType = GPIO_OType_PP;
 	gpio.GPIO_Speed = GPIO_Speed_100MHz;
-	gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	gpio.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOE,&gpio);
 
 	USART_DeInit(UART7);
@@ -89,11 +89,13 @@ void UART7_IRQHandler(void)
 //		LostCountFeed(&Error_Check.count[LOST_VISION]);
 		UART7_Res=USART_ReceiveData(UART7);
 
+		(void)UART7->SR;
+		(void)UART7->DR;
+		
 		VisionData_Receive(UART7_Res);
 		vision_count++;
 		
-		(void)UART7->SR;
-		(void)UART7->DR;
+		
 	}
 
 }

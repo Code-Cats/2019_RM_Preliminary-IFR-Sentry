@@ -63,7 +63,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 //	}
 				
 	chassis_Data.lf_wheel_tarV=(Chassis_Vx)*K_SPEED;
-	chassis_Data.rf_wheel_tarV=(Chassis_Vx)*K_SPEED;	///////////////////////////////////同侧轮异侧轮
+	chassis_Data.rf_wheel_tarV=(-Chassis_Vx)*K_SPEED;	///////////////////////////////////同侧轮异侧轮
 
 	
 	chassis_Data.lf_wheel_output=PID_General(chassis_Data.lf_wheel_tarV,chassis_Data.lf_wheel_fdbV,&PID_Chassis_Speed[LF]);

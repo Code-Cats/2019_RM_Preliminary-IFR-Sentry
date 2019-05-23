@@ -8,10 +8,19 @@ extern YUN_MOTOR_DATA 			yunMotorData;
 VisionDataTypeDef	VisionData={0};
 VisionReceiveDataTypeDef VisionReceiveData={0};
 
+u8 tempdata[13]={0};
+u8 tempcount=0;
+
 #define DATA_LEN 12	//加上帧头帧尾总长度
 u32 t_vision_count=0;
 void VisionData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 {
+	tempcount++;
+	if(tempcount>=12)
+	{
+		tempcount=0;
+	}
+	tempdata[tempcount]=data;
 //	LostCountFeed(&Error_Check.count[LOST_VICEBOARD]);
 	if(data==0x5A&&VisionReceiveData.headOK_state==0)
 	{

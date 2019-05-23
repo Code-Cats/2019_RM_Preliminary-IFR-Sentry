@@ -25,6 +25,7 @@
 
 void PWM4_Config(void);
 void PWM5_Config(void);
+void PWM4_ZGX_Init(void);
 
 #endif
 

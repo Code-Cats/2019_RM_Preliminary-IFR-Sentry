@@ -33,6 +33,7 @@ void BSP_Init(void)
 	/************PWM************/
 	Pwm_Buzzer_Init(10-1,pre_calc(0,0));
 	PWM4_Config();
+	//PWM4_ZGX_Init();
 	PWM5_Config();
 	PWM_Heat_Init();	//ÍÓÂÝÒÇ¼ÓÈÈµç×è
 	delay_ms(2000);
@@ -48,8 +49,8 @@ void BSP_Init(void)
 	
 	USART6_ViceBoard_Init(115200);
 	
-	UART7_Vision_Init(576000);
-	
+	UART7_Vision_Init(115200);
+	delay_ms(10000);
 	/*******MPU********/
 	IMU_SPI5_Init();
 	MPU_Device_Init();	

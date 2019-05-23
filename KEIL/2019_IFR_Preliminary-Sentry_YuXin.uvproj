@@ -612,11 +612,6 @@
               <FilePath>..\STM32MCU\system_stm32f4xx.c</FilePath>
             </File>
             <File>
-              <FileName>startup_stm32f427_437xx.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\STM32MCU\CORE\startup_stm32f427_437xx.s</FilePath>
-            </File>
-            <File>
               <FileName>misc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\STM32MCU\FWLIB\src\misc.c</FilePath>
@@ -665,6 +660,11 @@
               <FileName>stm32f4xx_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\STM32MCU\FWLIB\src\stm32f4xx_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>startup_stm32f427x.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\STM32MCU\CORE\startup_stm32f427x.s</FilePath>
             </File>
           </Files>
         </Group>

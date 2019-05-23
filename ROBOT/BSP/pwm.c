@@ -34,9 +34,9 @@ void PWM5_Config(void)
 	GPIO_PinAFConfig(GPIOI,GPIO_PinSource0,GPIO_AF_TIM5);//定时器5 通道4
 
 	/* TIM5 */
-	tim.TIM_Prescaler = 84-1;
+	tim.TIM_Prescaler = 840-1;
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
-	tim.TIM_Period = 10000;   //20ms
+	tim.TIM_Period = 1000-1;   //10ms
 	tim.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInit(TIM5,&tim);
 
@@ -63,10 +63,10 @@ void PWM5_Config(void)
 
 	TIM_Cmd(TIM5,ENABLE);
 
-	PWM5_1=1000;
-	PWM5_2=1000;
-	PWM5_3=1000;
-	PWM5_4=1000;
+	PWM5_1=100;
+	PWM5_2=100;
+	PWM5_3=100;
+	PWM5_4=100;
 }
 
 
@@ -100,7 +100,7 @@ void PWM4_Config(void)
 	/* TIM4 */
 	tim.TIM_Prescaler = 84-1;
     tim.TIM_CounterMode = TIM_CounterMode_Up;
-    tim.TIM_Period = 8300;   //7ms
+    tim.TIM_Period = 7700-1;   //7ms  8333-120hz
     tim.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM4,&tim);
 		
@@ -123,7 +123,7 @@ void PWM4_Config(void)
 	TIM_OC3PreloadConfig(TIM4,TIM_OCPreload_Enable);
 	TIM_OC4PreloadConfig(TIM4,TIM_OCPreload_Enable);
            
-    TIM_ARRPreloadConfig(TIM4,ENABLE);
+    TIM_ARRPreloadConfig(TIM4,ENABLE);  
 		
 	TIM_Cmd(TIM4,ENABLE);
 		
@@ -131,4 +131,83 @@ void PWM4_Config(void)
 	PWM4_2=1000;
 	PWM4_3=1000;
 	PWM4_4=1000;
+}
+
+
+void PWM4_ZGX_Init(void)
+{
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;	
+	TIM_OCInitTypeDef  TIM_OCInitStructure;
+	
+		GPIO_InitTypeDef gpio;
+	
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOI, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOH, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	
+	gpio.GPIO_Pin = GPIO_Pin_0;           
+	gpio.GPIO_Mode = GPIO_Mode_AF;        
+	gpio.GPIO_Speed = GPIO_Speed_100MHz;	
+	gpio.GPIO_OType = GPIO_OType_PP;     
+	gpio.GPIO_PuPd = GPIO_PuPd_UP;   
+	
+	GPIO_Init(GPIOI,&gpio);
+	
+	gpio.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_11 | GPIO_Pin_10;
+	GPIO_Init(GPIOH,&gpio);
+	
+	gpio.GPIO_Pin = GPIO_Pin_12;
+	GPIO_Init(GPIOD,&gpio);												//PWMH
+		
+	GPIO_PinAFConfig(GPIOI, GPIO_PinSource0 , GPIO_AF_TIM5);			//PWMA
+	GPIO_PinAFConfig(GPIOH, GPIO_PinSource12, GPIO_AF_TIM5);			//PWMB
+	GPIO_PinAFConfig(GPIOH, GPIO_PinSource11, GPIO_AF_TIM5);			//PWMC
+	GPIO_PinAFConfig(GPIOH, GPIO_PinSource10, GPIO_AF_TIM5);			//PWMD
+	
+	GPIO_PinAFConfig(GPIOD, GPIO_PinSource12 , GPIO_AF_TIM4);			//PWMH
+	
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+	
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseStructure.TIM_Period = 20000 - 1;
+	TIM_TimeBaseStructure.TIM_Prescaler = 84 - 1;
+	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
+	
+	TIM_TimeBaseInit(TIM5,&TIM_TimeBaseStructure);
+	
+	TIM_TimeBaseStructure.TIM_Prescaler = 840 - 1;
+	TIM_TimeBaseStructure.TIM_Period = 1000 - 1;
+	TIM_TimeBaseInit(TIM4,&TIM_TimeBaseStructure);				//PWMH
+	
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCInitStructure.TIM_Pulse = 1000;
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+	
+	TIM_OC4Init(TIM5, &TIM_OCInitStructure);    				//PWMA
+	TIM_OC3Init(TIM5, &TIM_OCInitStructure);					//PWMB
+	TIM_OC2Init(TIM5, &TIM_OCInitStructure);					//PWMC
+	TIM_OC1Init(TIM5, &TIM_OCInitStructure);					//PWMD
+	
+	TIM_OC1PreloadConfig(TIM5, ENABLE);
+	TIM_OC2PreloadConfig(TIM5, ENABLE);
+	TIM_OC3PreloadConfig(TIM5, ENABLE);
+	TIM_OC4PreloadConfig(TIM5, ENABLE);
+	
+	TIM_ARRPreloadConfig(TIM5, ENABLE);
+	TIM_CtrlPWMOutputs(TIM5, ENABLE);
+	
+	TIM_Cmd(TIM5, ENABLE);
+	
+	TIM_OCInitStructure.TIM_Pulse = 500;						//PWMH
+	TIM_OC1Init(TIM4, &TIM_OCInitStructure);
+	
+	TIM_OC1PreloadConfig(TIM4, ENABLE);
+	
+	TIM_ARRPreloadConfig(TIM4, ENABLE);
+	TIM_CtrlPWMOutputs(TIM4, ENABLE);
+	
+	TIM_Cmd(TIM4, ENABLE);
 }

@@ -29,7 +29,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
- 
 
 /** @addtogroup Template_Project
   * @{
@@ -143,6 +142,7 @@ void SysTick_Handler(void)
 {
  
 }
+
 
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */

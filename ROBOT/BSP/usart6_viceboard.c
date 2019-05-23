@@ -142,11 +142,13 @@ void USART6_IRQHandler(void)
 	{
 		
 		USART6_Res=USART_ReceiveData(USART6);
+		(void)USART6->SR;
+		(void)USART6->DR;
+		
 		///////////////////////ViceData_Receive(USART6_Res);	//副板解析
 		ViceData_Receive(USART6_Res);	//视觉解析
 		//clear the idle pending flag 
-		(void)USART6->SR;
-		(void)USART6->DR;
+		
 	}
 
 }

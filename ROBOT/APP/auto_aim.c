@@ -142,7 +142,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	
 }
 
-#define SHOOT_V	21.5f//15.5f	//14M/s
+#define SHOOT_V	16.0f//15.5f	//14M/s
 #define SHOOT_V_2 (SHOOT_V*SHOOT_V)
 #define G	9.8f	//重力加速度
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//重力补偿坐标系中，向下为正
