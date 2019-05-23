@@ -79,22 +79,22 @@ extern s32 YAW_INIT;
 //#define PITCH_SPEED_PID_DEAD 1	//计算死区3
 
 
-#define YAW_SPEED_PID_P 82//70//160//45//44//45	//30  
+#define YAW_SPEED_PID_P 85//70//160//45//44//45	//30  
 #define YAW_SPEED_PID_I 0.42f//0.03	//0.02
 #define YAW_SPEED_PID_D 1//4
 #define YAW_SPEED_PID_MER 370	//最大偏差输入
 #define YAW_SPEED_PID_MAXINPUT 460	//最大期望输入
 #define YAW_SPEED_PID_MAXOUTPUT 30000	//最大输出
-#define YAW_SPEED_PID_I_MAX 2000//0//1200/YAW_SPEED_PID_I	//I累加限制
+#define YAW_SPEED_PID_I_MAX 2200//0//1200/YAW_SPEED_PID_I	//I累加限制
 #define YAW_SPEED_PID_DEAD 0	//计算死区
 
 #define YAW_POSITION_PID_P 1.45f//1//1//1.3f//1.4//1.2  
-#define YAW_POSITION_PID_I 0.042f
+#define YAW_POSITION_PID_I 0.045f
 #define YAW_POSITION_PID_D 1//6	//经过实验观察数据发现D过大引起tarV波动过大，但D对于减弱波形超调猜测有效用，采用非线性D	//原值6
 #define YAW_POSITION_PID_MER 420	//最大偏差输入
 #define YAW_POSITION_PID_MAXINPUT 5350	//最大期望输入
 #define YAW_POSITION_PID_MAXOUTPUT 450	//最大输出
-#define YAW_POSITION_PID_I_MAX 20//0//15/YAW_POSITION_PID_I	//I累加限制
+#define YAW_POSITION_PID_I_MAX 30//0//15/YAW_POSITION_PID_I	//I累加限制
 #define YAW_POSITION_PID_DEAD 0	//计算死区
 
 //PITCH电机位置环参数

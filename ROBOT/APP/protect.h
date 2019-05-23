@@ -40,7 +40,7 @@ extern Error_check_t Error_Check;
 	17,\
 	4,\
 	10,\
-	20,\
+	5,\
 	4,\
 	4,\
 	4,\

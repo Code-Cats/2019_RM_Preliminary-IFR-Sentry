@@ -62,6 +62,8 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 #define YUN_UP_DISLIMIT 100	//正常的活动范围，UP为正
 #define YUN_DOWN_DISLIMIT 1500	//正常的活动范围，DOWN为负
 
+
+s32 imu_angelv_z_10=0;
 float yaw_residual_error=0;	//打移动靶时云台跟随静差
 /////////////////
 s32 yaw_angvel_10=0;
@@ -70,9 +72,10 @@ float t_target_v=0;
 ////////////////
 u8 sign_count=0;	//第三帧才开始动态识别
 #define VISION_TARX 990//1035//710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
-#define VISION_TARY	580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
+#define VISION_TARY	570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
+	imu_angelv_z_10=(s32)(imu.angleV.z*10);
 	if(Error_Check.statu[LOST_VISION]==1){	VisionData.armor_type=0;VisionData.armor_sign=0;	}//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
 //	t_target_v=t_yaw_angel_v+Gyro_Data
@@ -142,7 +145,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	
 }
 
-#define SHOOT_V	16.0f//15.5f	//14M/s
+#define SHOOT_V	22.2f//15.5f	//14M/s
 #define SHOOT_V_2 (SHOOT_V*SHOOT_V)
 #define G	9.8f	//重力加速度
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//重力补偿坐标系中，向下为正

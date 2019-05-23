@@ -34,16 +34,16 @@ void PWM5_Config(void)
 	GPIO_PinAFConfig(GPIOI,GPIO_PinSource0,GPIO_AF_TIM5);//定时器5 通道4
 
 	/* TIM5 */
-	tim.TIM_Prescaler = 840-1;
+	tim.TIM_Prescaler = 84-1;
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
-	tim.TIM_Period = 1000-1;   //10ms
+	tim.TIM_Period = 10000-1;   //10ms
 	tim.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInit(TIM5,&tim);
 
 	oc.TIM_OCMode = TIM_OCMode_PWM2;
 	oc.TIM_OutputState = TIM_OutputState_Enable;
 	oc.TIM_OutputNState = TIM_OutputState_Disable;
-	oc.TIM_Pulse = 1000;
+	oc.TIM_Pulse = 2000;
 	oc.TIM_OCPolarity = TIM_OCPolarity_Low;
 	oc.TIM_OCNPolarity = TIM_OCPolarity_High;
 	oc.TIM_OCIdleState = TIM_OCIdleState_Reset;
@@ -63,10 +63,10 @@ void PWM5_Config(void)
 
 	TIM_Cmd(TIM5,ENABLE);
 
-	PWM5_1=100;
-	PWM5_2=100;
-	PWM5_3=100;
-	PWM5_4=100;
+	PWM5_1=1000;
+	PWM5_2=1000;
+	PWM5_3=1000;
+	PWM5_4=1000;
 }
 
 

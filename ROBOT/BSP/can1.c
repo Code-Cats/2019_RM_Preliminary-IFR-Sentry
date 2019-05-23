@@ -42,9 +42,9 @@ void CAN1_Motors_Config(void)
     CAN_InitStructure.CAN_TXFP = DISABLE;
     CAN_InitStructure.CAN_Mode = CAN_Mode_Normal;
     CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
-    CAN_InitStructure.CAN_BS1 = CAN_BS1_6tq;
-    CAN_InitStructure.CAN_BS2 = CAN_BS2_2tq;
-    CAN_InitStructure.CAN_Prescaler = 5;
+    CAN_InitStructure.CAN_BS1 = CAN_BS1_9tq;
+    CAN_InitStructure.CAN_BS2 = CAN_BS2_4tq;//CAN_BS2_2tq;
+    CAN_InitStructure.CAN_Prescaler = 3;//5;
     CAN_Init(CAN1, &CAN_InitStructure);
 
     CAN_FilterInitStructure.CAN_FilterNumber = 0;
