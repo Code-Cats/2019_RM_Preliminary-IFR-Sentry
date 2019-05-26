@@ -16,6 +16,9 @@ void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_v);	//目标速度融合
 
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m);	//重力补偿坐标系中，向下为正
 
+void Record_ImuYawAngle(float angle_z);	//记录yaw位置数据调用频率1ms
+float GetRecordYawAngle(u16 lastcount);	//获取过去的yaw目标值
+
 void Record_ImuYawAnglev(float anglev_z);	//记录数据调用频率1ms
 float GetRecordYawAnglev(u16 lastcount);
 

@@ -62,8 +62,8 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 //		Auto_Move_Task(0,0);
 //	}
 				
-	Chassis_Vx=Chassis_Vx>220?220:Chassis_Vx;
-	Chassis_Vx=Chassis_Vx<-220?-220:Chassis_Vx;
+	Chassis_Vx=Chassis_Vx>400?400:Chassis_Vx;
+	Chassis_Vx=Chassis_Vx<-400?-400:Chassis_Vx;
 	
 	chassis_Data.lf_wheel_tarV=(Chassis_Vx)*K_SPEED;
 	chassis_Data.rf_wheel_tarV=(-Chassis_Vx)*K_SPEED;	///////////////////////////////////同侧轮异侧轮
@@ -74,7 +74,8 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 
 		
 	{	//功率限制块
-		chassis_limit_k=Limit_Power(heat_data_judge.chassis_power,heat_data_judge.chassis_power_buffer);	//testPowerHeatData.chassisPowerBuffer
+		u32 outputsum=abs(chassis_Data.lf_wheel_output)+abs(chassis_Data.rf_wheel_output);
+		chassis_limit_k=Limit_Power(heat_data_judge.chassis_power,heat_data_judge.chassis_power_buffer,outputsum);	//testPowerHeatData.chassisPowerBuffer
 		float output_limit_lf=chassis_Data.lf_wheel_output*chassis_limit_k;
 		float output_limit_rf=chassis_Data.rf_wheel_output*chassis_limit_k;
 //		float output_limit_lb=chassis_Data.lb_wheel_output*limit_k;
@@ -130,75 +131,39 @@ void RC_Control_Chassis(void)
 	
 }
 
+extern ext_game_robot_state_t robot_state_judge;
 extern AUTO_OperationStateTypeDef AutoOperationState;
+u8 Tar_remain_powerbuffer=160;
 
-#define POWER_LIMIT_K 0.9f/120//0.8f/50.0f	//即能量槽空时0.2，50时开始限制
-#define POWER_LIMIT_B	0.1f//0.21f
+#define POWER_LIMIT_K 0.9f/120 //0.8f/50.0f	//即能量槽空时0.2，50时开始限制
+#define POWER_LIMIT_B	0.1f //0.21f
 u8 limit_power_statu=0;
 extern u8 SuperC_Output_Enable;	//电容是否能放电
 extern Error_check_t Error_Check;
 #define POWERLIMIT 20 	//20w功率限制
 #define POWERBUFFER 200	//200J功率缓冲
-float Limit_Power(float power,float powerbuffer)	//英雄120J热量限制，直接限制总输出
+float Limit_Power(float power,float powerbuffer,u32 outputsum)	//经调试 output=500正好=20w 限制400
 {
 	float limit_k=1;
-//	if(power>POWERLIMIT*0.6)
-//	{
-////		limit_k=3.0f*powerbuffer/200.0f+0.2f;	//0.4
-////		limit_k=limit_k>1?1:limit_k;
-////		limit_k=limit_k<0.1f?0.1f:limit_k;
-//	}
-//	limit_k=0.9;	//取消功率限制，屏蔽后取消
-////////////	if(SuperC_Output_Enable==0)//电容不能放电
-////////////	{
-////////////		limit_power_statu=1;
-////////////		limit_k=3.0f*powerbuffer/200.0f+0.08f;	//0.4
-////////////		limit_k=limit_k>1?1:limit_k;
-////////////		limit_k=limit_k<0.1f?0.1f:limit_k;
-////////////	}
-////////////	else	//电容可以放电，放宽限制
-////////////	{
-////////////		limit_power_statu=2;
-////////////		limit_k=3.0f*powerbuffer/125.0f+0.1f;//+0.16f;//+0.25f;	//30j开始限制
-////////////		limit_k=limit_k>1?1:limit_k;
-////////////		limit_k=limit_k<0.1f?0.1f:limit_k;
-////////////	}
 
-	if(Error_Check.statu[LOST_REFEREE]==1)	//裁判lost
+	if(outputsum>700||Tar_remain_powerbuffer<=50||powerbuffer<=50)//&&robot_state_judge.remain_HP>=300
 	{
-		limit_power_statu=3;
-		limit_k=0.6;
-	}
-	else
-	{
-		switch(AutoOperationState)
+		if(Error_Check.statu[LOST_REFEREE]==1)	//裁判lost
 		{
-			case NO_ENEMY:
-			{
-				powerbuffer-=140;
-				break;
-			}
-			case FIND_INFANTRY:
-			{
-				powerbuffer-=30;
-				break;
-			}
-			case FINE_HERO:
-			{
-				powerbuffer-=30;
-				break;
-			}
-			default:powerbuffer-=30;
-				break;
+			limit_power_statu=3;
+			limit_k=0.6;
 		}
-		//powerbuffer-=30;
-		//if(power>15)
-		//{
+		else
+		{
+			powerbuffer-=Tar_remain_powerbuffer;
+
 			limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4
 			limit_k=limit_k>1?1:limit_k;
 			limit_k=limit_k<0.05f?0.05f:limit_k;
-		//}
+		}
 	}
+
+
 	
 	return limit_k;
 }

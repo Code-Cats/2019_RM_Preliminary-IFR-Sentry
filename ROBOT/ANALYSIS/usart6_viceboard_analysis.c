@@ -2,6 +2,8 @@
 #include "protect.h"
 
 s16 ViceBoard_Position=0;
+u8 encoder_startsensor=0;
+u8 encoder_endsensor=0;
 //SensorDataTypeDef SensorData={0};
 ViceControlDataTypeDef ViceControlData={0};
 ViceBoardSendTypeDef SendData=VICEBOARD_SENDDATA_DEFAULT;
@@ -88,6 +90,8 @@ void SensorData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 	ViceBoard_Position=*(pData+1);
 	ViceBoard_Position=ViceBoard_Position<<8;
 	ViceBoard_Position+=*(pData+2);
+	encoder_startsensor=*(pData+3)&0x01;
+	encoder_endsensor=(*(pData+3)>>1)&0x01;
 //	ViceBoard_Position=(s16)(*(pData+1))<<8 | (s16)(*(pData+2));
 //	for(int i=0;i<4;i++)
 //	{

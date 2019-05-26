@@ -95,7 +95,7 @@ void Chassis_Control_External_Solution(void);	//外置反馈方案
 
 void RC_Control_Chassis(void);
 
-float Limit_Power(float power,float powerbuffer);	//英雄120W热量限制，直接限制总输出
+float Limit_Power(float power,float powerbuffer,u32 outputsum); //同时根据输出来限制
 
 #endif
 

@@ -187,6 +187,29 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬Ï
 	return gravity_ballistic_angle;
 }
 
+
+#define YAWANGLE_REDNUMS 50
+float YawAngleLast[YAWANGLE_REDNUMS];
+u16 YawAngleLastcount=0;
+void Record_ImuYawAngle(float angle_z)	//¼ÇÂ¼yawÎ»ÖÃÊý¾Ýµ÷ÓÃÆµÂÊ1ms
+{
+	YawAngleLast[YawAngleLastcount]=angle_z;
+	YawAngleLastcount++;
+	if(YawAngleLastcount>=YAWANGLE_REDNUMS)
+	{
+		YawAngleLastcount=0;
+	}
+}
+
+float GetRecordYawAngle(u16 lastcount)	//»ñÈ¡¹ýÈ¥µÄyawÄ¿±êÖµ
+{
+	lastcount=lastcount>(YAWANGLE_REDNUMS-1)?(YAWANGLE_REDNUMS-1):lastcount;
+	s16 lastindex=(s16)YawAngleLastcount-(s16)lastcount;
+	lastindex=lastindex<0?(lastindex+YAWANGLE_REDNUMS):lastindex;
+	return YawAngleLast[lastindex];
+}
+
+
 #define YAWANGLEV_REDNUMS 50
 float YawAnglevLast[YAWANGLEV_REDNUMS];
 u16 YawAnglevLastcount=0;
