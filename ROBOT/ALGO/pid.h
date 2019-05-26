@@ -5,20 +5,20 @@
 
 typedef __packed struct
 {
-		float   k_p;
-		float   k_i;
-		float   k_d;
-		float input_maxerror;
-    const int32_t input_min;
-    const int32_t input_max;
-    const int32_t output_min;
-    const int32_t output_max;
-		float i_sum_max;
-	  float Data_Save[2];
-    float inte;
-    float dire;
-    float output;	
-	  const int32_t tiny;
+	float   k_p;
+	float   k_i;
+	float   k_d;
+	float input_maxerror;
+	int32_t input_min;
+	int32_t input_max;
+	const int32_t output_min;
+	const int32_t output_max;
+	float i_sum_max;
+	float Data_Save[2];
+	float inte;
+	float dire;
+	float output;	
+	const int32_t tiny;
 	s16 t_error;
 	s16 t_dire;
 	s16 t_inte;

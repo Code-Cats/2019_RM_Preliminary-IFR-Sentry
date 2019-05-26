@@ -30,8 +30,9 @@
 #include "usart1_remote_analysis.h"
 #include "usart2_wifidebug.h"
 #include "usart3_judge.h"
-#include "usart6_viceboard.h"
+//#include "usart6_viceboard.h"
 #include "uart7_vision.h"
+#include "usart8_viceboard.h"
 	
 	/*******MPU********/
 #include "My_IIC.h"

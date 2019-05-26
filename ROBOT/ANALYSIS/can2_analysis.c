@@ -80,6 +80,8 @@ void CAN2_Feedback_Analysis(CanRxMsg *rx_message)
 					ZGyroModuleAngle=Z_Angle_Tem;
 				}
 				
+				ZGyroModuleAngle=-ZGyroModuleAngle;
+				
 				angel_10x=(int)(ZGyroModuleAngle*10);
 				LostCountFeed(&Error_Check.count[LOST_IMU2]);
 				DeviceFpsFeed(LOST_IMU2);

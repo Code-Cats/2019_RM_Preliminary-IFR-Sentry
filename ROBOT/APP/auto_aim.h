@@ -15,6 +15,10 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error);	//´Ó×îÔ­Ê¼µÄÊı¾İ½øĞĞ¼ÆËã¿ÉÒÔ¼
 void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_v);	//Ä¿±êËÙ¶ÈÈÚºÏ
 
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m);	//ÖØÁ¦²¹³¥×ø±êÏµÖĞ£¬ÏòÏÂÎªÕı
+
+void Record_ImuYawAnglev(float anglev_z);	//¼ÇÂ¼Êı¾İµ÷ÓÃÆµÂÊ1ms
+float GetRecordYawAnglev(u16 lastcount);
+
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v);
 
 float Target_Range_Deal(s16 dis_dm,float armor_width);	//ÒÔ·ÖÃ×Îªµ¥Î» Õı³£ÊÇ0.65f

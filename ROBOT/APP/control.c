@@ -286,6 +286,7 @@ void Motor_Send(void)
 		}
 		case AUTO_STATE:	//ֹͣ״̬
 		{
+			//CAN1_Chassis_SendMsg(0,0,0,0);
 			CAN1_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,frictionWheel_Data.l_wheel_output,frictionWheel_Data.r_wheel_output);
 			CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output,shoot_Motor_Data_Down.output,0);
 			break;

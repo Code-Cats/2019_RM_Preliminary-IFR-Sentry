@@ -62,6 +62,7 @@ void VisionData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 float test_pitch;
 u16 tem_dis,tem_tarx,tem_tary=0;
 s16 tem_speed=0;
+s16 last_speed=0;
 void VisionData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 {
 	VisionData.armor_sign=*(pData+1)>>(7)&0x01;
@@ -69,7 +70,7 @@ void VisionData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 	tem_dis=*(pData+2)<<8|*(pData+3);
 	tem_tarx=*(pData+4)<<8|*(pData+5);
 	tem_tary=*(pData+6)<<8|*(pData+7);
-	tem_speed=*(pData+8)<<8|*(pData+9);
+	VisionData.pix_x_v=*(pData+8)<<8|*(pData+9);
 	VisionData.dealingtime=*(pData+10);
 	
 	if(tem_dis<=1000)
@@ -85,10 +86,16 @@ void VisionData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 	{
 		VisionData.tar_y=tem_tary;
 	}
-	if(tem_speed<800)
+	if(VisionData.pix_x_v>1900)//&&abs(tem_speed-last_speed)<550
 	{
-		VisionData.pix_x_v=tem_speed;
+		VisionData.pix_x_v=1900;
 	}
+	else if(VisionData.pix_x_v<-1900)
+	{
+		VisionData.pix_x_v=-1900;
+	}
+	
+	last_speed=VisionData.pix_x_v;
 	
 	//if(RC_Ctl.rc.switch_right==RC_SWITCH_UP&&GetWorkState()==NORMAL_STATE )	//放在中断中运行
 	//{

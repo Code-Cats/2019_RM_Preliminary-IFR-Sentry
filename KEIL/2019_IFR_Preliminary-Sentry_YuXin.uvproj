@@ -596,6 +596,11 @@
               <FileType>1</FileType>
               <FilePath>..\ROBOT\BSP\gpio_ws2812.c</FilePath>
             </File>
+            <File>
+              <FileName>usart8_viceboard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ROBOT\BSP\usart8_viceboard.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

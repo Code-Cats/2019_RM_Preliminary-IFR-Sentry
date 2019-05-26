@@ -62,6 +62,9 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 //		Auto_Move_Task(0,0);
 //	}
 				
+	Chassis_Vx=Chassis_Vx>220?220:Chassis_Vx;
+	Chassis_Vx=Chassis_Vx<-220?-220:Chassis_Vx;
+	
 	chassis_Data.lf_wheel_tarV=(Chassis_Vx)*K_SPEED;
 	chassis_Data.rf_wheel_tarV=(-Chassis_Vx)*K_SPEED;	///////////////////////////////////同侧轮异侧轮
 

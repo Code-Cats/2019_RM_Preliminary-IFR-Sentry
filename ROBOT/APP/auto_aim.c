@@ -7,6 +7,11 @@
 
 //PITCH_GYRO_INIT 2720
 
+extern PID_GENERAL          PID_PITCH_POSITION;
+extern PID_GENERAL          PID_PITCH_SPEED;
+extern PID_GENERAL          PID_YAW_POSITION;
+extern PID_GENERAL          PID_YAW_SPEED;
+
 extern YUN_MOTOR_DATA 			yunMotorData;
 extern RC_Ctl_t RC_Ctl;
 extern VisionDataTypeDef	VisionData;
@@ -32,26 +37,28 @@ float Pixel_to_angle(s16 pix_error)	//½«ÏñËØÎó²î×ª»»³É½Ç¶È
 angel_error=atan(pix_error/1460.0f)*57.3f;	//arm_atan_f32ÎªDSP	//1855¡£2ÊÇÈ¥ÄêµÄ  ÊÓ¾õ±ê¶¨µÄÊÇ1750
 	t_yaw_error=angel_error;
 	
+	angel_error=angel_error>12?12:angel_error;
+	angel_error=angel_error<-12?-12:angel_error;
 	//30.79
 	//angel_error=pix_error/30.79f;
 	
 	return angel_error;
 }
 
-#define CAMERA_D	1855	//Ïà»ú¾µÆ¬µ½¸Ğ¹âÆ¬µÈĞ§ÏñËØÁ¿
+#define CAMERA_D	1460	//Ïà»ú¾µÆ¬µ½¸Ğ¹âÆ¬µÈĞ§ÏñËØÁ¿
 float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//´Ó×îÔ­Ê¼µÄÊı¾İ½øĞĞ¼ÆËã¿ÉÒÔ¼õÉÙµ¥Æ¬»ú¸¡µãÔËËãµÄ¾«¶È¶ªÊ§£¨Îó²îÔö¼Ó£©
 {
-	/***********************************
-//	int camera_d_2=CAMERA_D*CAMERA_D;	//¾àÀëÆ½·½
-//	int r_2=camera_d_2+pix_error*pix_error;	//µÈĞ§°ë¾¶Æ½·½
-//	float cos_angel_2=(float)camera_d_2/(float)r_2;
-	float angel_v=0;
-//	angel_v=pix_v*cos_angel_2/(float)CAMERA_D;
-//	angel_v=angel_v*57.3f;//*2*PI;	//½øĞĞ»¹Ô­´¦Àí
 	
-	angel_v=0.036081f*pix_v+0.1f;//+0.3026f;	//MATLABÄâºÏ
-	***************************************/
+	int camera_d_2=CAMERA_D*CAMERA_D;	//¾àÀëÆ½·½
+	int r_2=camera_d_2+pix_error*pix_error;	//µÈĞ§°ë¾¶Æ½·½
+	float cos_angel_2=(float)camera_d_2/(float)r_2;
 	float angel_v=0;
+	angel_v=pix_v*cos_angel_2/(float)CAMERA_D;
+	angel_v=angel_v*57.5f;//*2*PI;	//½øĞĞ»¹Ô­´¦Àí
+	
+	//angel_v=0.036081f*pix_v+0.1f;//+0.3026f;	//MATLABÄâºÏ
+	
+	//float angel_v=0;
 	return angel_v;
 }
 
@@ -62,17 +69,19 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//´Ó×îÔ­Ê¼µÄÊı¾İ½øĞĞ¼ÆËã¿ÉÒÔ¼õ
 #define YUN_UP_DISLIMIT 100	//Õı³£µÄ»î¶¯·¶Î§£¬UPÎªÕı
 #define YUN_DOWN_DISLIMIT 1500	//Õı³£µÄ»î¶¯·¶Î§£¬DOWNÎª¸º
 
+s32 imu_matchz_10=0;
+float pix_anglev=0;
+s32 pix_anglev_10=0;
+s32 anglev_mix_10;
+s32 anglev_mix_10_filter;
 
 s32 imu_angelv_z_10=0;
 float yaw_residual_error=0;	//´òÒÆ¶¯°ĞÊ±ÔÆÌ¨¸úËæ¾²²î
 /////////////////
-s32 yaw_angvel_10=0;
-float t_yaw_angel_v=0;
-float t_target_v=0;
 ////////////////
 u8 sign_count=0;	//µÚÈıÖ¡²Å¿ªÊ¼¶¯Ì¬Ê¶±ğ
 #define VISION_TARX 990//1035//710//640+105//1053//1035ÊÇĞŞÕı°²×°Æ«²î1020//580	//×óÉÏÔ­µã	640
-#define VISION_TARY	570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//×óÉÏÔ­µã	480	//´ò5Ã×ÄÚÄ¿±ê£ºÏòÉÏ²¹³¥518-360¸öÏñËØµã	//ÒòÎªÓĞ×èÁ¦ºã¶¨¾²Ì¬Îó²î£¬¹Ê²¹³¥
+#define VISION_TARY	580//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//×óÉÏÔ­µã	480	//´ò5Ã×ÄÚÄ¿±ê£ºÏòÉÏ²¹³¥518-360¸öÏñËØµã	//ÒòÎªÓĞ×èÁ¦ºã¶¨¾²Ì¬Îó²î£¬¹Ê²¹³¥
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 {
 	imu_angelv_z_10=(s32)(imu.angleV.z*10);
@@ -82,10 +91,18 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 	if((RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_sign==1)||(RC_Ctl.mouse.press_r==1&&VisionData.armor_sign==1))	//VisionData.armor_sign!=0
 	{
 		VisionData.vision_control_state=1;	//×îÖÕ¿ØÖÆÎ»
+//		PID_PITCH_SPEED.input_max=80;
+//		PID_PITCH_SPEED.input_min=-80;
+//		PID_YAW_SPEED.input_max=100;
+//		PID_YAW_SPEED.input_min=-100;
 	}
 	else
 	{
 		VisionData.vision_control_state=0;	//×îÖÕ¿ØÖÆÎ»
+//		PID_PITCH_SPEED.input_max=PITCH_SPEED_PID_MAXINPUT;
+//		PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
+//		PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
+//		PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
 	}
 	
 	if(VisionData.armor_sign==1)	//±£»¤ĞÔÊä³ö£¬Ç°¼¸Ö¡ËÙ¶ÈÖÃ0
@@ -98,12 +115,14 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		sign_count=0;
 	}
 	
-//	yaw_angvel_10=Gyro_Data.angvel[YAW]*10;
-	t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
+
+	VisionData.imu_vz_match= GetRecordYawAnglev(22);
+	imu_matchz_10=(s32)(VisionData.imu_vz_match*10);
+	pix_anglev=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
 	
 	if(sign_count>3)	//ÎÈ¶¨ºó
 	{
-		Tar_Relative_V_Mix(imu.angleV.z,t_yaw_angel_v);	//ËÙ¶ÈÈÚºÏ
+		Tar_Relative_V_Mix(VisionData.imu_vz_match,pix_anglev);	//ËÙ¶ÈÈÚºÏ
 	}
 	else
 	{
@@ -127,13 +146,14 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis_filter/100.0f));	//ÖØÁ¦²¹³¥
 		
-//		if(GetWorkState()!=WAIST_STATE)
-//		{
-			if(VisionData.armor_dis<40)	//Ö»Ô¤²â4mÒÔÄÚ
+		//
+		
+		
+			if(VisionData.armor_dis<600)	//Ö»Ô¤²â6mÒÔÄÚ
 			{
-				//Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/10.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ıµ÷½Ú
+				//Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ıµ÷½Ú
 			}
-//		}
+
 		
 		//t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
 		
@@ -152,7 +172,7 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖĞ£¬Ï
 {
 	if(dis_m>8)	dis_m=8;
 	
-	//dis_m+=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
+	//dis_m-=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//»¡¶ÈÖÆ¼ò»¯¼ÆËã2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;
@@ -167,63 +187,94 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖĞ£¬Ï
 	return gravity_ballistic_angle;
 }
 
+#define YAWANGLEV_REDNUMS 50
+float YawAnglevLast[YAWANGLEV_REDNUMS];
+u16 YawAnglevLastcount=0;
+void Record_ImuYawAnglev(float anglev_z)	//¼ÇÂ¼Êı¾İµ÷ÓÃÆµÂÊ1ms
+{
+	YawAnglevLast[YawAnglevLastcount]=anglev_z;
+	YawAnglevLastcount++;
+	if(YawAnglevLastcount>=YAWANGLEV_REDNUMS)
+	{
+		YawAnglevLastcount=0;
+	}
+}
+
+float GetRecordYawAnglev(u16 lastcount)
+{
+	lastcount=lastcount>(YAWANGLEV_REDNUMS-1)?(YAWANGLEV_REDNUMS-1):lastcount;
+	s16 lastindex=(s16)YawAnglevLastcount-(s16)lastcount;
+	lastindex=lastindex<0?(lastindex+YAWANGLEV_REDNUMS):lastindex;
+	return YawAnglevLast[lastindex];
+}
+
+
 s16 pix_x_v_filter_10=0;
 s16 tar_v_ronghe=0;
 s16 tar_v_ronghe_filter=0;
+float pix_x_v_filter=0;
 #define FILTER_FACTOR	3	//5½×ÂË²¨
-void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_v)
+void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_anglev)
 {
-	static float yaw_angvel_last[3];
-//	static s16 pix_x_v_last[FILTER_FACTOR-1]={0};	//4½×ÖĞÖµÂË²¨
-//	static u8 last_count=0;
-//	s16 pix_x_v_now_sort[FILTER_FACTOR];
-//	
-//	
-//	for(u8 i=0;i<FILTER_FACTOR-1;i++)	//copy last data
-//	{
-//		  pix_x_v_now_sort[i]=pix_x_v_last[i];
-//	}
-//	
-//	pix_x_v_now_sort[FILTER_FACTOR-1]=pix_x_v;	//copy current data
-//	
-//	for(u8 i=0;i<FILTER_FACTOR-1;i++)	//Ã°ÅİÅÅĞò	Ö»ÓÃÑ­»·FILTER_FACTOR-1  FILTER_FACTOR-2  FILTER_FACTOR-3 FILTER_FACTOR-4 ´Î
-//	{
-//		for(u8 j=0;j<FILTER_FACTOR-1-i;j++)
-//		{
-//			if(pix_x_v_now_sort[j]<pix_x_v_now_sort[j+1])
-//			{
-//				float tem_small=pix_x_v_now_sort[j];
-//				pix_x_v_now_sort[j]=pix_x_v_now_sort[j+1];
-//				pix_x_v_now_sort[j+1]=tem_small;
-//			}
-//		}
-//	}	//ÅÅĞòÍê³É
-//	
-//	if(FILTER_FACTOR%2==1)	//ÖĞÎ»Êı
-//	{
-//		pix_x_v_filter=pix_x_v_now_sort[(FILTER_FACTOR-1)/2];
-//	}
-//	else
-//	{
-//		pix_x_v_filter=(pix_x_v_now_sort[FILTER_FACTOR/2]+pix_x_v_now_sort[FILTER_FACTOR/2-1])/2;
-//	}
-	static float f_pix_x_v_filter=0;
-	
-	f_pix_x_v_filter=f_pix_x_v_filter*0.5f+pix_x_v*0.5f;	//6-4
-	
-	pix_x_v_filter_10=(s16)(f_pix_x_v_filter*10);
 	
 	if(yaw_angvel>45)	yaw_angvel=45;	//ÏŞ·ù
 	if(yaw_angvel<-45)	yaw_angvel=-45;
-	if(pix_x_v>45)	pix_x_v=45;
-	if(pix_x_v<-45)	pix_x_v=-45;
+	if(pix_x_anglev>45)	pix_x_anglev=45;
+	if(pix_x_anglev<-45)	pix_x_anglev=-45;
 	
-	yaw_angvel_10=10*yaw_angvel_last[2];	//ËÙ¶È²é¿´-jscope
-	VisionData.angel_x_v=10*yaw_angvel_last[2]+1.0f*pix_x_v_filter_10;	//½âËãµÃÄ¿±êÖµ
-tar_v_ronghe=(s16)VisionData.angel_x_v;////////////////////////////////////////////
+	
+				static s16 pix_x_v_last[FILTER_FACTOR-1]={0};	//4½×ÖĞÖµÂË²¨
+				static u8 last_count=0;
+				s16 pix_x_v_now_sort[FILTER_FACTOR];
+				
+				
+				for(u8 i=0;i<FILTER_FACTOR-1;i++)	//copy last data
+				{
+					  pix_x_v_now_sort[i]=pix_x_v_last[i];
+				}
+				
+				pix_x_v_now_sort[FILTER_FACTOR-1]=pix_x_anglev;	//copy current data
+				
+				for(u8 i=0;i<FILTER_FACTOR-1;i++)	//Ã°ÅİÅÅĞò	Ö»ÓÃÑ­»·FILTER_FACTOR-1  FILTER_FACTOR-2  FILTER_FACTOR-3 FILTER_FACTOR-4 ´Î
+				{
+					for(u8 j=0;j<FILTER_FACTOR-1-i;j++)
+					{
+						if(pix_x_v_now_sort[j]<pix_x_v_now_sort[j+1])
+						{
+							float tem_small=pix_x_v_now_sort[j];
+							pix_x_v_now_sort[j]=pix_x_v_now_sort[j+1];
+							pix_x_v_now_sort[j+1]=tem_small;
+						}
+					}
+				}	//ÅÅĞòÍê³É
+				
+				if(FILTER_FACTOR%2==1)	//ÖĞÎ»Êı
+				{
+					pix_x_v_filter=pix_x_v_now_sort[(FILTER_FACTOR-1)/2];
+				}
+				else
+				{
+					pix_x_v_filter=(pix_x_v_now_sort[FILTER_FACTOR/2]+pix_x_v_now_sort[FILTER_FACTOR/2-1])/2;
+				}//ÅÅĞòÍê³É
 
-	VisionData.angle_x_v_filter=VisionData.angle_x_v_filter*0.6f+VisionData.angel_x_v*0.4f;
-tar_v_ronghe_filter=(s16)VisionData.angle_x_v_filter;
+	
+	
+	static float f_pix_x_v_filter=0;
+	
+	f_pix_x_v_filter=f_pix_x_v_filter*0.5f+pix_x_v_filter*0.5f;	//6-4
+	
+	pix_x_v_filter_10=(s16)(f_pix_x_v_filter*10);
+	
+	
+
+
+		pix_anglev_10=(s32)(f_pix_x_v_filter*10);
+		VisionData.angel_x_v=f_pix_x_v_filter+yaw_angvel;
+		anglev_mix_10=VisionData.angel_x_v*10;
+		VisionData.angle_x_v_filter=VisionData.angle_x_v_filter*0.25f+VisionData.angel_x_v*0.75f;
+		anglev_mix_10_filter=VisionData.angle_x_v_filter*10;
+
+
 //	if(abs(VisionData.tar_x-VISION_TARX)<50)
 //	{
 //		VisionData.angle_x_v_filter=VisionData.angel_x_v*(VisionData.tar_x-VISION_TARX)/50.0f;
@@ -236,24 +287,18 @@ tar_v_ronghe_filter=(s16)VisionData.angle_x_v_filter;
 //	pix_x_v_last[last_count]=pix_x_v;	//ÖĞÎ»ÊıÂË²¨µü´ú
 //	last_count++;
 //	last_count=last_count>FILTER_FACTOR-2?0:last_count;
-
-
-	//·¢ÏÖÊÓ¾õĞÅºÅÑÓ³Ù20ms×óÓÒ£¬¹ÊÈÚºÏÓÃÉÏÒ»´Î
-	yaw_angvel_last[2]=yaw_angvel_last[1];
-	yaw_angvel_last[1]=yaw_angvel_last[0];	//ÉÏÉÏ
-	yaw_angvel_last[0]=yaw_angvel;	//ÉÏ
 }
 
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//¾­¹ı¼ÆËã£¬Ö»´ò35¶È/sÄÚµÄÎïÌå
 {
-	float pre_angle_limit=70;
+	float pre_angle_limit=80;
 //	static float tar_v_fliter=0;
 //	if(abs(tar_v)<2)	tar_v=0;
-	if(tar_v>400)	tar_v=400;	//350
-	if(tar_v<-400)	tar_v=-400;
+	if(tar_v>500)	tar_v=500;	//350
+	if(tar_v<-500)	tar_v=-500;
 //	tar_v_fliter=0.6f*tar_v_fliter+0.4f*tar_v;
 	
-	if(dis_m>3.2f)	//¾àÀë´óÓÚ3mÏŞÖÆÔ¤²â½Ç¶È
+	if(dis_m>5)	//¾àÀë´óÓÚ3mÏŞÖÆÔ¤²â½Ç¶È
 	{
 		pre_angle_limit=70-(dis_m-3.2f)*20;
 		pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
@@ -261,14 +306,14 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//¾­¹ı¼ÆËã£¬Ö»´ò35¶È/
 	}
 	else
 	{
-		pre_angle_limit=70;
+		pre_angle_limit=80;
 	}
 	
-	if (dis_m>3.2f)	//2.5
+	if (dis_m>4.5f)	//2.5
 	{
-		dis_m=3.2f;
+		dis_m=4.5f;
 	}
-	float shoot_delay=dis_m/SHOOT_V+0.06f;	//ÒÔÃëÎªµ¥Î»	//¼ÓÉÏ³öµ¯ÑÓÊ±0.08
+	float shoot_delay=dis_m/SHOOT_V+0.4f;	//ÒÔÃëÎªµ¥Î»	//¼ÓÉÏ³öµ¯ÑÓÊ±0.08
 	float pre_angle=tar_v*shoot_delay;
 	
 

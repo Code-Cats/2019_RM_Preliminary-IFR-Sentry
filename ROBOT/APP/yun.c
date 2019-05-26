@@ -4,6 +4,7 @@
 
 void pitch_Feedforward_to_distinguish(void);
 float Pitch_Offset2019(float tarp);
+float YawSpeed_Offset2019(float tarv);
 
 s32 YAW_INIT=YAW_INIT_DEFINE;
 
@@ -24,6 +25,7 @@ extern VisionDataTypeDef	VisionData;
 
 void Yun_Task(void)	//云台控制任务 
 {
+	Record_ImuYawAnglev(imu.angleV.z);
 //	if(IMU_Check_Useless_State==0)
 	{
 		Yun_Control_External_Solution();	//正常的位置环
@@ -52,8 +54,8 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 
 	extern float test_pitch;
 	test_pitch=0;
-	if(time_1ms_count%30==0)
-	Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);	//控制键位集成再内部
+	//if(time_1ms_count%100==0)
+	//Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);	//控制键位集成再内部
 	
 	//前馈辨别 需要辨识时再用
 	//pitch_Feedforward_to_distinguish();
@@ -91,6 +93,14 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,imu.angleV.z,&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
 	
 	yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP);
+	yunMotorData.yaw_output+=YawSpeed_Offset2019(yunMotorData.yaw_tarV);
+	
+	yunMotorData.pitch_output=yunMotorData.pitch_output>30000?30000:yunMotorData.pitch_output;
+	yunMotorData.pitch_output=yunMotorData.pitch_output<-30000?-30000:yunMotorData.pitch_output;
+	
+	yunMotorData.yaw_output=yunMotorData.yaw_output>30000?30000:yunMotorData.yaw_output;
+	yunMotorData.yaw_output=yunMotorData.yaw_output<-30000?-30000:yunMotorData.yaw_output;
+	
 //	State_Record=GetWorkState();
 }
 
@@ -328,3 +338,10 @@ float Pitch_Offset2019(float tarp)
 {
 	return 7.473f*tarp-48330;
 }
+
+
+float YawSpeed_Offset2019(float tarv)
+{
+	return 30*tarv;//80
+}
+

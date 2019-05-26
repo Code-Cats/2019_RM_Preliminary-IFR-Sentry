@@ -39,10 +39,18 @@ u16 t_vice_count=0;
 //////	}
 //////}
 
-
+u8 test_usart8data[5];
+u8 count_tt=0;
 ReceiveDataTypeDef ReceiveData={0};
 void ViceData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 {
+	test_usart8data[count_tt]=data;
+	count_tt++;
+	if(count_tt>=5)
+	{
+		count_tt=0;
+	}
+	
 	LostCountFeed(&Error_Check.count[LOST_VICEBOARD]);
 	if(data==0x5A&&ReceiveData.headOK_state==0)
 	{

@@ -47,16 +47,16 @@ extern s32 YAW_INIT;
 #define PITCH_POSITION_PID_MER 400	//最大偏差输入
 #define PITCH_POSITION_PID_MAXINPUT 8190	//最大期望输入
 #define PITCH_POSITION_PID_MAXOUTPUT 320	//最大输出
-#define PITCH_POSITION_PID_I_MAX 40//20//0//22/PITCH_POSITION_PID_I	//I累加限制
+#define PITCH_POSITION_PID_I_MAX 41//20//0//22/PITCH_POSITION_PID_I	//I累加限制
 #define PITCH_POSITION_PID_DEAD 0	//计算死区3
 //参数记录：
-#define PITCH_SPEED_PID_P 78//75//60//100//25
+#define PITCH_SPEED_PID_P 80//75//60//100//25
 #define PITCH_SPEED_PID_I 0.3f//0.6//0.01f*4//0.014	//0.026
 #define PITCH_SPEED_PID_D 2//3	//0.08
 #define PITCH_SPEED_PID_MER 260	//最大偏差输入240
 #define PITCH_SPEED_PID_MAXINPUT 500	//最大期望输入
 #define PITCH_SPEED_PID_MAXOUTPUT 30000	//超过7000电机反转
-#define PITCH_SPEED_PID_I_MAX 3000//0//3000/PITCH_SPEED_PID_I	//I累加限制1200
+#define PITCH_SPEED_PID_I_MAX 5000//0//3000/PITCH_SPEED_PID_I	//I累加限制1200
 #define PITCH_SPEED_PID_DEAD 0	//计算死区3
 
 ///*PID参数-板载陀螺仪*/
@@ -80,7 +80,7 @@ extern s32 YAW_INIT;
 
 
 #define YAW_SPEED_PID_P 85//70//160//45//44//45	//30  
-#define YAW_SPEED_PID_I 0.42f//0.03	//0.02
+#define YAW_SPEED_PID_I 0.4f//0.03	//0.02
 #define YAW_SPEED_PID_D 1//4
 #define YAW_SPEED_PID_MER 370	//最大偏差输入
 #define YAW_SPEED_PID_MAXINPUT 460	//最大期望输入
@@ -88,8 +88,8 @@ extern s32 YAW_INIT;
 #define YAW_SPEED_PID_I_MAX 2200//0//1200/YAW_SPEED_PID_I	//I累加限制
 #define YAW_SPEED_PID_DEAD 0	//计算死区
 
-#define YAW_POSITION_PID_P 1.45f//1//1//1.3f//1.4//1.2  
-#define YAW_POSITION_PID_I 0.045f
+#define YAW_POSITION_PID_P 1.48f//1//1//1.3f//1.4//1.2  
+#define YAW_POSITION_PID_I 0.05f
 #define YAW_POSITION_PID_D 1//6	//经过实验观察数据发现D过大引起tarV波动过大，但D对于减弱波形超调猜测有效用，采用非线性D	//原值6
 #define YAW_POSITION_PID_MER 420	//最大偏差输入
 #define YAW_POSITION_PID_MAXINPUT 5350	//最大期望输入

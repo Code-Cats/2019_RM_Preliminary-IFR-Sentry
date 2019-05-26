@@ -1,4 +1,4 @@
-#include "usart6_viceboard.h"
+#include "usart8_viceboard.h"
 #include "usart6_viceboard_analysis.h"
 
 
@@ -59,29 +59,28 @@ void USART6_Config(u32 baud)
 **************************************/
 
 
-void USART6_ViceBoard_Init(uint32_t baud_rate)
+void USART8_ViceBoard_Init(uint32_t baud_rate)
 {
-//	#define USART6_VICEBOARD
     GPIO_InitTypeDef gpio;
 	  USART_InitTypeDef usart;
 	  NVIC_InitTypeDef nvic;
 //    DMA_InitTypeDef dma;
     
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE); 
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE); 
 //     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART6, ENABLE); 
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART8, ENABLE); 
     
-    GPIO_PinAFConfig(GPIOG,GPIO_PinSource9,GPIO_AF_USART6);
-    GPIO_PinAFConfig(GPIOG,GPIO_PinSource14,GPIO_AF_USART6); 
+    GPIO_PinAFConfig(GPIOE,GPIO_PinSource0,GPIO_AF_UART8);	//pe0 rx
+    GPIO_PinAFConfig(GPIOE,GPIO_PinSource1,GPIO_AF_UART8); //pe1 tx
 
-    gpio.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_14;
+    gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
     gpio.GPIO_Mode = GPIO_Mode_AF;
     gpio.GPIO_OType = GPIO_OType_PP;
     gpio.GPIO_Speed = GPIO_Speed_100MHz;
-    gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_Init(GPIOG,&gpio);
+    gpio.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_Init(GPIOE,&gpio);
     
-    USART_DeInit(USART6);
+    USART_DeInit(UART8);
     USART_StructInit(&usart);
     usart.USART_BaudRate = baud_rate;
     usart.USART_WordLength = USART_WordLength_8b;
@@ -90,7 +89,7 @@ void USART6_ViceBoard_Init(uint32_t baud_rate)
    // usart.USART_Parity = USART_Parity_Even;
     usart.USART_Mode = USART_Mode_Rx|USART_Mode_Tx;
     usart.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_Init(USART6, &usart);
+    USART_Init(UART8, &usart);
 //		
 //		USART_DMACmd(USART3, USART_DMAReq_Rx, ENABLE);
 //		
@@ -120,33 +119,33 @@ void USART6_ViceBoard_Init(uint32_t baud_rate)
 //    
 //    DMA_Cmd(DMA1_Stream1, ENABLE);
 		
-    nvic.NVIC_IRQChannel = USART6_IRQn;
+    nvic.NVIC_IRQChannel = UART8_IRQn;
     nvic.NVIC_IRQChannelPreemptionPriority = 1;
     nvic.NVIC_IRQChannelSubPriority = 1;
     nvic.NVIC_IRQChannelCmd = ENABLE; 
     NVIC_Init(&nvic);
 		
-	USART_ITConfig(USART6, USART_IT_RXNE, ENABLE);        //usart rx idle interrupt  enabled
-    USART_Cmd(USART6, ENABLE);
+	USART_ITConfig(UART8, USART_IT_RXNE, ENABLE);        //usart rx idle interrupt  enabled
+    USART_Cmd(UART8, ENABLE);
 }
 
 //#ifdef USART6_VICEBOARD
-u8 USART6_Res=0;
-void USART6_IRQHandler(void)
+u8 USART8_Res=0;
+void UART8_IRQHandler(void)
 {
 ////		if(Vision_Flag==0)
 ////		{
 //	static uint32_t this_time_rx_len = 0;
 	
-	if(USART_GetITStatus(USART6, USART_IT_RXNE) != RESET)
+	if(USART_GetITStatus(UART8, USART_IT_RXNE) != RESET)
 	{
 		
-		USART6_Res=USART_ReceiveData(USART6);
-		(void)USART6->SR;
-		(void)USART6->DR;
+		USART8_Res=USART_ReceiveData(UART8);
+		(void)UART8->SR;
+		(void)UART8->DR;
 		
 		///////////////////////ViceData_Receive(USART6_Res);	//副板解析
-		ViceData_Receive(USART6_Res);	//视觉解析
+		ViceData_Receive(USART8_Res);	//视觉解析
 		//clear the idle pending flag 
 		
 	}

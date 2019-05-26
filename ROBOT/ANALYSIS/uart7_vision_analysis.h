@@ -15,19 +15,20 @@ typedef struct
 
 typedef struct
 {
-	u8 armor_sign;	//是否有有效装甲
-	u8 armor_type;	//装甲类型
-	u16 armor_dis;	//深度信息
-	float armor_dis_filter;
-	u16 tar_x;	//x坐标
-	u16 tar_y;	//y坐标
-	s16 shooterror_x;	//实际目标偏差x	作为自动射击
-	s16 shooterror_y;	//实际目标偏差y	作为自动射击
-	s16 pix_x_v;
-	float angel_x_v;	//经融合的到的相对速度	//单位为0.1度每秒
-	float angle_x_v_filter;
-	u8 dealingtime;
-	u8 vision_control_state;	//是否受控
+	volatile u8 armor_sign;	//是否有有效装甲
+	volatile u8 armor_type;	//装甲类型
+	volatile u16 armor_dis;	//深度信息
+	volatile float armor_dis_filter;
+	volatile u16 tar_x;	//x坐标
+	volatile u16 tar_y;	//y坐标
+	volatile s16 shooterror_x;	//实际目标偏差x	作为自动射击
+	volatile s16 shooterror_y;	//实际目标偏差y	作为自动射击
+	volatile s16 pix_x_v;
+	volatile float imu_vz_match;
+	volatile float angel_x_v;	//经融合的到的相对速度	//单位为0.1度每秒
+	volatile float angle_x_v_filter;
+	volatile u8 dealingtime;
+	volatile u8 vision_control_state;	//是否受控
 }VisionDataTypeDef;	//经解析得到的传感器数据
 
 void VisionData_Receive(u8 data);	//从视觉传过来的数据接受校验主函数
