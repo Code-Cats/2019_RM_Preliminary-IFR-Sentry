@@ -3,7 +3,7 @@
 #include "auto_aim.h"
 
 void pitch_Feedforward_to_distinguish(void);
-float Pitch_Offset2019(float tarp);
+float Pitch_Offset2019(float tarp,float fdbp);
 float YawSpeed_Offset2019(float tarv);
 
 s32 YAW_INIT=YAW_INIT_DEFINE;
@@ -26,6 +26,8 @@ extern VisionDataTypeDef	VisionData;
 void Yun_Task(void)	//ÔÆÌ¨¿ØÖÆÈÎÎñ 
 {
 	Record_ImuYawAnglev(imu.angleV.z);
+	Record_ImuYawAngle(ZGyroModuleAngle);
+	Record_ImuPitchAngle(yunMotorData.pitch_fdbP);
 //	if(IMU_Check_Useless_State==0)
 	{
 		Yun_Control_External_Solution();	//Õý³£µÄÎ»ÖÃ»·
@@ -58,7 +60,7 @@ void Yun_Control_External_Solution(void)	//ÍâÖÃ·´À¡·½°¸
 	//Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);	//¿ØÖÆ¼üÎ»¼¯³ÉÔÙÄÚ²¿
 	
 	//Ç°À¡±æ±ð ÐèÒª±æÊ¶Ê±ÔÙÓÃ
-	//pitch_Feedforward_to_distinguish();
+	pitch_Feedforward_to_distinguish();
 	
 	if(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP>8192/2)	//¹ýÁãµã
 	{
@@ -92,8 +94,9 @@ void Yun_Control_External_Solution(void)	//ÍâÖÃ·´À¡·½°¸
 	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,-imu.angleV.y,&PID_PITCH_SPEED);
 	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,imu.angleV.z,&PID_YAW_SPEED);	//²ÉÓÃÍâ½çÍÓÂÝÒÇ×ö·´À¡
 	
-	yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP);
+	yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP,yunMotorData.pitch_tarP);
 	yunMotorData.yaw_output+=YawSpeed_Offset2019(yunMotorData.yaw_tarV);
+	
 	
 	yunMotorData.pitch_output=yunMotorData.pitch_output>30000?30000:yunMotorData.pitch_output;
 	yunMotorData.pitch_output=yunMotorData.pitch_output<-30000?-30000:yunMotorData.pitch_output;
@@ -267,10 +270,10 @@ s16 Pitch_output_offset(s32 pitch_tarP)	//¿Ë·þÔÆÌ¨pitchÖá·ÇÏßÐÔÁ¦¼°·Ç¶Ô³ÆÐÔµÄ²¹³
 
 ////ÏÂ5810-ÉÏ7250	//40µÝ½ø
 //Ç°À¡±æÊ¶
-#define AVRNUMS 600
+#define AVRNUMS 700
 u8 Feedforward_startflag=0;
 u8 Feedforward_state=0;
-const u16 tapi=5800;
+const u16 tapi=6060;
 u16 record_i=0;
 float fdbpi[40]={0};
 float outputi[40]={0};
@@ -316,7 +319,7 @@ void pitch_Feedforward_to_distinguish(void)
 			}
 			case 2:
 			{
-				if(record_i<35)
+				if(record_i<30)
 				{
 					record_i++;
 					Feedforward_state=0;
@@ -334,9 +337,58 @@ void pitch_Feedforward_to_distinguish(void)
 	}
 }
 
-float Pitch_Offset2019(float tarp)
+float Pitch_Offset2019(float tarp,float fdbp)
 {
-	return 7.473f*tarp-48330;
+	float offset=0;
+	static u8 laststate=0;
+	static float fdbp_last=0;
+	
+	if(fdbp-fdbp_last>0.000001f)
+	{
+		laststate=0;
+	}
+	else if(fdbp-fdbp_last<-0.000001f)
+	{
+		laststate=1;
+	}
+	
+	if(laststate==0)
+	{
+		if(tarp<6600)
+		{
+			offset=-0.03132f*tarp*tarp+413.1f*tarp-1358000;
+		}
+		else
+		{
+			offset=0.0125f*tarp*tarp-158.4f*tarp+504300;
+		}
+	}
+	else
+	{
+		if(tarp<6600)
+		{
+			offset=-0.03132f*tarp*tarp+413.1f*tarp-1358000;
+			offset-=4000;
+		}
+		else
+		{
+			offset=0.0125f*tarp*tarp-158.4f*tarp+504300;
+			offset-=4000;
+		}
+	}
+	
+	offset=offset>13000?13000:offset;
+	offset=offset<-13000?-13000:offset;
+	
+	offset=0;
+//	if(offset>-1000&&offset<1000)
+//	{
+//		offset=0;
+//	}
+	
+	fdbp_last=fdbp;
+	
+	return offset;
 }
 
 

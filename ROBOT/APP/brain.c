@@ -4,6 +4,7 @@
 #include "friction_wheel.h"
 #include "yun.h"
 #include "usart3_judge_analysis.h"
+#include "heat_limit.h"
 
 s16 bulletSpeedSet=0;
 /***************************
@@ -32,12 +33,13 @@ extern s16 ViceBoard_Position;	//0-2690	//正方向与速度一致
 AUTO_OperationStateTypeDef AutoOperationState=CHASSIS_FINDING_ENEMY_NORMAL;
 AUTO_OperationYunStateTypeDef AUTO_OperationYunState=YUN_FINDING_ENEMY;
 
-#define ORBIT_MAX_POS 2000
-#define ORBIT_EVADING_DRONES_POSLIMIT 1300 //2000	//躲避无人机中止点
-#define ORBIT_ORIGIN_POS 40	//轨道起点
-#define ORBOT_INFLEXION1_POS 700	//第一个拐点
-#define ORBOT_INFLEXION2_POS 1300	//第二个拐点
+#define ORBIT_MAX_POS 1740
+#define ORBIT_EVADING_DRONES_POSLIMIT 1280 //2000	//躲避无人机中止点
+#define ORBIT_ORIGIN_POS 0	//轨道起点
+#define ORBOT_INFLEXION1_POS 500	//第一个拐点
+#define ORBOT_INFLEXION2_POS 1280	//第二个拐点
 
+extern u8 Friction_State;
 
 u8 robot_hurted_state=0;
 u32 robot_hurted_num=0;
@@ -108,25 +110,25 @@ void Auto_Operation(void)	//运行频率1000hz
 		case CHASSIS_FINDING_ENEMY_NORMAL://正常情况边走边寻找目标
 		{
 			Tar_remain_powerbuffer=160;
-			if(no_enemy_move_state==1)
-			{
-				Auto_Move_Task(ORBIT_EVADING_DRONES_POSLIMIT,280);//MAX_STROKE-40
-				if(ViceBoard_Position>ORBIT_EVADING_DRONES_POSLIMIT-30) //2690-60=2630	MAX_STROKE-60
-				{
-					no_enemy_move_state=0;
-					
-				}
-				
-			}
-			else
-			{
-				Auto_Move_Task(ORBIT_ORIGIN_POS,280);
-				if(ViceBoard_Position<ORBIT_ORIGIN_POS+30)
-				{
-					no_enemy_move_state=1;
-					
-				}
-			}
+//			if(no_enemy_move_state==1)
+//			{
+//				Auto_Move_Task(ORBIT_EVADING_DRONES_POSLIMIT,280);//MAX_STROKE-40
+//				if(ViceBoard_Position>+ORBIT_EVADING_DRONES_POSLIMIT-50) //2690-60=2630	MAX_STROKE-60
+//				{
+//					no_enemy_move_state=0;
+//					
+//				}
+//				
+//			}
+//			else
+//			{
+//				Auto_Move_Task(ORBIT_ORIGIN_POS,280);
+//				if(ViceBoard_Position<ORBIT_ORIGIN_POS+50)
+//				{
+//					no_enemy_move_state=1;
+//					
+//				}
+//			}
 			if(VisionData.armor_sign==1)
 			{
 				AutoOperationState=CHASSIS_HIT_ENEMY_STOP;
@@ -134,8 +136,8 @@ void Auto_Operation(void)	//运行频率1000hz
 			}
 			if(robot_hurted_state==1)	//受到威胁 进入//////////////////////////////////////////////
 			{
-				//Tar_remain_powerbuffer=100;
-				AutoOperationState=CHASSIS_HIT_ENEMY_WAIST;
+				//AutoOperationState=CHASSIS_HIT_ENEMY_WAIST;//猛跑一段时间
+				AutoOperationState=CHASSIS_HIT_ENEMY_ELUDE;	//换轨道段跑
 				no_enemy_move_state=!no_enemy_move_state;
 			}
 			break;
@@ -147,6 +149,12 @@ void Auto_Operation(void)	//运行频率1000hz
 			{
 				AutoOperationState=CHASSIS_FINDING_ENEMY_NORMAL;
 			}
+			
+			if(robot_hurted_state==1)	//受到普通威胁
+			{
+				//AutoOperationState=CHASSIS_HIT_ENEMY_WAIST;//猛跑一段时间
+				AutoOperationState=CHASSIS_HIT_ENEMY_ELUDE;	//换轨道段跑
+			}//下面待补充收到大子弹威胁
 			break;
 		}
 		case CHASSIS_HIT_ENEMY_NEARBY:	//就近点击打目标 记录两个云台中点 判断
@@ -154,8 +162,37 @@ void Auto_Operation(void)	//运行频率1000hz
 			
 			break;
 		}
-		case CHASSIS_HIT_ENEMY_ELUDE:	//优先闪避击打目标 在远点移动
+		case CHASSIS_HIT_ENEMY_ELUDE:	//优先闪避击打目标 在远点移动 //改
 		{
+			static u32 timecount=0;
+			static u8 run_pos_state=1;
+			if(robot_hurt_lastnum!=robot_hurted_num)
+			{
+				u8 nowpos=Recognize_EncoderPosState(ViceBoard_Position);	//辨别自己当前在轨道位置
+				if(nowpos==1)	//近基地
+				{
+					run_pos_state=3;	//如果在近基地收到打击 则去远基地端
+				}
+				else if(nowpos==2)
+				{
+					run_pos_state=1;
+				}
+				else
+				{
+					run_pos_state=2;
+				}
+				timecount=0;
+			}
+			
+			Chassis_ORBITState_Run(run_pos_state);
+			
+			timecount++;
+			if(timecount>16000)	//16s 超时没有攻击则退出
+			{
+				timecount=0;
+				AutoOperationState=CHASSIS_FINDING_ENEMY_NORMAL;
+				Chassis_Vx=0;
+			}
 			
 			break;
 		}
@@ -218,6 +255,15 @@ void Auto_Operation(void)	//运行频率1000hz
 		}
 	}
 	
+	if(encoder_startsensor==0&&encoder_endsensor==1)
+	{
+		Chassis_Vx=320;
+	}
+	
+	if(encoder_endsensor==0&&encoder_startsensor==1)
+	{
+		Chassis_Vx=-320;
+	}
 	
 	static u8 yun_pitch_findstate=0;
 	switch(AUTO_OperationYunState)	//云台	//待加入装甲受到攻击则云台转向状态-云台快速移动PID向目标区域上下扫描，如果超时则推出到寻找模式 如果sign=1则进入打击模式
@@ -231,35 +277,35 @@ void Auto_Operation(void)	//运行频率1000hz
 			}
 			else	//没有目标，云台自动转
 			{
-				yunMotorData.yaw_tarP=ZGyroModuleAngle*10+180;
-				switch(yun_pitch_findstate)
-				{
-					case 0:
-					{
-						static u32 timecount=0;
-						yunMotorData.pitch_tarP=7160;
-						timecount++;
-						if(timecount>230)
-						{
-							timecount=0;
-							yun_pitch_findstate=1;
-						}
-						
-						break;
-					}
-					case 1:
-					{
-						static u32 timecount=0;
-						yunMotorData.pitch_tarP=6300;
-						timecount++;
-						if(timecount>230)
-						{
-							timecount=0;
-							yun_pitch_findstate=0;
-						}
-						break;
-					}
-				}
+//////				yunMotorData.yaw_tarP=ZGyroModuleAngle*10+180;
+//////				switch(yun_pitch_findstate)
+//////				{
+//////					case 0:
+//////					{
+//////						static u32 timecount=0;
+//////						yunMotorData.pitch_tarP=7160;
+//////						timecount++;
+//////						if(timecount>230)
+//////						{
+//////							timecount=0;
+//////							yun_pitch_findstate=1;
+//////						}
+//////						
+//////						break;
+//////					}
+//////					case 1:
+//////					{
+//////						static u32 timecount=0;
+//////						yunMotorData.pitch_tarP=6300;
+//////						timecount++;
+//////						if(timecount>230)
+//////						{
+//////							timecount=0;
+//////							yun_pitch_findstate=0;
+//////						}
+//////						break;
+//////					}
+//////				}
 			}
 			
 //			PID_PITCH_SPEED.input_max=PITCH_SPEED_PID_MAXINPUT;
@@ -294,11 +340,111 @@ void Auto_Operation(void)	//运行频率1000hz
 			{
 				AUTO_OperationYunState=YUN_FINDING_ENEMY;
 			}
+			
+			if(time_1ms_count%100==0&&VisionData.vision_control_state==1&&Shoot_Heat_Limit()==1&&Friction_State==1)
+			{
+				AddBulletToShootingSystem();
+			}
 			break;
 		}
 	}
 	
 	robot_hurt_lastnum=robot_hurted_num;
+}
+
+u8 Recognize_EncoderPosState(s16 pos)	//识别到底是第几阶段
+{
+	if(pos<=ORBOT_INFLEXION1_POS)
+	{
+		return 1;
+	}
+	else if(pos<=ORBOT_INFLEXION2_POS)
+	{
+		return 2;
+	}
+	else
+	{
+		return 3;
+	}
+}
+
+void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
+{
+	switch(runstate)
+	{
+		case 1:	//轨道第一段
+		{
+			static u8 movestate=0;
+			if(movestate==1)
+			{
+				Auto_Move_Task(ORBOT_INFLEXION1_POS,280);//MAX_STROKE-40
+				if(ViceBoard_Position>ORBOT_INFLEXION1_POS-60) //2690-60=2630	MAX_STROKE-60
+				{
+					movestate=0;
+					
+				}
+				
+			}
+			else
+			{
+				Auto_Move_Task(ORBIT_ORIGIN_POS,280);
+				if(ViceBoard_Position<ORBIT_ORIGIN_POS+70)
+				{
+					movestate=1;
+					
+				}
+			}
+			break;
+		}
+		case 2:
+		{
+			static u8 movestate=0;
+			if(movestate==1)
+			{
+				Auto_Move_Task(ORBOT_INFLEXION2_POS,280);//MAX_STROKE-40
+				if(ViceBoard_Position>ORBOT_INFLEXION2_POS-50) //2690-60=2630	MAX_STROKE-60
+				{
+					movestate=0;
+					
+				}
+				
+			}
+			else
+			{
+				Auto_Move_Task(ORBOT_INFLEXION1_POS,280);
+				if(ViceBoard_Position<ORBOT_INFLEXION1_POS+50)
+				{
+					movestate=1;
+					
+				}
+			}
+			break;
+		}
+		case 3:
+		{
+			static u8 movestate=0;
+			if(movestate==1)
+			{
+				Auto_Move_Task(ORBIT_MAX_POS,280);//MAX_STROKE-40
+				if(ViceBoard_Position>ORBIT_MAX_POS-50) //2690-60=2630	MAX_STROKE-60
+				{
+					movestate=0;
+					
+				}
+				
+			}
+			else
+			{
+				Auto_Move_Task(ORBOT_INFLEXION2_POS,280);
+				if(ViceBoard_Position<ORBOT_INFLEXION2_POS+50)
+				{
+					movestate=1;
+					
+				}
+			}
+			break;
+		}
+	}
 }
 
 /*

@@ -154,6 +154,10 @@ void Work_State_Change(void)
 		}
 		case AUTO_STATE:	//ֹͣ״̬
 		{
+			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP)	
+			{
+				SetWorkState(NORMAL_STATE);
+			}
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE)	
 			{
 				SetWorkState(STOP_STATE);

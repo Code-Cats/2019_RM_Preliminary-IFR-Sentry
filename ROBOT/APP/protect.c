@@ -104,7 +104,7 @@ void Check_Task(void)
 		}
 		else if(GetWorkState()!=AUTO_STATE)	//自动模式不检测
 		{
-			SetWorkState(LOST_STATE);
+			SetWorkState(AUTO_STATE);
 		}
 		
 	}

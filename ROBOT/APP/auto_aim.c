@@ -69,6 +69,10 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//´Ó×îÔ­Ê¼µÄÊý¾Ý½øÐÐ¼ÆËã¿ÉÒÔ¼õ
 #define YUN_UP_DISLIMIT 100	//Õý³£µÄ»î¶¯·¶Î§£¬UPÎªÕý
 #define YUN_DOWN_DISLIMIT 1500	//Õý³£µÄ»î¶¯·¶Î§£¬DOWNÎª¸º
 
+
+float Shoot_V=20.0f;//15.5f	//14M/s
+float Shoot_V_2= 400.0f;//(SHOOT_V*SHOOT_V)
+
 s32 imu_matchz_10=0;
 float pix_anglev=0;
 s32 pix_anglev_10=0;
@@ -84,6 +88,7 @@ u8 sign_count=0;	//µÚÈýÖ¡²Å¿ªÊ¼¶¯Ì¬Ê¶±ð
 #define VISION_TARY	580//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//×óÉÏÔ­µã	480	//´ò5Ã×ÄÚÄ¿±ê£ºÏòÉÏ²¹³¥518-360¸öÏñËØµã	//ÒòÎªÓÐ×èÁ¦ºã¶¨¾²Ì¬Îó²î£¬¹Ê²¹³¥
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 {
+	Shoot_V_2=Shoot_V*Shoot_V;
 	imu_angelv_z_10=(s32)(imu.angleV.z*10);
 	if(Error_Check.statu[LOST_VISION]==1){	VisionData.armor_type=0;VisionData.armor_sign=0;	}//ÈôÎÞ·´À¡=£¬¸ÃTask·ÅÔÚÖÐ¶ÏÖÐÖ÷ÔËÐÐ£¬¼°·ÅÔÚyun.cÖÐÒÔ½ÏÂýÆµÂÊ±£»¤ÔËÐÐ
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
@@ -142,8 +147,10 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 //		t_yaw_error=(float)Gyro_Data.angle[2]*10-Pixel_to_angle((s16)(VisionData.error_x-VISION_TARX))*10;
 //		t_pitch_error=(float)yunMotorData.pitch_fdbP+Pixel_to_angle((s16)(VisionData.error_y-VISION_TARY))*8192/360;
 		float offset_x_angle=atan(9.0f/VisionData.armor_dis)*573;
-		*yaw_tarP=(float)ZGyroModuleAngle*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;
-		*pitch_tarP=(float)yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
+		float zgyro_match_10=GetRecordYawAngle(10)*10;
+		float pitch_fdb_match=GetRecordPitchAngle(10);
+		*yaw_tarP=(float)ZGyroModuleAngle*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;//(float)ZGyroModuleAngle*10
+		*pitch_tarP=yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis_filter/100.0f));	//ÖØÁ¦²¹³¥
 		
 		//
@@ -161,12 +168,12 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		*pitch_tarP=*pitch_tarP<(PITCH_INIT-YUN_DOWN_DISLIMIT)?(PITCH_INIT-YUN_DOWN_DISLIMIT):*pitch_tarP;	//ÏÞÖÆÐÐ³Ì
 		
 		yaw_residual_error=*yaw_tarP-ZGyroModuleAngle*10;	//²Ð²î¼ÇÂ¼
+			
+			//if(yaw_residual_error)	//×Ô¶¯·¢Éä
 	}
 	
 }
 
-#define SHOOT_V	22.2f//15.5f	//14M/s
-#define SHOOT_V_2 (SHOOT_V*SHOOT_V)
 #define G	9.8f	//ÖØÁ¦¼ÓËÙ¶È
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬ÏòÏÂÎªÕý
 {
@@ -179,7 +186,7 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬Ï
 	float sin_tar_angle=sin(tar_angle_rad);
 	float gravity_ballistic_angle_rad=0;	//²¹³¥½Ç »¡¶ÈÖÆ
 	float gravity_ballistic_angle=0;	//²¹³¥½Ç ½Ç¶ÈÖÆ
-	gravity_ballistic_angle_rad=0.5f*(-asin((G*dis_m*(1-sin_tar_angle*sin_tar_angle)-sin_tar_angle*SHOOT_V_2)/SHOOT_V_2)+tar_angle_rad);
+	gravity_ballistic_angle_rad=0.5f*(-asin((G*dis_m*(1-sin_tar_angle*sin_tar_angle)-sin_tar_angle*Shoot_V_2)/Shoot_V_2)+tar_angle_rad);
 	gravity_ballistic_angle=gravity_ballistic_angle_rad*57.3f;
 
 	*pitch_tarP=PITCH_GYRO_INIT-gravity_ballistic_angle*8192.0f/360;//////////////////////////////
@@ -188,10 +195,32 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬Ï
 }
 
 
-#define YAWANGLE_REDNUMS 50
+#define PITCHANGLE_REDNUMS 60
+float PitchAngleLast[PITCHANGLE_REDNUMS];
+u16 PitchAngleLastcount=0;
+void Record_ImuPitchAngle(float angle_z)	//¼ÇÂ¼pitchÎ»ÖÃÊý¾Ýµ÷ÓÃÆµÂÊ1ms POS
+{
+	PitchAngleLast[PitchAngleLastcount]=angle_z;
+	PitchAngleLastcount++;
+	if(PitchAngleLastcount>=PITCHANGLE_REDNUMS)
+	{
+		PitchAngleLastcount=0;
+	}
+}
+
+float GetRecordPitchAngle(u16 lastcount)	//»ñÈ¡¹ýÈ¥µÄpitchÄ¿±êÖµ POS
+{
+	lastcount=lastcount>(PITCHANGLE_REDNUMS-1)?(PITCHANGLE_REDNUMS-1):lastcount;
+	s16 lastindex=(s16)PitchAngleLastcount-(s16)lastcount;
+	lastindex=lastindex<0?(lastindex+PITCHANGLE_REDNUMS):lastindex;
+	return PitchAngleLast[lastindex];
+}
+
+
+#define YAWANGLE_REDNUMS 60
 float YawAngleLast[YAWANGLE_REDNUMS];
 u16 YawAngleLastcount=0;
-void Record_ImuYawAngle(float angle_z)	//¼ÇÂ¼yawÎ»ÖÃÊý¾Ýµ÷ÓÃÆµÂÊ1ms
+void Record_ImuYawAngle(float angle_z)	//¼ÇÂ¼yawÎ»ÖÃÊý¾Ýµ÷ÓÃÆµÂÊ1ms POS
 {
 	YawAngleLast[YawAngleLastcount]=angle_z;
 	YawAngleLastcount++;
@@ -201,7 +230,7 @@ void Record_ImuYawAngle(float angle_z)	//¼ÇÂ¼yawÎ»ÖÃÊý¾Ýµ÷ÓÃÆµÂÊ1ms
 	}
 }
 
-float GetRecordYawAngle(u16 lastcount)	//»ñÈ¡¹ýÈ¥µÄyawÄ¿±êÖµ
+float GetRecordYawAngle(u16 lastcount)	//»ñÈ¡¹ýÈ¥µÄyawÄ¿±êÖµ POS
 {
 	lastcount=lastcount>(YAWANGLE_REDNUMS-1)?(YAWANGLE_REDNUMS-1):lastcount;
 	s16 lastindex=(s16)YawAngleLastcount-(s16)lastcount;
@@ -336,7 +365,7 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//¾­¹ý¼ÆËã£¬Ö»´ò35¶È/
 	{
 		dis_m=4.5f;
 	}
-	float shoot_delay=dis_m/SHOOT_V+0.4f;	//ÒÔÃëÎªµ¥Î»	//¼ÓÉÏ³öµ¯ÑÓÊ±0.08
+	float shoot_delay=dis_m/Shoot_V+0.4f;	//ÒÔÃëÎªµ¥Î»	//¼ÓÉÏ³öµ¯ÑÓÊ±0.08
 	float pre_angle=tar_v*shoot_delay;
 	
 

@@ -31,4 +31,7 @@ typedef struct
 void Auto_Operation(void);
 void RobotHurtCallback(uint8_t armorid,uint8_t hurttype);
 
+u8 Recognize_EncoderPosState(s16 pos);
+void Chassis_ORBITState_Run(u8 runstate);	//根据传入参数决定在轨道哪一段运行
+
 #endif

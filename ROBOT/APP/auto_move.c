@@ -2,8 +2,8 @@
 #include "math.h"
 #include "brain.h"
 
-#define CHASSIS_POS_KP 2
-#define CHASSIS_MIN_SPEED 40
+#define CHASSIS_POS_KP 3
+#define CHASSIS_MIN_SPEED 50
 
 extern s16 ViceBoard_Position;	//0-2690	//正方向与速度一致
 
