@@ -70,8 +70,8 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 #define YUN_DOWN_DISLIMIT 1500	//正常的活动范围，DOWN为负
 
 
-float Shoot_V=20.0f;//15.5f	//14M/s
-float Shoot_V_2= 400.0f;//(SHOOT_V*SHOOT_V)
+float Shoot_V=18.0f;//15.5f	//14M/s
+float Shoot_V_2= 324.0f;//(SHOOT_V*SHOOT_V)
 
 s32 imu_matchz_10=0;
 float pix_anglev=0;
@@ -93,7 +93,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	if(Error_Check.statu[LOST_VISION]==1){	VisionData.armor_type=0;VisionData.armor_sign=0;	}//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
 //	t_target_v=t_yaw_angel_v+Gyro_Data
-	if((RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_sign==1)||(RC_Ctl.mouse.press_r==1&&VisionData.armor_sign==1))	//VisionData.armor_sign!=0
+	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_sign==1&&VisionData.armor_dis<=750)	//VisionData.armor_sign!=0
 	{
 		VisionData.vision_control_state=1;	//最终控制位
 //		PID_PITCH_SPEED.input_max=80;

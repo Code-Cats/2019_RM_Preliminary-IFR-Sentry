@@ -341,7 +341,7 @@ float Pitch_Offset2019(float tarp,float fdbp)
 {
 	float offset=0;
 	static u8 laststate=0;
-	static float fdbp_last=0;
+	static float fdbp_last,fdb_record=0;
 	
 	if(fdbp-fdbp_last>0.000001f)
 	{
@@ -380,7 +380,7 @@ float Pitch_Offset2019(float tarp,float fdbp)
 	offset=offset>13000?13000:offset;
 	offset=offset<-13000?-13000:offset;
 	
-	offset=0;
+	////offset=0;
 //	if(offset>-1000&&offset<1000)
 //	{
 //		offset=0;
@@ -394,6 +394,6 @@ float Pitch_Offset2019(float tarp,float fdbp)
 
 float YawSpeed_Offset2019(float tarv)
 {
-	return 30*tarv;//80
+	return 35*tarv;//80
 }
 

@@ -7,9 +7,9 @@
 #define  YAW_INIT_DEFINE 0//7320//3525//3160
 //s32 YAW_INIT=YAW_INIT_DEFINE;
 extern s32 YAW_INIT;
-//下5810-上7240
-#define PITCH_UPLIMIT 7240
-#define PITCH_DOWNLIMIT 6060//5810
+//下5810-上7240  //6.1更新6245 7110
+#define PITCH_UPLIMIT 7110
+#define PITCH_DOWNLIMIT 6245//5810
 #define PITCH_INIT         7197//1330//3045//3098
 #define PITCH_GYRO_INIT 7197//1330//3045//3098	//云台陀螺仪零点对应电机位置，陀螺仪更改位置需要重调	//反馈的太小，说明这个太大需要调
 

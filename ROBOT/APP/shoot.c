@@ -3,6 +3,7 @@
 #include "pid.h"
 #include "friction_wheel.h"
 #include "heat_limit.h"
+#include "control.h"
 //#include "vision.h"
 
 SHOOT_DATA shoot_Data_Down=SHOOT_DATA_INIT;
@@ -34,7 +35,15 @@ u16 Friction_Send=FRICTION_INIT;\
 
 void Shoot_Task(void)	//¶¨Ê±ÆµÂÊ£º1ms
 {
-	LASER_SWITCH=1; 
+	if(GetWorkState()==AUTO_STATE)
+	{
+		//LASER_SWITCH=0;
+	}
+	else
+	{
+		LASER_SWITCH=1; 
+	}
+	
 	//LASER_SWITCH=Friction_State; 
 	if(Friction_State==1)
 	{

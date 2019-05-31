@@ -18,3 +18,10 @@ USART:
 7
 8
 
+
+调试模式与赛场模式屏蔽记录：
+shoot.c : AUTO_STATE close LASER
+brain.c : CHASSIS_AUTORUN
+		  YUN_AUTORUN
+		  AUTO_SHOOT
+
