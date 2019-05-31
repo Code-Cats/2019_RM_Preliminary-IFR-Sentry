@@ -30,7 +30,7 @@ void Friction_Speed_Set(u16 bullet_speed)	//设置射速，射速到摩擦轮速度的转换
 	
 	bulletSpeedSet=frictionWheel_Data.l_wheel_tarV;	//test
 	
-	frictionWheel_Data.l_wheel_output=1000+frictionWheel_Data.l_wheel_tarV*10+5;
+	frictionWheel_Data.l_wheel_output=1000+frictionWheel_Data.l_wheel_tarV*10+4;
 	
 	//斜坡函数
 	if(frictionWheel_Data.l_wheel_output_slope-frictionWheel_Data.l_wheel_output>=1)

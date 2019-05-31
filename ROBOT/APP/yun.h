@@ -32,6 +32,7 @@ extern s32 YAW_INIT;
 	0,\
 	0,\
 	0,\
+	0,\
 	YAW_INIT_DEFINE,\
 	0,\
 }
@@ -179,6 +180,7 @@ typedef struct  __YUN_MOTOR_DATA__
 		int32_t   pitch_fdbV;
 		int32_t   pitch_tarV;
 		float   pitch_tarP;	//现在以角度为单位
+	float   pitch_tarP_filter;	//现在以角度为单位
     int32_t   pitch_output;
 
 		int32_t   yaw_fdbP;  //航向轴电机

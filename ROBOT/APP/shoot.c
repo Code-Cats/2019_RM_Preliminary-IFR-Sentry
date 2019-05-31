@@ -43,7 +43,6 @@ void Shoot_Task(void)	//定时频率：1ms
 	{
 		LASER_SWITCH=1; 
 	}
-	
 	//LASER_SWITCH=Friction_State; 
 	if(Friction_State==1)
 	{
@@ -144,7 +143,7 @@ void RC_Control_Shoot(u8* fri_state)
 				//shoot_Data_Down.last_time=time_1ms_count;
 			}
 			
-			if(time_1ms_count%35==0&&RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
+			if(time_1ms_count%80==0&&RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
 //////				if(abs(RC_Ctl.rc.ch1-1024)>100)	//测试最高射频
 //////				{

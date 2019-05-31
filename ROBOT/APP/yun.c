@@ -62,17 +62,19 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	//前馈辨别 需要辨识时再用
 	pitch_Feedforward_to_distinguish();
 	
-	if(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP>8192/2)	//过零点
+	yunMotorData.pitch_tarP_filter=yunMotorData.pitch_tarP*0.1f+yunMotorData.pitch_tarP_filter*0.9f;
+	
+	if(yunMotorData.pitch_tarP_filter-yunMotorData.pitch_fdbP>8192/2)	//过零点
 	{
-		yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP,yunMotorData .pitch_fdbP+8192,&PID_PITCH_POSITION);
+		yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP_filter,yunMotorData.pitch_fdbP+8192,&PID_PITCH_POSITION);
 	}
-	else if(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP<-8192/2)
+	else if(yunMotorData.pitch_tarP_filter-yunMotorData.pitch_fdbP<-8192/2)
 	{
-		yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP,yunMotorData.pitch_fdbP-8192,&PID_PITCH_POSITION);
+		yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP_filter,yunMotorData.pitch_fdbP-8192,&PID_PITCH_POSITION);
 	}
 	else
 	{
-		yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP,yunMotorData.pitch_fdbP,&PID_PITCH_POSITION);
+		yunMotorData.pitch_tarV=PID_General(yunMotorData.pitch_tarP_filter,yunMotorData.pitch_fdbP,&PID_PITCH_POSITION);
 	}
 	
 	if(yunMotorData.yaw_tarP-ZGyroModuleAngle*10>1800)	//过零点
@@ -342,12 +344,36 @@ float Pitch_Offset2019(float tarp,float fdbp)
 	float offset=0;
 	static u8 laststate=0;
 	static float fdbp_last,fdb_record=0;
+	static u32 state0_count,state1_count=0;
 	
-	if(fdbp-fdbp_last>0.000001f)
+//	if(fdbp-fdbp_last>0.000001f)
+//	{
+//		laststate=0;
+//	}
+//	else if(fdbp-fdbp_last<-0.000001f)
+//	{
+//		laststate=1;
+//	}
+	if(fdbp-fdb_record>10)
+	{
+		//laststate=0;
+		fdb_record=fdbp;
+		state0_count++;
+		state1_count=0;
+	}
+	else if(fdbp-fdb_record<-10)
+	{
+		//laststate=1;
+		fdb_record=fdbp;
+		state1_count++;
+		state0_count=0;
+	}
+	
+	if(state0_count>200)
 	{
 		laststate=0;
 	}
-	else if(fdbp-fdbp_last<-0.000001f)
+	if(state1_count>200)
 	{
 		laststate=1;
 	}
@@ -357,10 +383,12 @@ float Pitch_Offset2019(float tarp,float fdbp)
 		if(tarp<6600)
 		{
 			offset=-0.03132f*tarp*tarp+413.1f*tarp-1358000;
+			offset-=2000;
 		}
 		else
 		{
 			offset=0.0125f*tarp*tarp-158.4f*tarp+504300;
+			offset-=1200;
 		}
 	}
 	else
@@ -369,21 +397,27 @@ float Pitch_Offset2019(float tarp,float fdbp)
 		{
 			offset=-0.03132f*tarp*tarp+413.1f*tarp-1358000;
 			offset-=4000;
+			offset-=2000;
 		}
 		else
 		{
 			offset=0.0125f*tarp*tarp-158.4f*tarp+504300;
 			offset-=4000;
+			offset-=1200;
 		}
+	}
+	if(tarp<6420)
+	{
+		offset-=2500;
 	}
 	
 	offset=offset>13000?13000:offset;
 	offset=offset<-13000?-13000:offset;
 	
 	////offset=0;
-//	if(offset>-1000&&offset<1000)
+//	if(offset>-2000&&offset<2000)
 //	{
-//		offset=0;
+//		offset*=0.2f;
 //	}
 	
 	fdbp_last=fdbp;

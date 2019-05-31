@@ -85,7 +85,7 @@ float yaw_residual_error=0;	//´òÒÆ¶¯°ÐÊ±ÔÆÌ¨¸úËæ¾²²î
 ////////////////
 u8 sign_count=0;	//µÚÈýÖ¡²Å¿ªÊ¼¶¯Ì¬Ê¶±ð
 #define VISION_TARX 990//1035//710//640+105//1053//1035ÊÇÐÞÕý°²×°Æ«²î1020//580	//×óÉÏÔ­µã	640
-#define VISION_TARY	580//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//×óÉÏÔ­µã	480	//´ò5Ã×ÄÚÄ¿±ê£ºÏòÉÏ²¹³¥518-360¸öÏñËØµã	//ÒòÎªÓÐ×èÁ¦ºã¶¨¾²Ì¬Îó²î£¬¹Ê²¹³¥
+#define VISION_TARY	570//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//×óÉÏÔ­µã	480	//´ò5Ã×ÄÚÄ¿±ê£ºÏòÉÏ²¹³¥518-360¸öÏñËØµã	//ÒòÎªÓÐ×èÁ¦ºã¶¨¾²Ì¬Îó²î£¬¹Ê²¹³¥
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 {
 	Shoot_V_2=Shoot_V*Shoot_V;
@@ -121,7 +121,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 	}
 	
 
-	VisionData.imu_vz_match= GetRecordYawAnglev(22);
+	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.dealingtime*2);
 	imu_matchz_10=(s32)(VisionData.imu_vz_match*10);
 	pix_anglev=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
 	
@@ -147,10 +147,10 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 //		t_yaw_error=(float)Gyro_Data.angle[2]*10-Pixel_to_angle((s16)(VisionData.error_x-VISION_TARX))*10;
 //		t_pitch_error=(float)yunMotorData.pitch_fdbP+Pixel_to_angle((s16)(VisionData.error_y-VISION_TARY))*8192/360;
 		float offset_x_angle=atan(9.0f/VisionData.armor_dis)*573;
-		float zgyro_match_10=GetRecordYawAngle(10)*10;
-		float pitch_fdb_match=GetRecordPitchAngle(10);
-		*yaw_tarP=(float)ZGyroModuleAngle*10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;//(float)ZGyroModuleAngle*10
-		*pitch_tarP=yunMotorData.pitch_fdbP-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
+		float zgyro_match_10=GetRecordYawAngle(12)*10;
+		float pitch_fdb_match=GetRecordPitchAngle(VisionData.dealingtime);
+		*yaw_tarP=zgyro_match_10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;//(float)ZGyroModuleAngle*10
+		*pitch_tarP=pitch_fdb_match-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis_filter/100.0f));	//ÖØÁ¦²¹³¥
 		
 		//
@@ -158,7 +158,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		
 			if(VisionData.armor_dis<600)	//Ö»Ô¤²â6mÒÔÄÚ
 			{
-				//Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ýµ÷½Ú
+			//	Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ýµ÷½Ú
 			}
 
 		
@@ -179,7 +179,7 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬Ï
 {
 	if(dis_m>8)	dis_m=8;
 	
-	//dis_m-=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
+	dis_m-=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//»¡¶ÈÖÆ¼ò»¯¼ÆËã2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;
@@ -195,7 +195,7 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬Ï
 }
 
 
-#define PITCHANGLE_REDNUMS 60
+#define PITCHANGLE_REDNUMS 80
 float PitchAngleLast[PITCHANGLE_REDNUMS];
 u16 PitchAngleLastcount=0;
 void Record_ImuPitchAngle(float angle_z)	//¼ÇÂ¼pitchÎ»ÖÃÊý¾Ýµ÷ÓÃÆµÂÊ1ms POS
@@ -217,7 +217,7 @@ float GetRecordPitchAngle(u16 lastcount)	//»ñÈ¡¹ýÈ¥µÄpitchÄ¿±êÖµ POS
 }
 
 
-#define YAWANGLE_REDNUMS 60
+#define YAWANGLE_REDNUMS 80
 float YawAngleLast[YAWANGLE_REDNUMS];
 u16 YawAngleLastcount=0;
 void Record_ImuYawAngle(float angle_z)	//¼ÇÂ¼yawÎ»ÖÃÊý¾Ýµ÷ÓÃÆµÂÊ1ms POS
@@ -239,7 +239,7 @@ float GetRecordYawAngle(u16 lastcount)	//»ñÈ¡¹ýÈ¥µÄyawÄ¿±êÖµ POS
 }
 
 
-#define YAWANGLEV_REDNUMS 50
+#define YAWANGLEV_REDNUMS 100
 float YawAnglevLast[YAWANGLEV_REDNUMS];
 u16 YawAnglevLastcount=0;
 void Record_ImuYawAnglev(float anglev_z)	//¼ÇÂ¼Êý¾Ýµ÷ÓÃÆµÂÊ1ms
@@ -315,13 +315,13 @@ void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_anglev)
 	
 	f_pix_x_v_filter=f_pix_x_v_filter*0.5f+pix_x_v_filter*0.5f;	//6-4
 	
-	pix_x_v_filter_10=(s16)(f_pix_x_v_filter*10);
+	pix_x_v_filter_10=(s16)(f_pix_x_v_filter*10);//??????????000
 	
 	
 
 
 		pix_anglev_10=(s32)(f_pix_x_v_filter*10);
-		VisionData.angel_x_v=f_pix_x_v_filter+yaw_angvel;
+		VisionData.angel_x_v=f_pix_x_v_filter+yaw_angvel;/////////////////////////////////gai
 		anglev_mix_10=VisionData.angel_x_v*10;
 		VisionData.angle_x_v_filter=VisionData.angle_x_v_filter*0.25f+VisionData.angel_x_v*0.75f;
 		anglev_mix_10_filter=VisionData.angle_x_v_filter*10;
