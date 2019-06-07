@@ -31,11 +31,11 @@ extern RC_Ctl_t RC_Ctl;
 extern SHOOT_MOTOR_DATA shoot_Motor_Data_Down;
 
 
-void Control_Task()
+void Control_Task()	//定时器总控制函数
 {
 	if(time_1ms_count%10==0)
 	{
-		//WS2812_Run();
+		//WS2812_Run();	//全彩RGB运行函数
 	}
 	
 	//if(IMU_Read==1)
@@ -43,22 +43,25 @@ void Control_Task()
 		MPU_get_Data();
 	//}
 	if(time_1ms_count%5==0)
-	Heat_Simulating();
+	{
+		Heat_Simulating();	//热量本地端仿真
+	}
 	
-	Check_Task();
 	
-	Work_State_Change();
-	Work_Execute();
+	Check_Task();//自检
 	
-	Motor_Send(); 
+	Work_State_Change();	//工作状态切换函数
+	Work_Execute();	//工作状态执行函数
 	
-	Teleconltroller_Data_protect();
+	Motor_Send(); //电机发送函数
+	
+	Teleconltroller_Data_protect();	//遥控器数据错误检测
 	
 	if(time_1ms_count%120==0)
 	{
 		if(led_num>0)
 		led_num--;
-		Green_LED_8_SetNum(led_num);
+		Green_LED_8_SetNum(led_num);	//A板LED闪烁函数
 	}
 }
 
