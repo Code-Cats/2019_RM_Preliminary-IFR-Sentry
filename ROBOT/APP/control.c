@@ -148,7 +148,7 @@ void Work_State_Change(void)
 				time_count=0;
 			}
 			
-			if(Error_Check.statu[LOST_DBUS]==0&&time_count>8000)	//有反馈认为无法恢复	（数据错乱）
+			if(Error_Check.statu[LOST_DBUS]==0&&time_count>6000)	//有反馈认为无法恢复	（数据错乱）
 			{
 				time_count=0;
 				NVIC_SystemReset();
@@ -164,6 +164,7 @@ void Work_State_Change(void)
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_MIDDLE)	
 			{
 				SetWorkState(STOP_STATE);
+				
 			}
 			break;
 		}
@@ -238,7 +239,9 @@ void Work_Execute(void)	//工作执行2018.7.1
 		}
 		case AUTO_STATE:	//停止状态
 		{
+
 			Auto_Operation();	//自动运行
+			Auto_Move_NewTest();
 			
 			Yun_Task();	//开启云台处理
 			Shoot_Task();
@@ -276,6 +279,7 @@ void Motor_Send(void)
 		{
 			CAN1_Chassis_SendMsg(chassis_Data.lf_wheel_output,chassis_Data.rf_wheel_output,frictionWheel_Data.l_wheel_output,frictionWheel_Data.r_wheel_output);	//Friction_State*8000,Friction_State*-8000
 			CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,yunMotorData.pitch_output,shoot_Motor_Data_Down.output,0);
+			//CAN1_Yun_Shoot_SendMsg(0,0,shoot_Motor_Data_Down.output,0);
 			//CAN1_Yun_Shoot_SendMsg(yunMotorData.yaw_output,0,0,0);	//yaw pitch
 			break;
 		}

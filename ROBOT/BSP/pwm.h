@@ -14,8 +14,8 @@
 #define PWM5_4 TIM5->CCR4
 
 #define SetFrictionWheelSpeed(x) \
-        PWM5_1 = x;                \
-        PWM5_2 = x;
+        PWM5_3 = x;                \
+        PWM5_4 = x;
 				
 				
 #define FRICTION_INIT      1000

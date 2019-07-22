@@ -1,6 +1,7 @@
 #include "yun.h"
 #include "usart1_remote_analysis.h"
 #include "auto_aim.h"
+#include "control.h"
 
 void pitch_Feedforward_to_distinguish(void);
 float Pitch_Offset2019(float tarp,float fdbp);
@@ -54,6 +55,14 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		RC_Control_Yun(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);
 	}
 
+	if(GetWorkState()==NORMAL_STATE)
+	{
+		PID_PITCH_SPEED.input_max=PITCH_SPEED_PID_MAXINPUT;	//18
+		PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
+		PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;	//15
+		PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
+	}
+	
 	extern float test_pitch;
 	test_pitch=0;
 	//if(time_1ms_count%100==0)
@@ -93,11 +102,11 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 
 	
 	
-	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,-imu.angleV.y,&PID_PITCH_SPEED);
+	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,imu.angleV.y,&PID_PITCH_SPEED);
 	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,imu.angleV.z,&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
 	
-	yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP,yunMotorData.pitch_tarP);
-	yunMotorData.yaw_output+=YawSpeed_Offset2019(yunMotorData.yaw_tarV);
+	//yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP,yunMotorData.pitch_tarP);
+	//yunMotorData.yaw_output+=YawSpeed_Offset2019(yunMotorData.yaw_tarV);
 	
 	
 	yunMotorData.pitch_output=yunMotorData.pitch_output>30000?30000:yunMotorData.pitch_output;

@@ -6,6 +6,8 @@
 #include "usart3_judge_analysis.h"
 #include "heat_limit.h"
 
+#include <stdlib.h>
+
 s16 bulletSpeedSet=0;
 /***************************
 哨兵大脑1.0
@@ -30,14 +32,16 @@ extern VisionDataTypeDef	VisionData;
  extern float ZGyroModuleAngle;
 extern YUN_MOTOR_DATA 			yunMotorData;
 extern s16 ViceBoard_Position;	//0-2690	//正方向与速度一致
+extern s8 encoder_speed;	//编码器测速 与位置正方向一致
+
 AUTO_OperationStateTypeDef AutoOperationState=CHASSIS_FINDING_ENEMY_NORMAL;
 AUTO_OperationYunStateTypeDef AUTO_OperationYunState=YUN_FINDING_ENEMY;
 
-#define ORBIT_MAX_POS 1740
-#define ORBIT_EVADING_DRONES_POSLIMIT 1280 //2000	//躲避无人机中止点
+#define ORBIT_MAX_POS 2390+40//1740
+#define ORBIT_EVADING_DRONES_POSLIMIT 1765//1280 //2000	//躲避无人机中止点
 #define ORBIT_ORIGIN_POS 0	//轨道起点
-#define ORBOT_INFLEXION1_POS 500	//第一个拐点
-#define ORBOT_INFLEXION2_POS 1280	//第二个拐点
+#define ORBOT_INFLEXION1_POS 584//500	//第一个拐点
+#define ORBOT_INFLEXION2_POS 1765//1280	//第二个拐点
 
 extern u8 Friction_State;
 
@@ -109,11 +113,11 @@ void Auto_Operation(void)	//运行频率1000hz
 	{
 		case CHASSIS_FINDING_ENEMY_NORMAL://正常情况边走边寻找目标
 		{
-			///*********************************************************************
+			/*********************************************************************
 			Tar_remain_powerbuffer=160;
 			if(no_enemy_move_state==1)
 			{
-				Auto_Move_Task(ORBIT_EVADING_DRONES_POSLIMIT,280);//MAX_STROKE-40
+				Auto_Move_Task(ORBIT_EVADING_DRONES_POSLIMIT,1000);//MAX_STROKE-40
 				if(ViceBoard_Position>+ORBIT_EVADING_DRONES_POSLIMIT-50) //2690-60=2630	MAX_STROKE-60
 				{
 					no_enemy_move_state=0;
@@ -123,7 +127,7 @@ void Auto_Operation(void)	//运行频率1000hz
 			}
 			else
 			{
-				Auto_Move_Task(ORBIT_ORIGIN_POS,280);
+				Auto_Move_Task(ORBIT_ORIGIN_POS,1000);
 				if(ViceBoard_Position<ORBIT_ORIGIN_POS+50)
 				{
 					no_enemy_move_state=1;
@@ -142,7 +146,7 @@ void Auto_Operation(void)	//运行频率1000hz
 				no_enemy_move_state=!no_enemy_move_state;
 			}
 			
-			//**************************************************************/
+			**************************************************************/
 			break;
 		}
 		case CHASSIS_HIT_ENEMY_STOP:	//底盘静止停止击打目标
@@ -169,6 +173,7 @@ void Auto_Operation(void)	//运行频率1000hz
 		{
 			static u32 timecount=0;
 			static u8 run_pos_state=1;
+			Tar_remain_powerbuffer=90;
 			if(robot_hurt_lastnum!=robot_hurted_num)
 			{
 				u8 nowpos=Recognize_EncoderPosState(ViceBoard_Position);	//辨别自己当前在轨道位置
@@ -204,11 +209,11 @@ void Auto_Operation(void)	//运行频率1000hz
 			static u32 timecount=0;
 			timecount++;
 			Tar_remain_powerbuffer=90;
-			Auto_Move_Task(ORBIT_ORIGIN_POS,400);
+			Auto_Move_Task(ORBIT_ORIGIN_POS,1500);
 			
 			if(no_enemy_move_state==1)
 			{
-				Auto_Move_Task(ORBIT_MAX_POS,400);//MAX_STROKE-40
+				Auto_Move_Task(ORBIT_MAX_POS,1500);//MAX_STROKE-40
 				if(ViceBoard_Position>ORBIT_EVADING_DRONES_POSLIMIT-40) //2690-60=2630	MAX_STROKE-60
 				{
 					no_enemy_move_state=0;
@@ -218,7 +223,7 @@ void Auto_Operation(void)	//运行频率1000hz
 			}
 			else
 			{
-				Auto_Move_Task(ORBIT_ORIGIN_POS,350);
+				Auto_Move_Task(ORBIT_ORIGIN_POS,1500);
 				if(ViceBoard_Position<ORBIT_ORIGIN_POS+40)
 				{
 					no_enemy_move_state=1;
@@ -240,10 +245,10 @@ void Auto_Operation(void)	//运行频率1000hz
 			break;
 	}
 	
-
+/****************************************************8
 	if(encoder_caili_flag==1)	//向原点校准
 	{
-		Chassis_Vx=-280;
+		Chassis_Vx=-350;
 		if(encoder_startsensor==0||encoder_endsensor==0)
 		{
 			encoder_caili_flag=0;
@@ -251,7 +256,7 @@ void Auto_Operation(void)	//运行频率1000hz
 	}
 	if(encoder_caili_flag==-1)
 	{
-		Chassis_Vx=280;
+		Chassis_Vx=350;
 		if(encoder_startsensor==0||encoder_endsensor==0)
 		{
 			encoder_caili_flag=0;
@@ -260,14 +265,14 @@ void Auto_Operation(void)	//运行频率1000hz
 	
 	if(encoder_startsensor==0&&encoder_endsensor==1)
 	{
-		Chassis_Vx=320;
+		Chassis_Vx=350;
 	}
 	
 	if(encoder_endsensor==0&&encoder_startsensor==1)
 	{
-		Chassis_Vx=-320;
+		Chassis_Vx=-350;
 	}
-	
+*******************************************************/
 	static u8 yun_pitch_findstate=0;
 	switch(AUTO_OperationYunState)	//云台	//待加入装甲受到攻击则云台转向状态-云台快速移动PID向目标区域上下扫描，如果超时则推出到寻找模式 如果sign=1则进入打击模式
 	{
@@ -281,13 +286,13 @@ void Auto_Operation(void)	//运行频率1000hz
 			else	//没有目标，云台自动转
 			{
 				///*********************************************************************************
-				yunMotorData.yaw_tarP=ZGyroModuleAngle*10+165;
+				yunMotorData.yaw_tarP=ZGyroModuleAngle*10+135;//165
 				switch(yun_pitch_findstate)
 				{
 					case 0:
 					{
 						static u32 timecount=0;
-						yunMotorData.pitch_tarP=7100;
+						yunMotorData.pitch_tarP=2800;
 						timecount++;
 						if(timecount>250)
 						{
@@ -300,7 +305,7 @@ void Auto_Operation(void)	//运行频率1000hz
 					case 1:
 					{
 						static u32 timecount=0;
-						yunMotorData.pitch_tarP=6150;
+						yunMotorData.pitch_tarP=2000;
 						timecount++;
 						if(timecount>250)
 						{
@@ -318,8 +323,8 @@ void Auto_Operation(void)	//运行频率1000hz
 //			PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
 //			PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
 //			PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
-			PID_PITCH_SPEED.input_max=180;	//18
-			PID_PITCH_SPEED.input_min=-180;
+			PID_PITCH_SPEED.input_max=150;	//18
+			PID_PITCH_SPEED.input_min=-150;
 			PID_YAW_SPEED.input_max=150;	//15
 			PID_YAW_SPEED.input_min=-150;
 			break;
@@ -385,7 +390,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 			static u8 movestate=0;
 			if(movestate==1)
 			{
-				Auto_Move_Task(ORBOT_INFLEXION1_POS,320);//MAX_STROKE-40
+				Auto_Move_Task(ORBOT_INFLEXION1_POS,1000);//MAX_STROKE-40
 				if(ViceBoard_Position>ORBOT_INFLEXION1_POS-60) //2690-60=2630	MAX_STROKE-60
 				{
 					movestate=0;
@@ -395,7 +400,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 			}
 			else
 			{
-				Auto_Move_Task(ORBIT_ORIGIN_POS,320);
+				Auto_Move_Task(ORBIT_ORIGIN_POS,1000);
 				if(ViceBoard_Position<ORBIT_ORIGIN_POS+70)
 				{
 					movestate=1;
@@ -409,7 +414,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 			static u8 movestate=0;
 			if(movestate==1)
 			{
-				Auto_Move_Task(ORBOT_INFLEXION2_POS,320);//MAX_STROKE-40
+				Auto_Move_Task(ORBOT_INFLEXION2_POS,1000);//MAX_STROKE-40
 				if(ViceBoard_Position>ORBOT_INFLEXION2_POS-60) //2690-60=2630	MAX_STROKE-60
 				{
 					movestate=0;
@@ -419,7 +424,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 			}
 			else
 			{
-				Auto_Move_Task(ORBOT_INFLEXION1_POS,320);
+				Auto_Move_Task(ORBOT_INFLEXION1_POS,1000);
 				if(ViceBoard_Position<ORBOT_INFLEXION1_POS+60)
 				{
 					movestate=1;
@@ -433,7 +438,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 			static u8 movestate=0;
 			if(movestate==1)
 			{
-				Auto_Move_Task(ORBIT_MAX_POS,320);//MAX_STROKE-40
+				Auto_Move_Task(ORBIT_MAX_POS,1000);//MAX_STROKE-40
 				if(ViceBoard_Position>ORBIT_MAX_POS-60) //2690-60=2630	MAX_STROKE-60
 				{
 					movestate=0;
@@ -443,12 +448,83 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 			}
 			else
 			{
-				Auto_Move_Task(ORBOT_INFLEXION2_POS,320);
+				Auto_Move_Task(ORBOT_INFLEXION2_POS,1000);
 				if(ViceBoard_Position<ORBOT_INFLEXION2_POS+60)
 				{
 					movestate=1;
 					
 				}
+			}
+			break;
+		}
+	}
+}
+
+u8 autoState_ChssisEnable=1;
+u8 new_move_flag=0;
+//encoder_speed
+//extern u8 encoder_startsensor;
+//extern u8 encoder_endsensor;
+void Auto_Move_NewTest(void)	//结合动能转化的轨道优化策略测试
+{
+	
+	switch(new_move_flag)
+	{
+		case 0:
+		{
+			if(ViceBoard_Position>0)
+			{
+				Chassis_Vx=-1200;
+			}
+			if(encoder_startsensor==0)
+			{
+				autoState_ChssisEnable=0;
+				//Tar_remain_powerbuffer=100;
+			}
+			else
+			{
+				autoState_ChssisEnable=1;
+				//Tar_remain_powerbuffer=160;
+			}
+			
+			if((time_1ms_count+50)%1000==0&&(rand()%100)<50)
+			{
+				srand(time_1ms_count);
+				new_move_flag=1;
+			}
+			
+			if(encoder_speed>0)
+			{
+				new_move_flag=1;
+			}
+			//Auto_Move_Task(ORBIT_EVADING_DRONES_POSLIMIT,1000);//MAX_STROKE-40
+			break;
+		}
+		case 1:
+		{
+			if(ViceBoard_Position<2430)
+			{
+				Chassis_Vx=1200;
+			}
+			if(encoder_endsensor==0)
+			{
+				//Tar_remain_powerbuffer=100;
+				autoState_ChssisEnable=0;
+			}
+			else
+			{
+				//Tar_remain_powerbuffer=160;
+				autoState_ChssisEnable=1;
+			}
+			
+			if(time_1ms_count%1000==0&&(rand()%100)<50)
+			{
+				new_move_flag=0;
+			}
+			
+			if(encoder_speed<0)
+			{
+				new_move_flag=0;
 			}
 			break;
 		}

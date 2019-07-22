@@ -25,3 +25,8 @@ brain.c : CHASSIS_AUTORUN
 		  YUN_AUTORUN
 		  AUTO_SHOOT
 
+
+待更改REMOTE DMA空闲触发
+
+
+目标buffer设置斜坡

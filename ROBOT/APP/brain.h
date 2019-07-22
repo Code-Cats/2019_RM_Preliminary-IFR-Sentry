@@ -5,7 +5,6 @@
 
 #define MAX_STROKE 2690
 
-void Auto_Operation(void);
 
 typedef enum	//注意控制功率限制函数  注意单位时间收到攻击血量的变化设置为切换状态的标志位
 {
@@ -34,4 +33,5 @@ void RobotHurtCallback(uint8_t armorid,uint8_t hurttype);
 u8 Recognize_EncoderPosState(s16 pos);
 void Chassis_ORBITState_Run(u8 runstate);	//根据传入参数决定在轨道哪一段运行
 
+void Auto_Move_NewTest(void);	//结合动能转化的轨道优化策略测试
 #endif

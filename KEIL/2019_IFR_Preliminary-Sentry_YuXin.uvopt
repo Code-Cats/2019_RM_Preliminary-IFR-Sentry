@@ -167,24 +167,7 @@
           <Name>-O207 -S0 -C0 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F4xx_2048 -FS08000000 -FL0200000)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>38</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134255728</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\ROBOT\ANALYSIS\usart3_judge_analysis.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -289,12 +272,12 @@
         <Ww>
           <count>20</count>
           <WinNumber>1</WinNumber>
-          <ItemText>((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0C00))-&gt;CCR1</ItemText>
+          <ItemText>((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0C00))-&gt;CCR1,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>21</count>
           <WinNumber>1</WinNumber>
-          <ItemText>((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0C00))-&gt;CCR1</ItemText>
+          <ItemText>((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0C00))-&gt;CCR1,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>22</count>
@@ -543,6 +526,46 @@
           <WinNumber>2</WinNumber>
           <ItemText>timecount</ItemText>
         </Ww>
+        <Ww>
+          <count>35</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>USART3_DMA_RX_BUF[1]</ItemText>
+        </Ww>
+        <Ww>
+          <count>36</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>((TIM_TypeDef *) (((uint32_t)0x40000000) + 0x0C00)),0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>37</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>\\2019_IFR_Preliminary_Sentry_YuXin\../ROBOT/ANALYSIS/usart1_remote_analysis.c\RC_Ctl.rc.ch1</ItemText>
+        </Ww>
+        <Ww>
+          <count>38</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>\\2019_IFR_Preliminary_Sentry_YuXin\../ROBOT/ANALYSIS/usart1_remote_analysis.c\RC_Ctl.rc.ch1</ItemText>
+        </Ww>
+        <Ww>
+          <count>39</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>encoder_speed,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>40</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>autoState_ChssisEnable</ItemText>
+        </Ww>
+        <Ww>
+          <count>41</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>encoder_endsensor</ItemText>
+        </Ww>
+        <Ww>
+          <count>42</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>encoder_startsensor</ItemText>
+        </Ww>
       </WatchWindow2>
       <Tracepoint>
         <THDelay>0</THDelay>
@@ -579,6 +602,14 @@
         <Entry>
           <Name>System Viewer\DMA1</Name>
           <WinId>35905</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\TIM4</Name>
+          <WinId>35904</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\TIM5</Name>
+          <WinId>35903</WinId>
         </Entry>
       </SystemViewers>
     </TargetOption>
