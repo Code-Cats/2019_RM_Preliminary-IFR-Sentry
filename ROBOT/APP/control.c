@@ -240,8 +240,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		case AUTO_STATE:	//停止状态
 		{
 
-			Auto_Operation();	//自动运行
-			Auto_Move_NewTest();
+			Auto_Operation_New();	//自动运行
 			
 			Yun_Task();	//开启云台处理
 			Shoot_Task();

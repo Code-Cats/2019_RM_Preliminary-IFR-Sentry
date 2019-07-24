@@ -2,6 +2,7 @@
 #include "math.h"
 #include "yun.h"
 #include "protect.h"
+#include "friction_wheel.h"
 
 //#include "arm_math.h"
 
@@ -66,9 +67,10 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 //#define PITCH_INIT         7197	//2019.5.22
 #define YUN_DOWN_VALUELIMIT 6500	//向下限位
 #define YUN_UP_VALUELIMIT 7350	//向上限位
-#define YUN_UP_DISLIMIT 100	//正常的活动范围，UP为正
-#define YUN_DOWN_DISLIMIT 1500	//正常的活动范围，DOWN为负
+#define YUN_UP_DISLIMIT 120	//正常的活动范围，UP为正
+#define YUN_DOWN_DISLIMIT 1120	//正常的活动范围，DOWN为负
 
+extern FRICTIONWHEEL_DATA frictionWheel_Data;
 
 float Shoot_V=18.0f;//15.5f	//14M/s
 float Shoot_V_2= 324.0f;//(SHOOT_V*SHOOT_V)
@@ -83,12 +85,21 @@ s32 imu_angelv_z_10=0;
 float yaw_residual_error=0;	//打移动靶时云台跟随静差
 /////////////////
 ////////////////
+
+u16 last_tarx=0;
+
 u8 sign_count=0;	//第三帧才开始动态识别
 #define VISION_TARX 990//1035//710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
 #define VISION_TARY	610//590//570//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
-	Shoot_V_2=Shoot_V*Shoot_V;
+	if(frictionWheel_Data.l_wheel_tarV!=0)
+	{
+		Shoot_V=frictionWheel_Data.l_wheel_tarV;
+		Shoot_V_2=Shoot_V*Shoot_V;
+	}
+	
+	
 	imu_angelv_z_10=(s32)(imu.angleV.z*10);
 	if(Error_Check.statu[LOST_VISION]==1){	VisionData.armor_type=0;VisionData.armor_sign=0;	}//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
@@ -154,7 +165,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis_filter/100.0f));	//重力补偿
 		
 		//
-		
+		last_tarx=VisionData.tar_x;
 		
 			if(VisionData.armor_dis<600)	//只预测6m以内
 			{

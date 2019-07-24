@@ -48,7 +48,7 @@ void BSP_Init(void)
 	USART3_Configuration(115200);
 	
 	//USART6_ViceBoard_Init(115200);
-	USART8_ViceBoard_Init(256000);
+	USART8_ViceBoard_Init(512000);
 	
 	UART7_Vision_Init(115200);
 	//delay_ms(10000);

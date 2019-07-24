@@ -30,3 +30,6 @@ brain.c : CHASSIS_AUTORUN
 
 
 目标buffer设置斜坡
+
+在3s使用完后 使tarbuffer=judge_buffer?
+根据裁判数据回传自动开关摩擦轮和强制进入自动模式

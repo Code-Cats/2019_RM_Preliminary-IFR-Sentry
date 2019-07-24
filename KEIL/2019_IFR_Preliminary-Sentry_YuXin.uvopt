@@ -566,6 +566,21 @@
           <WinNumber>2</WinNumber>
           <ItemText>encoder_startsensor</ItemText>
         </Ww>
+        <Ww>
+          <count>43</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>AutoOperationData,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>44</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>SensorData,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>45</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Shoot_V</ItemText>
+        </Ww>
       </WatchWindow2>
       <Tracepoint>
         <THDelay>0</THDelay>

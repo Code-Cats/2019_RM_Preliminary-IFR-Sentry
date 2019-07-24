@@ -54,7 +54,6 @@ int main(void)//40-508-1289-1705
 		
 		if(time_1ms_count%1000==0)
 		{
-			
 			led_num=8;
 		}
 		

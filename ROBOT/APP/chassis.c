@@ -23,14 +23,14 @@ extern ext_power_heat_data_t heat_data_judge;
 /*************************************************************/
 
 /***************底盘相关控制位（其他函数会引用）*****************/
-
+extern AutoOperationDataTypeDef AutoOperationData;
 /*************************************************************/
 
 #define K_SPEED 15
 
 float t_Vx_k=0;
 u8 Chassis_Control_RCorPC=RC_CONTROL;
-extern u8 autoState_ChssisEnable;
+
 void Remote_Task(void)
 {
 	Chassis_Control_External_Solution();
@@ -72,7 +72,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 	chassis_Data.lf_wheel_output=PID_General(chassis_Data.lf_wheel_tarV,chassis_Data.lf_wheel_fdbV,&PID_Chassis_Speed[LF]);
 	chassis_Data.rf_wheel_output=PID_General(chassis_Data.rf_wheel_tarV,chassis_Data.rf_wheel_fdbV,&PID_Chassis_Speed[RF]);
 
-	if(GetWorkState()==AUTO_STATE&&autoState_ChssisEnable==0)
+	if(GetWorkState()==AUTO_STATE&&AutoOperationData.chassis_enable==0)
 	{
 		chassis_Data.lf_wheel_output=0;
 		chassis_Data.rf_wheel_output=0;
@@ -137,8 +137,7 @@ void RC_Control_Chassis(void)
 }
 
 extern ext_game_robot_state_t robot_state_judge;
-extern AUTO_OperationStateTypeDef AutoOperationState;
-u8 Tar_remain_powerbuffer=160;
+//u8 Tar_remain_powerbuffer=160;
 
 #define POWER_LIMIT_K 0.9f/120 //0.8f/50.0f	//即能量槽空时0.2，50时开始限制
 #define POWER_LIMIT_B	0.1f //0.21f
@@ -151,7 +150,7 @@ float Limit_Power(float power,float powerbuffer,u32 outputsum)	//经调试 output=5
 {
 	float limit_k=1;
 
-	if(outputsum>700||Tar_remain_powerbuffer<=50||powerbuffer<=50)//&&robot_state_judge.remain_HP>=300
+	if(outputsum>700||AutoOperationData.real_remainbuffer<=50||powerbuffer<=50)//需要重新测试
 	{
 		if(Error_Check.statu[LOST_REFEREE]==1)	//裁判lost
 		{
@@ -160,11 +159,11 @@ float Limit_Power(float power,float powerbuffer,u32 outputsum)	//经调试 output=5
 		}
 		else
 		{
-			powerbuffer-=Tar_remain_powerbuffer;
+			powerbuffer-=AutoOperationData.real_remainbuffer;
 
 			limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4
 			limit_k=limit_k>1?1:limit_k;
-			limit_k=limit_k<0.05f?0.05f:limit_k;
+			limit_k=limit_k<0.1f?0.1f:limit_k;
 		}
 	}
 

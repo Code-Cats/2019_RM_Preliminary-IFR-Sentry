@@ -8,7 +8,7 @@ float Pitch_Offset2019(float tarp,float fdbp);
 float YawSpeed_Offset2019(float tarv);
 
 s32 YAW_INIT=YAW_INIT_DEFINE;
-
+s32 yaw_tarp_test=0;
 
 YUN_MOTOR_DATA 			yunMotorData=YUN_MOTOR_DATA_DEFAULT;
 YUN_DATA          	yunData=YUN_DATA_DEFAULT;
@@ -37,6 +37,7 @@ void Yun_Task(void)	//云台控制任务
 //	{
 //		Yun_Control_Inscribe_Solution();	//当陀螺仪位置反馈崩了，就采用速度环控制
 //	}
+	yaw_tarp_test=yunMotorData.yaw_tarP;
 }
 
 u8 Yun_Control_RCorPC=RC_CONTROL;

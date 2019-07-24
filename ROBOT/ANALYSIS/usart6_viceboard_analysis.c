@@ -1,11 +1,11 @@
 #include "usart6_viceboard_analysis.h"
 #include "protect.h"
 
-s16 ViceBoard_Position=0;
-u8 encoder_startsensor=0;
-u8 encoder_endsensor=0;
-s8 encoder_speed=0;
-//SensorDataTypeDef SensorData={0};
+SensorDataTypeDef SensorData={0};
+//s16 ViceBoard_Position=0;
+//u8 encoder_startsensor=0;
+//u8 encoder_endsensor=0;
+//s8 encoder_speed=0;
 ViceControlDataTypeDef ViceControlData={0};
 ViceBoardSendTypeDef SendData=VICEBOARD_SENDDATA_DEFAULT;
 u16 t_vice_count=0;
@@ -88,12 +88,12 @@ void ViceData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 
 void SensorData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 {
-	ViceBoard_Position=*(pData+1);
-	ViceBoard_Position=ViceBoard_Position<<6;
-	ViceBoard_Position+=(*(pData+2))>>2;
-	encoder_startsensor=*(pData+2)&0x01;
-	encoder_endsensor=(*(pData+2)>>1)&0x01;
-	encoder_speed=*(pData+3);
+	SensorData.encoderPos=*(pData+1);
+	SensorData.encoderPos=SensorData.encoderPos<<6;
+	SensorData.encoderPos+=(*(pData+2))>>2;
+	SensorData.switch_start=*(pData+2)&0x01;
+	SensorData.switch_end=(*(pData+2)>>1)&0x01;
+	SensorData.encoderSpeed=*(pData+3);
 //	ViceBoard_Position=(s16)(*(pData+1))<<8 | (s16)(*(pData+2));
 //	for(int i=0;i<4;i++)
 //	{
