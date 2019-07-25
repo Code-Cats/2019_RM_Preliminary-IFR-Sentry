@@ -64,11 +64,6 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 		PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
 	}
 	
-	extern float test_pitch;
-	test_pitch=0;
-	//if(time_1ms_count%100==0)
-	//Vision_Task(&yunMotorData.yaw_tarP,&yunMotorData.pitch_tarP);	//控制键位集成再内部
-	
 	//前馈辨别 需要辨识时再用
 	pitch_Feedforward_to_distinguish();
 	

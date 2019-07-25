@@ -72,8 +72,8 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//´Ó×îÔ­Ê¼µÄÊý¾Ý½øÐÐ¼ÆËã¿ÉÒÔ¼õ
 
 extern FRICTIONWHEEL_DATA frictionWheel_Data;
 
-float Shoot_V=18.0f;//15.5f	//14M/s
-float Shoot_V_2= 324.0f;//(SHOOT_V*SHOOT_V)
+float Shoot_V=25;//18.0f;//15.5f	//14M/s
+float Shoot_V_2= 625;//324.0f;//(SHOOT_V*SHOOT_V)
 
 s32 imu_matchz_10=0;
 float pix_anglev=0;
@@ -132,7 +132,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 	}
 	
 
-	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.dealingtime*2);
+	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.predicttime);
 	imu_matchz_10=(s32)(VisionData.imu_vz_match*10);
 	pix_anglev=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
 	
@@ -157,8 +157,8 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		
 //		t_yaw_error=(float)Gyro_Data.angle[2]*10-Pixel_to_angle((s16)(VisionData.error_x-VISION_TARX))*10;
 //		t_pitch_error=(float)yunMotorData.pitch_fdbP+Pixel_to_angle((s16)(VisionData.error_y-VISION_TARY))*8192/360;
-		float offset_x_angle=atan(9.0f/VisionData.armor_dis)*573;
-		float zgyro_match_10=GetRecordYawAngle(12)*10;
+		float offset_x_angle=atan(7.5f/VisionData.armor_dis)*573;
+		float zgyro_match_10=GetRecordYawAngle(5)*10;
 		float pitch_fdb_match=GetRecordPitchAngle(VisionData.dealingtime);
 		*yaw_tarP=zgyro_match_10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;//(float)ZGyroModuleAngle*10
 		*pitch_tarP=pitch_fdb_match-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
@@ -169,7 +169,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 		
 			if(VisionData.armor_dis<600)	//Ö»Ô¤²â6mÒÔÄÚ
 			{
-			//	Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ýµ÷½Ú
+				//Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ýµ÷½Ú
 			}
 
 		
@@ -190,7 +190,7 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖÐ£¬Ï
 {
 	if(dis_m>8)	dis_m=8;
 	
-	dis_m-=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
+	//dis_m-=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//»¡¶ÈÖÆ¼ò»¯¼ÆËã2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;

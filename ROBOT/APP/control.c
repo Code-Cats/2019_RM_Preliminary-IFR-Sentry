@@ -7,8 +7,12 @@
 #include "heat_limit.h"
 #include "led_control.h"
 
+#include "uart7_vision_analysis.h"
+
 WorkState_e workState=PREPARE_STATE;
 
+u8 fffffuuuuuuukkkkkktttttttt=0;
+extern VisionDataTypeDef	VisionData;
 //uint32_t time_tick_1ms = 0;	//全局1ms计时变量
 ///***************************************************************************/
 //WorkState_e workState = PREPARE_STATE;
@@ -36,6 +40,11 @@ void Control_Task()	//定时器总控制函数
 	if(time_1ms_count%10==0)
 	{
 		//WS2812_Run();	//全彩RGB运行函数
+	}
+	
+	if(VisionData.armor_sign==0&&VisionData.vision_control_state==1)
+	{
+		fffffuuuuuuukkkkkktttttttt=1;
 	}
 	
 	//if(IMU_Read==1)
@@ -240,7 +249,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		case AUTO_STATE:	//停止状态
 		{
 
-			Auto_Operation_New();	//自动运行
+			//Auto_Operation_New();	//自动运行
 			
 			Yun_Task();	//开启云台处理
 			Shoot_Task();

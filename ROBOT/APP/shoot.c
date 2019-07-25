@@ -46,7 +46,7 @@ void Shoot_Task(void)	//¶¨Ê±ÆµÂÊ£º1ms
 	//LASER_SWITCH=Friction_State; 
 	if(Friction_State==1)
 	{
-		Friction_Speed_Set(25);
+		Friction_Speed_Set(18);
 	}
 	else
 	{

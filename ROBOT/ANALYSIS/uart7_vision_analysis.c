@@ -8,15 +8,15 @@ extern YUN_MOTOR_DATA 			yunMotorData;
 VisionDataTypeDef	VisionData={0};
 VisionReceiveDataTypeDef VisionReceiveData={0};
 
-u8 tempdata[13]={0};
+u8 tempdata[14]={0};
 u8 tempcount=0;
 
-#define DATA_LEN 12	//加上帧头帧尾总长度
+#define DATA_LEN 13	//加上帧头帧尾总长度
 u32 t_vision_count=0;
 void VisionData_Receive(u8 data)	//从主板传过来的数据解析（主副板通用）
 {
 	tempcount++;
-	if(tempcount>=12)
+	if(tempcount>=13)
 	{
 		tempcount=0;
 	}
@@ -68,10 +68,12 @@ void VisionData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 	VisionData.armor_sign=*(pData+1)>>(7)&0x01;
 	VisionData.armor_type=*(pData+1)>>(4)&0x07;
 	tem_dis=*(pData+2)<<8|*(pData+3);
+	//tem_dis=520;
 	tem_tarx=*(pData+4)<<8|*(pData+5);
 	tem_tary=*(pData+6)<<8|*(pData+7);
 	VisionData.pix_x_v=*(pData+8)<<8|*(pData+9);
-	VisionData.dealingtime=*(pData+10);
+	VisionData.predicttime=*(pData+10);//time_v
+	VisionData.dealingtime=*(pData+11);
 	
 	if(tem_dis<=1000)
 	{

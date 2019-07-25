@@ -12,6 +12,10 @@ void Friction_Speed_Set(u16 bullet_speed)	//设置射速，射速到摩擦轮速度的转换
 	{
 		frictionWheel_Data.l_wheel_tarV=16;
 	}
+	else if(bullet_speed==18)
+	{
+		frictionWheel_Data.l_wheel_tarV=18;
+	}
 	else if(bullet_speed==21)
 	{
 		frictionWheel_Data.l_wheel_tarV=21;
@@ -37,7 +41,7 @@ void Friction_Speed_Set(u16 bullet_speed)	//设置射速，射速到摩擦轮速度的转换
 	}
 	else
 	{
-		frictionWheel_Data.l_wheel_output=1115+(frictionWheel_Data.l_wheel_tarV-10)*5;	//1115->speed=10
+		frictionWheel_Data.l_wheel_output=1120+(frictionWheel_Data.l_wheel_tarV-10)*5;	//1115->speed=10  1120
 	}
 	
 	

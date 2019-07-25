@@ -138,7 +138,7 @@ void RC_Control_Chassis(void)
 
 extern ext_game_robot_state_t robot_state_judge;
 //u8 Tar_remain_powerbuffer=160;
-
+//设置为40j能量缓冲
 #define POWER_LIMIT_K 0.9f/120 //0.8f/50.0f	//即能量槽空时0.2，50时开始限制
 #define POWER_LIMIT_B	0.1f //0.21f
 u8 limit_power_statu=0;

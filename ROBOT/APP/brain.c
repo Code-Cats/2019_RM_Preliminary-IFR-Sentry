@@ -712,7 +712,7 @@ void Auto_Move_Normal(void)	//普通模式全程轨道跑
 //encoder_speed
 //extern u8 encoder_startsensor;
 //extern u8 encoder_endsensor;
-#define EVADE_VX 1200
+#define EVADE_VX 1000
 void Auto_Move_Evade(void)	//闪模式随机跑
 {
 	static u8 move_evade_state=4;
