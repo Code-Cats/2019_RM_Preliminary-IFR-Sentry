@@ -275,12 +275,12 @@ s16 Pitch_output_offset(s32 pitch_tarP)	//¿Ë·şÔÆÌ¨pitchÖá·ÇÏßĞÔÁ¦¼°·Ç¶Ô³ÆĞÔµÄ²¹³
 }
 
 
-////ÏÂ5810-ÉÏ7250	//40µİ½ø
+////ÏÂ2000-ÉÏ3250	//40µİ½ø
 //Ç°À¡±æÊ¶
 #define AVRNUMS 700
 u8 Feedforward_startflag=0;
 u8 Feedforward_state=0;
-const u16 tapi=6060;
+const u16 tapi=2000;
 u16 record_i=0;
 float fdbpi[40]={0};
 float outputi[40]={0};
@@ -359,7 +359,7 @@ float Pitch_Offset2019(float tarp,float fdbp)
 //	{
 //		laststate=1;
 //	}
-	if(fdbp-fdb_record>10)
+	if(fdbp-fdb_record>10)	//
 	{
 		//laststate=0;
 		fdb_record=fdbp;

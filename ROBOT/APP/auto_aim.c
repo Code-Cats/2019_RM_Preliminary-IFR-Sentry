@@ -55,7 +55,7 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 	float cos_angel_2=(float)camera_d_2/(float)r_2;
 	float angel_v=0;
 	angel_v=pix_v*cos_angel_2/(float)CAMERA_D;
-	angel_v=angel_v*57.5f;//*2*PI;	//进行还原处理
+	angel_v=angel_v*58.2f;//*2*PI;	//进行还原处理
 	
 	//angel_v=0.036081f*pix_v+0.1f;//+0.3026f;	//MATLAB拟合
 	
@@ -89,7 +89,7 @@ float yaw_residual_error=0;	//打移动靶时云台跟随静差
 u16 last_tarx=0;
 
 u8 sign_count=0;	//第三帧才开始动态识别
-#define VISION_TARX 990//1035//710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
+#define VISION_TARX 970//990//1035//710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
 #define VISION_TARY	610//590//570//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
@@ -107,18 +107,18 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_sign==1&&VisionData.armor_dis<=750)	//VisionData.armor_sign!=0
 	{
 		VisionData.vision_control_state=1;	//最终控制位
-//		PID_PITCH_SPEED.input_max=80;
-//		PID_PITCH_SPEED.input_min=-80;
-//		PID_YAW_SPEED.input_max=100;
-//		PID_YAW_SPEED.input_min=-100;
+		PID_PITCH_SPEED.input_max=180;
+		PID_PITCH_SPEED.input_min=-180;
+		PID_YAW_SPEED.input_max=150;
+		PID_YAW_SPEED.input_min=-150;
 	}
 	else
 	{
 		VisionData.vision_control_state=0;	//最终控制位
-//		PID_PITCH_SPEED.input_max=PITCH_SPEED_PID_MAXINPUT;
-//		PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
-//		PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
-//		PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
+		PID_PITCH_SPEED.input_max=PITCH_SPEED_PID_MAXINPUT;
+		PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
+		PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
+		PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
 	}
 	
 	if(VisionData.armor_sign==1)	//保护性输出，前几帧速度置0
@@ -132,7 +132,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	}
 	
 
-	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.predicttime);
+	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.predicttime-2);
 	imu_matchz_10=(s32)(VisionData.imu_vz_match*10);
 	pix_anglev=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
 	
@@ -157,7 +157,8 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		
 //		t_yaw_error=(float)Gyro_Data.angle[2]*10-Pixel_to_angle((s16)(VisionData.error_x-VISION_TARX))*10;
 //		t_pitch_error=(float)yunMotorData.pitch_fdbP+Pixel_to_angle((s16)(VisionData.error_y-VISION_TARY))*8192/360;
-		float offset_x_angle=atan(7.5f/VisionData.armor_dis)*573;
+		float offset_x_angle=atan(6.5f/VisionData.armor_dis)*573;
+		//offset_x_angle=0;
 		float zgyro_match_10=GetRecordYawAngle(5)*10;
 		float pitch_fdb_match=GetRecordPitchAngle(VisionData.dealingtime);
 		*yaw_tarP=zgyro_match_10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;//(float)ZGyroModuleAngle*10
@@ -285,71 +286,12 @@ void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_anglev)
 	if(pix_x_anglev>45)	pix_x_anglev=45;
 	if(pix_x_anglev<-45)	pix_x_anglev=-45;
 	
-	
-				static s16 pix_x_v_last[FILTER_FACTOR-1]={0};	//4阶中值滤波
-				static u8 last_count=0;
-				s16 pix_x_v_now_sort[FILTER_FACTOR];
-				
-				
-				for(u8 i=0;i<FILTER_FACTOR-1;i++)	//copy last data
-				{
-					  pix_x_v_now_sort[i]=pix_x_v_last[i];
-				}
-				
-				pix_x_v_now_sort[FILTER_FACTOR-1]=pix_x_anglev;	//copy current data
-				
-				for(u8 i=0;i<FILTER_FACTOR-1;i++)	//冒泡排序	只用循环FILTER_FACTOR-1  FILTER_FACTOR-2  FILTER_FACTOR-3 FILTER_FACTOR-4 次
-				{
-					for(u8 j=0;j<FILTER_FACTOR-1-i;j++)
-					{
-						if(pix_x_v_now_sort[j]<pix_x_v_now_sort[j+1])
-						{
-							float tem_small=pix_x_v_now_sort[j];
-							pix_x_v_now_sort[j]=pix_x_v_now_sort[j+1];
-							pix_x_v_now_sort[j+1]=tem_small;
-						}
-					}
-				}	//排序完成
-				
-				if(FILTER_FACTOR%2==1)	//中位数
-				{
-					pix_x_v_filter=pix_x_v_now_sort[(FILTER_FACTOR-1)/2];
-				}
-				else
-				{
-					pix_x_v_filter=(pix_x_v_now_sort[FILTER_FACTOR/2]+pix_x_v_now_sort[FILTER_FACTOR/2-1])/2;
-				}//排序完成
-
-	
-	
-	static float f_pix_x_v_filter=0;
-	
-	f_pix_x_v_filter=f_pix_x_v_filter*0.5f+pix_x_v_filter*0.5f;	//6-4
-	
-	pix_x_v_filter_10=(s16)(f_pix_x_v_filter*10);//??????????000
-	
-	
-
-
-		pix_anglev_10=(s32)(f_pix_x_v_filter*10);
-		VisionData.angel_x_v=f_pix_x_v_filter+yaw_angvel;/////////////////////////////////gai
-		anglev_mix_10=VisionData.angel_x_v*10;
-		VisionData.angle_x_v_filter=VisionData.angle_x_v_filter*0.25f+VisionData.angel_x_v*0.75f;
-		anglev_mix_10_filter=VisionData.angle_x_v_filter*10;
-
-
-//	if(abs(VisionData.tar_x-VISION_TARX)<50)
-//	{
-//		VisionData.angle_x_v_filter=VisionData.angel_x_v*(VisionData.tar_x-VISION_TARX)/50.0f;
-//	}
-//	else
-//	{
-//		VisionData.angle_x_v_filter=VisionData.angel_x_v;
-//	}
-	
-//	pix_x_v_last[last_count]=pix_x_v;	//中位数滤波迭代
-//	last_count++;
-//	last_count=last_count>FILTER_FACTOR-2?0:last_count;
+	pix_anglev_10=pix_x_anglev*10;
+	pix_x_v_filter=0.4f*pix_x_v_filter+0.6f*pix_x_anglev;
+	pix_x_v_filter_10=pix_x_v_filter*10;
+	VisionData.angel_x_v=9*(pix_x_anglev+yaw_angvel);	//融合
+	VisionData.angle_x_v_filter=0.5f*VisionData.angle_x_v_filter+0.5f*VisionData.angel_x_v;
+	anglev_mix_10=VisionData.angel_x_v*10;
 }
 
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/s内的物体
@@ -361,22 +303,22 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/
 	if(tar_v<-500)	tar_v=-500;
 //	tar_v_fliter=0.6f*tar_v_fliter+0.4f*tar_v;
 	
-	if(dis_m>5)	//距离大于3m限制预测角度
-	{
-		pre_angle_limit=70-(dis_m-3.2f)*20;
-		pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
-		pre_angle_limit=pre_angle_limit>70?70:pre_angle_limit;
-	}
-	else
-	{
+	//if(dis_m>5)	//距离大于3m限制预测角度
+	//{
+	//	pre_angle_limit=70-(dis_m-3.2f)*20;
+	//	pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
+	//	pre_angle_limit=pre_angle_limit>70?70:pre_angle_limit;
+	//}
+	//else
+	//{
 		pre_angle_limit=80;
-	}
+	//}
 	
-	if (dis_m>4.5f)	//2.5
+	if (dis_m>6)	//2.5
 	{
-		dis_m=4.5f;
+		dis_m=6;
 	}
-	float shoot_delay=dis_m/Shoot_V+0.4f;	//以秒为单位	//加上出弹延时0.08
+	float shoot_delay=dis_m/Shoot_V+0.2f;	//以秒为单位	//加上出弹延时0.08
 	float pre_angle=tar_v*shoot_delay;
 	
 

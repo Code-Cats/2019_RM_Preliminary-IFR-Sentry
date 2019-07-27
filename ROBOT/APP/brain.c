@@ -485,10 +485,10 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 		case CHASSIS_FINDING_ENEMY_NORMAL:	//寻找敌人 
 		{
 			Auto_Move_Normal();
-//			if(VisionData.armor_sign==1)
-//			{
-//				AutoOperationData.chassis_state=CHASSIS_HIT_ENEMY_NEARBY;
-//			}
+			if(VisionData.armor_sign==1)
+			{
+				AutoOperationData.chassis_state=CHASSIS_HIT_ENEMY_NEARBY;
+			}
 //			
 			if(AutoOperationData.robot_hits_count!=robot_hits_count_last)	//受到打击
 			{

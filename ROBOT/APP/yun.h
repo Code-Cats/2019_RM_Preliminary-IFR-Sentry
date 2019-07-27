@@ -10,8 +10,8 @@ extern s32 YAW_INIT;
 //下5810-上7240  //6.1更新6245 7110
 #define PITCH_UPLIMIT 3250//7110
 #define PITCH_DOWNLIMIT 2000//6245//5810
-#define PITCH_INIT         3120//7197//1330//3045//3098
-#define PITCH_GYRO_INIT 3120//7197//1330//3045//3098	//云台陀螺仪零点对应电机位置，陀螺仪更改位置需要重调	//反馈的太小，说明这个太大需要调
+#define PITCH_INIT         3100//7197//1330//3045//3098
+#define PITCH_GYRO_INIT 3100//7197//1330//3045//3098	//云台陀螺仪零点对应电机位置，陀螺仪更改位置需要重调	//反馈的太小，说明这个太大需要调
 
 #define 		Yaw_MAX 			   YAW_INIT+1000
 #define 		Yaw_MIN				   YAW_INIT-1000
@@ -42,13 +42,13 @@ extern s32 YAW_INIT;
 
  
 /*PID参数-外接陀螺仪*/
-#define PITCH_POSITION_PID_P 0.88f//0.85//0.80//0.83
+#define PITCH_POSITION_PID_P 0.89f//0.85//0.80//0.83
 #define PITCH_POSITION_PID_I 0.25f//0.3f//0.2f//0.008f
 #define PITCH_POSITION_PID_D 1.1f	//1.2
 #define PITCH_POSITION_PID_MER 400	//最大偏差输入
 #define PITCH_POSITION_PID_MAXINPUT 8190	//最大期望输入
 #define PITCH_POSITION_PID_MAXOUTPUT 320	//最大输出
-#define PITCH_POSITION_PID_I_MAX 41//20//0//22/PITCH_POSITION_PID_I	//I累加限制
+#define PITCH_POSITION_PID_I_MAX 22//60//41//20//0//22/PITCH_POSITION_PID_I	//I累加限制
 #define PITCH_POSITION_PID_DEAD 0	//计算死区3
 //参数记录：
 #define PITCH_SPEED_PID_P 80//75//60//100//25
@@ -57,7 +57,7 @@ extern s32 YAW_INIT;
 #define PITCH_SPEED_PID_MER 260	//最大偏差输入240
 #define PITCH_SPEED_PID_MAXINPUT 500	//最大期望输入
 #define PITCH_SPEED_PID_MAXOUTPUT 30000	//超过7000电机反转
-#define PITCH_SPEED_PID_I_MAX 5000//0//3000/PITCH_SPEED_PID_I	//I累加限制1200
+#define PITCH_SPEED_PID_I_MAX 6000//5000//0//3000/PITCH_SPEED_PID_I	//I累加限制1200
 #define PITCH_SPEED_PID_DEAD 0	//计算死区3
 
 ///*PID参数-板载陀螺仪*/
