@@ -259,11 +259,12 @@ void ist8310_get_data(uint8_t* buff)
 void mpu_offset_call(void)
 {
 	int i;	
-	long offset_tmp[9] = {0};
+	volatile long offset_tmp[9] = {0};
 		
 	delay_ms(20);
 	for (i=0; i<300;i++)
 	{
+		MPU_get_Data();
 		offset_tmp[0] += mpu_data.acceler.x;
 		offset_tmp[1] += mpu_data.acceler.y;
 		offset_tmp[2] += mpu_data.acceler.z;
@@ -277,6 +278,7 @@ void mpu_offset_call(void)
 		offset_tmp[8] += mpu_data.magnet.z;
 		
 		delay_ms(5);
+		
 	}
 	
 	mpu_data.acceler_offset.x = (s16)(offset_tmp[0] / 300);
@@ -340,7 +342,7 @@ void MPU_Device_Init(void)
 	IMU_INIT_OK = 1;
 	
 	//while(GetTemp());        //等待温度到达指定温度
-	
+	delay_ms(20);
 	mpu_offset_call();
 	delay_ms(5);
 	GET_OFFSET_OK = 1;

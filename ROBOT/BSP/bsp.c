@@ -54,13 +54,14 @@ void BSP_Init(void)
 	//delay_ms(10000);
 	/*******MPU********/
 	IMU_SPI5_Init();
+	delay_ms(500);
 	MPU_Device_Init();	
 	
 	
 	/********TIM********/
 	
 	TIM6_Configuration();	////延时处理应当在定时器中，以便检测遥控器和陀螺仪	//设置BSP标志位
-	delay_ms(1000);
+	delay_ms(500);
 //	delay_ms(1600+0);
 	TIM6_Start();	
 Flag_bspOK=1;	

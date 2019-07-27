@@ -55,7 +55,7 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//从最原始的数据进行计算可以减
 	float cos_angel_2=(float)camera_d_2/(float)r_2;
 	float angel_v=0;
 	angel_v=pix_v*cos_angel_2/(float)CAMERA_D;
-	angel_v=angel_v*58.2f;//*2*PI;	//进行还原处理
+	angel_v=angel_v*58.5f;//*2*PI;	//进行还原处理
 	
 	//angel_v=0.036081f*pix_v+0.1f;//+0.3026f;	//MATLAB拟合
 	
@@ -85,6 +85,8 @@ s32 imu_angelv_z_10=0;
 float yaw_residual_error=0;	//打移动靶时云台跟随静差
 /////////////////
 ////////////////
+
+s32 zgyro_int_z=0;
 
 u16 last_tarx=0;
 
@@ -132,7 +134,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	}
 	
 
-	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.predicttime-2);
+	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.predicttime+3);
 	imu_matchz_10=(s32)(VisionData.imu_vz_match*10);
 	pix_anglev=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
 	
@@ -159,8 +161,9 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 //		t_pitch_error=(float)yunMotorData.pitch_fdbP+Pixel_to_angle((s16)(VisionData.error_y-VISION_TARY))*8192/360;
 		float offset_x_angle=atan(6.5f/VisionData.armor_dis)*573;
 		//offset_x_angle=0;
-		float zgyro_match_10=GetRecordYawAngle(5)*10;
-		float pitch_fdb_match=GetRecordPitchAngle(VisionData.dealingtime);
+		float zgyro_match_10=GetRecordYawAngle(VisionData.dealingtime-8)*10;
+		zgyro_int_z=zgyro_match_10;
+		float pitch_fdb_match=GetRecordPitchAngle(VisionData.dealingtime-5);//VisionData.dealingtime/2
 		*yaw_tarP=zgyro_match_10+Pixel_to_angle((s16)(VisionData.tar_x-VISION_TARX))*10-offset_x_angle;//(float)ZGyroModuleAngle*10
 		*pitch_tarP=pitch_fdb_match-Pixel_to_angle((s16)(VisionData.tar_y-VISION_TARY))*8192/360;
 		t_gravity_ballistic_set_angel=Gravity_Ballistic_Set(pitch_tarP,(float)(VisionData.armor_dis_filter/100.0f));	//重力补偿
@@ -273,7 +276,6 @@ float GetRecordYawAnglev(u16 lastcount)
 }
 
 
-s16 pix_x_v_filter_10=0;
 s16 tar_v_ronghe=0;
 s16 tar_v_ronghe_filter=0;
 float pix_x_v_filter=0;
@@ -281,17 +283,16 @@ float pix_x_v_filter=0;
 void Tar_Relative_V_Mix(float yaw_angvel,s16 pix_x_anglev)
 {
 	
-	if(yaw_angvel>45)	yaw_angvel=45;	//限幅
-	if(yaw_angvel<-45)	yaw_angvel=-45;
-	if(pix_x_anglev>45)	pix_x_anglev=45;
-	if(pix_x_anglev<-45)	pix_x_anglev=-45;
+	if(yaw_angvel>50)	yaw_angvel=50;	//限幅
+	if(yaw_angvel<-45)	yaw_angvel=-50;
+	if(pix_x_anglev>50)	pix_x_anglev=50;
+	if(pix_x_anglev<-50)	pix_x_anglev=-50;
 	
 	pix_anglev_10=pix_x_anglev*10;
-	pix_x_v_filter=0.4f*pix_x_v_filter+0.6f*pix_x_anglev;
-	pix_x_v_filter_10=pix_x_v_filter*10;
 	VisionData.angel_x_v=9*(pix_x_anglev+yaw_angvel);	//融合
-	VisionData.angle_x_v_filter=0.5f*VisionData.angle_x_v_filter+0.5f*VisionData.angel_x_v;
+	VisionData.angle_x_v_filter=0.6f*VisionData.angle_x_v_filter+0.4f*VisionData.angel_x_v;
 	anglev_mix_10=VisionData.angel_x_v*10;
+	anglev_mix_10_filter=VisionData.angle_x_v_filter*10;
 }
 
 void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/s内的物体
