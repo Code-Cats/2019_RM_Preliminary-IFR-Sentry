@@ -433,6 +433,6 @@ float Pitch_Offset2019(float tarp,float fdbp)
 
 float YawSpeed_Offset2019(float tarv)
 {
-	return 35*tarv;//80
+	return 15*tarv;//80//35
 }
 

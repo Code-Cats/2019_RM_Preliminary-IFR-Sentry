@@ -506,7 +506,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 			
 			if(AutoOperationData.yun_lost_count>800)
 			{
-				AutoOperationState=CHASSIS_FINDING_ENEMY_NORMAL;
+				AutoOperationData.chassis_state=CHASSIS_FINDING_ENEMY_NORMAL;
 			}
 			break;
 		}
