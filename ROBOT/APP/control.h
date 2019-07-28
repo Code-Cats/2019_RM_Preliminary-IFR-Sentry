@@ -31,6 +31,7 @@ extern WorkState_e workState;
 void SetWorkState(WorkState_e state);
 WorkState_e GetWorkState(void);
 
+void Reset_Task(void);
 void RC_Calibration(void);	//上电检测遥控器接收值并与默认参数比较，判断是否正常，否则软复位
 
 #endif

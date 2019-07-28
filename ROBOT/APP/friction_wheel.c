@@ -41,7 +41,7 @@ void Friction_Speed_Set(u16 bullet_speed)	//设置射速，射速到摩擦轮速度的转换
 	}
 	else
 	{
-		frictionWheel_Data.l_wheel_output=1118+(frictionWheel_Data.l_wheel_tarV-10)*5;	//1115->speed=10  1120
+		frictionWheel_Data.l_wheel_output=1125+(frictionWheel_Data.l_wheel_tarV-10)*5;	//1115->speed=10  1120 1105
 	}
 	
 	

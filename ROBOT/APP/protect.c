@@ -1,6 +1,7 @@
 #include <stm32f4xx.h>
 #include "protect.h"
 #include "main.h"
+#include "uart7_vision_analysis.h"
 /*
 该文件用途：提供传感器冗余算法，传感器切换，以及车体实时状态检测，保护状态切换
 预定义功能：
@@ -11,10 +12,10 @@
 5.待续...
 增加一个记录帧率、周期的运算？
 */
-
+extern VisionDataTypeDef	VisionData;
 extern RC_Ctl_t RC_Ctl;
 
-#define LOST_THRESHOLD 10
+#define LOST_THRESHOLD 6
 
 Error_check_t Error_Check={LOST_CYCLE,{0},{0}};
 
@@ -69,6 +70,10 @@ void Check_Task(void)
 		LostCountCheck(Error_Check.count[i],&Error_Check.statu[i],Error_Check.cycle[i]);
 	}
 	
+	if(Error_Check.statu[LOST_VISION]==1)
+	{//视觉标志位清零
+		VisionData.armor_sign=0;
+	}
 	
 	if(Error_check_workstate==1)	//工作状态
 	{

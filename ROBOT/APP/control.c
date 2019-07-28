@@ -133,6 +133,7 @@ void Work_State_Change(void)
 		}
 		case STOP_STATE:	//停止状态
 		{
+			Reset_Task();
 			if(RC_Ctl.rc.switch_left==RC_SWITCH_UP)	
 			{
 				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10);	//重置云台目标位置
@@ -249,7 +250,7 @@ void Work_Execute(void)	//工作执行2018.7.1
 		case AUTO_STATE:	//停止状态
 		{
 
-			//Auto_Operation_New();	//自动运行
+			Auto_Operation_New();	//自动运行
 			
 			Yun_Task();	//开启云台处理
 			Shoot_Task();
@@ -319,7 +320,20 @@ void Motor_Send(void)
 	}
 }
 	
-
+//重启状态：0 1684
+//1 1684
+//2 364
+//3 1864
+void Reset_Task(void)
+{
+	if(abs(1684-RC_Ctl.rc.ch0)<=1&&\
+		abs(1684-RC_Ctl.rc.ch1)<=1&&\
+	abs(RC_Ctl.rc.ch2-364)<=1&&\
+	abs(1684-RC_Ctl.rc.ch3)<=1)
+	{
+		NVIC_SystemReset();
+	}
+}
 
 void RC_Calibration(void)	//上电检测遥控器接收值并与默认参数比较，判断是否正常，否则软复位
 {													//注：必须放在遥控器接收初始化后
