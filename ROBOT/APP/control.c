@@ -11,6 +11,8 @@
 
 WorkState_e workState=PREPARE_STATE;
 
+extern ext_game_state_t game_state_judge;
+
 u8 fffffuuuuuuukkkkkktttttttt=0;
 extern VisionDataTypeDef	VisionData;
 //uint32_t time_tick_1ms = 0;	//全局1ms计时变量
@@ -61,6 +63,12 @@ void Control_Task()	//定时器总控制函数
 	Check_Task();//自检
 	
 	Work_State_Change();	//工作状态切换函数
+	
+	if(game_state_judge.game_progress==4)
+	{
+		SetWorkState(AUTO_STATE);
+	}
+	
 	Work_Execute();	//工作状态执行函数
 	
 	Motor_Send(); //电机发送函数

@@ -470,6 +470,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 	}
 }
 
+extern ext_game_state_t game_state_judge;
 extern ext_power_heat_data_t heat_data_judge;
 
 u8 Enemy_drone_state=0;	//0为不在线
@@ -568,6 +569,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 			AutoOperationData.real_remainbuffer=AutoOperationData.tar_remainbuffer;
 		}
 	}
+	
 	
 	
 	static u8 yun_pitch_findstate=0;
