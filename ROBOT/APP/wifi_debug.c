@@ -37,7 +37,7 @@ void WFDBG_DataSampling(void)	//该函数放在1ms定时器中
 //		Aframe_Data[2]=(char)test_countt>>8;
 //		Aframe_Data[3]=(char)test_countt;
 		memcpy(&Aframe_Data[0], &chassis_limit_k, 4);
-		memcpy(&Aframe_Data[4], &heat_data_judge.chassis_power, 4);
+		/////////////////////////memcpy(&Aframe_Data[4], &heat_data_judge.chassis_power, 4);
 		Aframe_Data[9]=(u8)heat_data_judge.chassis_power_buffer>>8;
 		Aframe_Data[8]=(u8)heat_data_judge.chassis_power_buffer;
 		memcpy((Apack_Data+15+copy_index*FRAME_BYTES), Aframe_Data, FRAME_BYTES);

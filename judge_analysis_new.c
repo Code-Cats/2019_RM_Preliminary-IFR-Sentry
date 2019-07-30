@@ -19,7 +19,6 @@ ext_game_robot_pos_t robot_pos_judge = {0};
 ext_buff_musk_t buff_musk_judge = {0};
 ext_robot_hurt_t robot_hurt_judge = {0};
 ext_shoot_data_t shoot_data_judge = {0};
-ext_bullet_remaining_t bullet_remaining_judge = {0};
 ext_student_interactive_header_data_t interactive_data_send = {0};
 client_custom_data_t custom_data_send = {0};
 robot_interactive_data_t interactive_data_judge = {0};
@@ -66,7 +65,6 @@ static void judge_Process(uint16_t CmdID, uint8_t *Data, uint8_t len)
 			AutoAdjust_FrictionSpeed(shoot_data_judge.bullet_speed);
 			break;
 		}
-		case Bullet_remainingID : memcpy(&bullet_remaining_judge, Data, 2); break;
 		case RobotInteractiveId	: memcpy(&interactive_data_judge, Data, len); break;
 		default:break;
 	}
@@ -101,7 +99,7 @@ void judgeData_analysis(uint8_t *pata, uint8_t len)
 			if(Get_CRC16_Check(&pata[i], 7+Data_len) == CRC16_recive)
 			{
 				/*检查是否在线*/
-				LostCountFeed(&Error_Check.count[LOST_REFEREE]);
+				LostCountFeed(LOST_JUDGE);
 				if(CmdID == ShootDataId)
 					shoot_data_judge.errorData_count = 0;
 				
@@ -159,7 +157,7 @@ void SendJudge_client_custom(void)
 	sendclientJudgeData[26] = CRC16&0xFF;
 	sendclientJudgeData[27] = (CRC16>>8)&0xFF;
 	
-	//HAL_UART_Transmit_DMA(&huart6, sendclientJudgeData, 28);
+	HAL_UART_Transmit_DMA(&huart6, sendclientJudgeData, 28);
 }
 
 void SendJudge_communicate_custom(uint8_t com_data)
@@ -204,6 +202,6 @@ void SendJudge_communicate_custom(uint8_t com_data)
 	sendclientJudgeData[13] = CRC16&0xFF;
 	sendclientJudgeData[14] = (CRC16>>8)&0xFF;
 	
-	//HAL_UART_Transmit_DMA(&huart6, sendclientJudgeData, 15);
+	HAL_UART_Transmit_DMA(&huart6, sendclientJudgeData, 15);
 
 }

@@ -27,7 +27,7 @@ typedef struct
 	1000,\
 }
 
-void Friction_Speed_Set(u16 bullet_speed);	//设置射速，射速到摩擦轮速度的转换
+void Friction_Speed_Set(void);	//设置射速，射速到摩擦轮速度的转换
 
 void Record_fireRateOffset(s16 offset);	//记录fireRateOffset数据调用频率1ms
 s16 GetRecordfireRateOffset(u16 lastcount);	//获取过去的fireRateOffset

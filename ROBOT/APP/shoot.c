@@ -42,16 +42,19 @@ void Shoot_Task(void)	//¶¨Ê±ÆµÂÊ£º1ms
 	else
 	{
 		LASER_SWITCH=1; 
+		if(Friction_State==1)
+		{
+			frictionWheel_Data.l_wheel_tarV=18;
+		}
+		else
+		{
+			frictionWheel_Data.l_wheel_tarV=0;
+		}
 	}
 	//LASER_SWITCH=Friction_State; 
-	if(Friction_State==1)
-	{
-		Friction_Speed_Set(18);
-	}
-	else
-	{
-		Friction_Speed_Set(0);
-	}
+	
+	
+	Friction_Speed_Set();
 	
 	Shoot_Instruction();
 	shoot_Motor_Data_Down.tarP=(s32)shoot_Data_Down.motor_tarP;

@@ -140,6 +140,7 @@ typedef __packed struct
 	uint16_t chassis_power_buffer;   				//·ÉÆÂÊ±250J
 	uint16_t shooter_heat17;   
 	uint16_t shooter_heat42;  
+	uint8_t fps;									//20
 }ext_power_heat_data_t;
 
 typedef __packed struct 

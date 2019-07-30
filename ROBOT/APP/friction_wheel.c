@@ -7,32 +7,8 @@ extern u32 time_1ms_count;
 extern s16 bulletSpeedSet;
 //5000 16，16.3，15.7，16.5	；7000 25 6000 21.08 20.97
 //new:28-1200  7-1100 19-1150  15-1140  16-1145  19-1155  20.2-1160 22-1170
-void Friction_Speed_Set(u16 bullet_speed)	//设置射速，射速到摩擦轮速度的转换
+void Friction_Speed_Set(void)	//设置射速，射速到摩擦轮速度的转换
 {
-	if(bullet_speed==16)
-	{
-		frictionWheel_Data.l_wheel_tarV=16;
-	}
-	else if(bullet_speed==18)
-	{
-		frictionWheel_Data.l_wheel_tarV=18;
-	}
-	else if(bullet_speed==21)
-	{
-		frictionWheel_Data.l_wheel_tarV=21;
-	}
-	else if(bullet_speed==25)
-	{
-		frictionWheel_Data.l_wheel_tarV=25;
-	}
-	else if(bullet_speed==28)
-	{
-		frictionWheel_Data.l_wheel_tarV=28;
-	}
-	else
-	{
-		frictionWheel_Data.l_wheel_tarV=0;
-	}
 	
 	bulletSpeedSet=frictionWheel_Data.l_wheel_tarV;	//test
 	
@@ -80,14 +56,27 @@ s16 GetRecordfireRateOffset(u16 lastcount)	//获取过去的fireRateOffset
 	return fireRateOffsetLast[lastindex];
 }
 
+u16 bulletspeed_10=0;
+u16 adjust_flagcount=0;
 ///@breif 自动调整射速补偿 在射速裁判反馈中调用
 void AutoAdjust_FrictionSpeed(float fdbv)
 {
-	if(ABS(fdbv-frictionWheel_Data.l_wheel_tarV)>1&&frictionWheel_Data.l_wheel_tarV!=0)
+	bulletspeed_10=fdbv*10;
+	
+	if(ABS(fdbv-frictionWheel_Data.l_wheel_tarV)>1.1f&&frictionWheel_Data.l_wheel_tarV!=0)
+	{
+		adjust_flagcount++;
+	}
+	else
+	{
+		adjust_flagcount=0;
+	}
+	
+	if(adjust_flagcount>1)
 	{
 		fireRateOffset=(s16)(GetRecordfireRateOffset(120)+(frictionWheel_Data.l_wheel_tarV-fdbv)*2);
-		fireRateOffset=fireRateOffset>20?20:fireRateOffset;
-		fireRateOffset=fireRateOffset<-20?-20:fireRateOffset;
+		fireRateOffset=fireRateOffset>24?24:fireRateOffset;
+		fireRateOffset=fireRateOffset<-24?-24:fireRateOffset;
 	}
 }
 
