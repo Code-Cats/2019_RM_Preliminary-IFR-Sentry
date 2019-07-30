@@ -63,6 +63,70 @@ float Pixel_V_to_angle_V(s16 pix_v,s16 pix_error)	//´Ó×îÔ­Ê¼µÄÊı¾İ½øĞĞ¼ÆËã¿ÉÒÔ¼õ
 	return angel_v;
 }
 
+//¸ù¾İ¾àÀë×Ô¶¯ÉèÖÃÉäËÙ
+void AutoSetFrictionSpeed(u16 dis_cm)
+{
+	static float dis_cm_f=0;
+	static u8 speed_state=0;
+	
+	dis_cm_f=0.6f*dis_cm_f+0.4f*dis_cm;
+	
+	if(dis_cm_f<330)
+	{
+		speed_state=0;
+	}
+	else if(dis_cm_f>370&&dis_cm_f<520)
+	{
+		speed_state=1;
+	}
+	else if(dis_cm_f>580)
+	{
+		speed_state=2;
+	}
+	
+	switch(speed_state)
+	{
+		case 0:	//16m/s
+		{
+			frictionWheel_Data.l_wheel_tarV=16;
+			if(dis_cm_f>520)
+			{
+				speed_state=2;
+			}
+			else if(dis_cm_f>370)
+			{
+				speed_state=1;
+			}
+			break;
+		}
+		case 1:	//21m/s
+		{
+			frictionWheel_Data.l_wheel_tarV=21;
+			if(dis_cm_f>580)
+			{
+				speed_state=2;
+			}
+			else if(dis_cm_f<330)
+			{
+				speed_state=0;
+			}
+			break;
+		}
+		case 2:	//26m/s
+		{
+			frictionWheel_Data.l_wheel_tarV=26;
+			if(dis_cm_f<370)
+			{
+				speed_state=0;
+			}
+			else if(dis_cm_f<520)
+			{
+				speed_state=1;
+			}
+			break;
+		}
+	}
+}
 
 //#define PITCH_INIT         7197	//2019.5.22
 #define YUN_DOWN_VALUELIMIT 6500	//ÏòÏÂÏŞÎ»
@@ -83,7 +147,7 @@ s32 anglev_mix_10_filter;
 
 s32 imu_angelv_z_10=0;
 float yaw_residual_error=0;	//´òÒÆ¶¯°ĞÊ±ÔÆÌ¨¸úËæ¾²²î
-/////////////////
+////////////////
 ////////////////
 
 s32 zgyro_int_z=0;
@@ -91,10 +155,12 @@ s32 zgyro_int_z=0;
 u16 last_tarx=0;
 
 u8 sign_count=0;	//µÚÈıÖ¡²Å¿ªÊ¼¶¯Ì¬Ê¶±ğ
-#define VISION_TARX 970//990//1035//710//640+105//1053//1035ÊÇĞŞÕı°²×°Æ«²î1020//580	//×óÉÏÔ­µã	640
+#define VISION_TARX 966//970//990//1035//710//640+105//1053//1035ÊÇĞŞÕı°²×°Æ«²î1020//580	//×óÉÏÔ­µã	640
 #define VISION_TARY	610//590//570//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//×óÉÏÔ­µã	480	//´ò5Ã×ÄÚÄ¿±ê£ºÏòÉÏ²¹³¥518-360¸öÏñËØµã	//ÒòÎªÓĞ×èÁ¦ºã¶¨¾²Ì¬Îó²î£¬¹Ê²¹³¥
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 {
+	AutoSetFrictionSpeed(VisionData.armor_dis);
+	
 	if(frictionWheel_Data.l_wheel_tarV!=0)
 	{
 		Shoot_V=frictionWheel_Data.l_wheel_tarV;
@@ -134,7 +200,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 	}
 	sign_count=10;
 
-	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.predicttime+3);
+	VisionData.imu_vz_match= GetRecordYawAnglev(VisionData.predicttime+5);
 	imu_matchz_10=(s32)(VisionData.imu_vz_match*10);
 	pix_anglev=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.tar_x-VISION_TARX));
 	
@@ -175,7 +241,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//´¦ÀíÄ¿±ê½Ç¶È
 			{
 				Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//Ô¤²â ´ıµ÷½Ú
 			}
-
+		Pitch_Move_Set(pitch_tarP,(float)(VisionData.armor_dis/100.0f),yunMotorData.pitch_tarV);//imu.angleV.y
 		
 		//t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
 		
@@ -194,7 +260,7 @@ float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//ÖØÁ¦²¹³¥×ø±êÏµÖĞ£¬Ï
 {
 	if(dis_m>8)	dis_m=8;
 	
-	//dis_m-=0.15f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
+	dis_m-=0.10f;	//ÁÙÊ±¼ÓµÄ£¬ÒòÎª¾­³£´òµ½×°¼×ÏÂ·½
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//»¡¶ÈÖÆ¼ò»¯¼ÆËã2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;
@@ -315,11 +381,11 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//¾­¹ı¼ÆËã£¬Ö»´ò35¶È/
 	//	pre_angle_limit=80;
 	//}
 	
-	if (dis_m>6)	//2.5
+	if (dis_m>5.6)	//2.5
 	{
-		dis_m=6;
+		dis_m=5.6;
 	}
-	float shoot_delay=dis_m/Shoot_V+0.25f;	//ÒÔÃëÎªµ¥Î»	//¼ÓÉÏ³öµ¯ÑÓÊ±0.08
+	float shoot_delay=dis_m/Shoot_V*1.13f+0.08f;	//ÒÔÃëÎªµ¥Î»	//¼ÓÉÏ³öµ¯ÑÓÊ±0.08
 	float pre_angle=tar_v*shoot_delay;
 	
 
@@ -332,6 +398,44 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//¾­¹ı¼ÆËã£¬Ö»´ò35¶È/
 	*yaw_tarP+=pre_angle;
 }
 
+void Pitch_Move_Set(float* pitch_tarP,float dis_m,float tar_v)
+{
+		float pre_angle_limit=40;
+//	static float tar_v_fliter=0;
+//	if(abs(tar_v)<2)	tar_v=0;
+	if(tar_v>150)	tar_v=150;	//350
+	if(tar_v<-150)	tar_v=-150;
+	
+	tar_v=tar_v*8192/3600;	//×ø±êÏµ×ª»»
+//	tar_v_fliter=0.6f*tar_v_fliter+0.4f*tar_v;
+	
+	//if(dis_m>5)	//¾àÀë´óÓÚ3mÏŞÖÆÔ¤²â½Ç¶È
+	//{
+	//	pre_angle_limit=70-(dis_m-3.2f)*20;
+	//	pre_angle_limit=pre_angle_limit<15?15:pre_angle_limit;
+	//	pre_angle_limit=pre_angle_limit>70?70:pre_angle_limit;
+	//}
+	//else
+	//{
+	//	pre_angle_limit=80;
+	//}
+	
+	if (dis_m>5.6)	//2.5
+	{
+		dis_m=5.6;
+	}
+	float shoot_delay=dis_m/Shoot_V*1.1f+0.08f;	//ÒÔÃëÎªµ¥Î»	//¼ÓÉÏ³öµ¯ÑÓÊ±0.08
+	float pre_angle=tar_v*shoot_delay;
+	
+
+
+//	if(pre_angle>pre_angle_limit)	pre_angle=pre_angle_limit;
+//	if(pre_angle<-pre_angle_limit)	pre_angle=-pre_angle_limit;
+	if(pre_angle>pre_angle_limit)	pre_angle=pre_angle_limit;
+	if(pre_angle<-pre_angle_limit)	pre_angle=-pre_angle_limit;
+	
+	*pitch_tarP+=pre_angle;
+}
 
 u8 Auto_Shoot_Aimfdb(void)	//Ãé×¼×´Ì¬×Ü	//
 {

@@ -652,7 +652,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 			}
 			
 			///**********************************************************************************************************
-			if(time_1ms_count%80==0&&AutoOperationData.yun_lost_count<400&&Shoot_Heat_Limit()==1&&Friction_State==1)
+			if(time_1ms_count%80==0&&AutoOperationData.yun_lost_count<400&&Shoot_Heat_Limit()==1&&frictionWheel_Data.l_wheel_tarV!=0)
 			{
 				AddBulletToShootingSystem();
 			}

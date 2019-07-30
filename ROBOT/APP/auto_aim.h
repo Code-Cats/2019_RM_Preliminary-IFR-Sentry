@@ -32,5 +32,6 @@ float Target_Range_Deal(s16 dis_dm,float armor_width);	//以分米为单位 正常是0.65
 u8 Auto_Shoot_Aimfdb(void);	//瞄准状态
 u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error);	//动态瞄准评估函数
 
+void Pitch_Move_Set(float* pitch_tarP,float dis_m,float tar_v);
 
 #endif

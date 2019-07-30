@@ -101,7 +101,7 @@ void Yun_Control_External_Solution(void)	//外置反馈方案
 	yunMotorData.pitch_output=PID_General(yunMotorData.pitch_tarV,imu.angleV.y,&PID_PITCH_SPEED);
 	yunMotorData.yaw_output=PID_General(yunMotorData.yaw_tarV,imu.angleV.z,&PID_YAW_SPEED);	//采用外界陀螺仪做反馈
 	
-	//yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP,yunMotorData.pitch_tarP);
+	yunMotorData.pitch_output+=Pitch_Offset2019(yunMotorData.pitch_tarP,yunMotorData.pitch_tarP);
 	//yunMotorData.yaw_output+=YawSpeed_Offset2019(yunMotorData.yaw_tarV);
 	
 	
@@ -343,89 +343,24 @@ void pitch_Feedforward_to_distinguish(void)
 		}
 	}
 }
-
+/*****2019.7.31 手动记录
+3060 4500
+2830 2500
+2670 1000
+2300 -2000*/
 float Pitch_Offset2019(float tarp,float fdbp)
 {
 	float offset=0;
-	static u8 laststate=0;
-	static float fdbp_last,fdb_record=0;
-	static u32 state0_count,state1_count=0;
-	
-//	if(fdbp-fdbp_last>0.000001f)
-//	{
-//		laststate=0;
-//	}
-//	else if(fdbp-fdbp_last<-0.000001f)
-//	{
-//		laststate=1;
-//	}
-	if(fdbp-fdb_record>10)	//
+
+	offset=tarp*8.564f-21750;
+	if(ABS(offset)<1200)
 	{
-		//laststate=0;
-		fdb_record=fdbp;
-		state0_count++;
-		state1_count=0;
+		offset=offset*0.6f;
 	}
-	else if(fdbp-fdb_record<-10)
+	else if(ABS(offset)<500)
 	{
-		//laststate=1;
-		fdb_record=fdbp;
-		state1_count++;
-		state0_count=0;
+		offset=offset*0.2f;
 	}
-	
-	if(state0_count>200)
-	{
-		laststate=0;
-	}
-	if(state1_count>200)
-	{
-		laststate=1;
-	}
-	
-	if(laststate==0)
-	{
-		if(tarp<6600)
-		{
-			offset=-0.03132f*tarp*tarp+413.1f*tarp-1358000;
-			offset-=2000;
-		}
-		else
-		{
-			offset=0.0125f*tarp*tarp-158.4f*tarp+504300;
-			offset-=1200;
-		}
-	}
-	else
-	{
-		if(tarp<6600)
-		{
-			offset=-0.03132f*tarp*tarp+413.1f*tarp-1358000;
-			offset-=4000;
-			offset-=2000;
-		}
-		else
-		{
-			offset=0.0125f*tarp*tarp-158.4f*tarp+504300;
-			offset-=4000;
-			offset-=1200;
-		}
-	}
-	if(tarp<6420)
-	{
-		offset-=2500;
-	}
-	
-	offset=offset>13000?13000:offset;
-	offset=offset<-13000?-13000:offset;
-	
-	////offset=0;
-//	if(offset>-2000&&offset<2000)
-//	{
-//		offset*=0.2f;
-//	}
-	
-	fdbp_last=fdbp;
 	
 	return offset;
 }

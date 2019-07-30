@@ -5,6 +5,10 @@
 #include "heat_limit.h"
 #include "control.h"
 //#include "vision.h"
+#include "usart3_judge_analysis.h"
+
+extern ext_bullet_remaining_t bullet_remaining_judge;
+extern ext_game_state_t game_state_judge;
 
 SHOOT_DATA shoot_Data_Down=SHOOT_DATA_INIT;
 SHOOT_MOTOR_DATA shoot_Motor_Data_Down ={0};
@@ -38,6 +42,11 @@ void Shoot_Task(void)	//定时频率：1ms
 	if(GetWorkState()==AUTO_STATE)
 	{
 		//LASER_SWITCH=0;
+		if(game_state_judge.game_progress==5)	//无发弹量或者比赛结束关闭摩擦轮  //bullet_remaining_judge.bullet_remaining_num==0||
+		{
+			frictionWheel_Data.l_wheel_tarV=0;
+			Friction_State=0;
+		}
 	}
 	else
 	{
@@ -136,7 +145,7 @@ void RC_Control_Shoot(u8* fri_state)
 	if(Shoot_RC_Control_State==1)
 	{
 		HeatLimitState=Shoot_Heat_Limit();
-		if(HeatLimitState==1&&*fri_state==1)	//热量限制	Shoot_Heat_Limit()==1&&
+		if(HeatLimitState==1&&frictionWheel_Data.l_wheel_tarV!=0)	//热量限制	Shoot_Heat_Limit()==1&&
 		{
 			if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
@@ -165,7 +174,7 @@ void RC_Control_Shoot(u8* fri_state)
 
 		}
 		
-		if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_UP)
+		if(RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&swicth_Last_state==RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_UP&&GetWorkState()!=AUTO_STATE)
 		{
 			*fri_state=!*fri_state;
 		}
