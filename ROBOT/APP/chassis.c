@@ -38,6 +38,8 @@ void Remote_Task(void)
 
 
 float chassis_limit_k=0;
+
+float now_wheel_output=0;
 /******************************************************/
 void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 {
@@ -70,8 +72,10 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 
 	
 	chassis_Data.lf_wheel_output=PID_General(chassis_Data.lf_wheel_tarV,chassis_Data.lf_wheel_fdbV,&PID_Chassis_Speed[LF]);
-	chassis_Data.rf_wheel_output=PID_General(chassis_Data.rf_wheel_tarV,chassis_Data.rf_wheel_fdbV,&PID_Chassis_Speed[RF]);
+	now_wheel_output=PID_General(chassis_Data.rf_wheel_tarV,chassis_Data.rf_wheel_fdbV,&PID_Chassis_Speed[RF]);
 
+	chassis_Data.rf_wheel_output=now_wheel_output;//0.5f*chassis_Data.rf_wheel_output+0.5f*
+	
 	if(GetWorkState()==AUTO_STATE&&AutoOperationData.chassis_enable==0)
 	{
 		chassis_Data.lf_wheel_output=0;
@@ -139,8 +143,8 @@ void RC_Control_Chassis(void)
 extern ext_game_robot_state_t robot_state_judge;
 //u8 Tar_remain_powerbuffer=160;
 //设置为40j能量缓冲
-#define POWER_LIMIT_K 0.9f/120 //0.8f/50.0f	//即能量槽空时0.2，50时开始限制
-#define POWER_LIMIT_B	0.1f //0.21f
+#define POWER_LIMIT_K 0.96f/42 //0.8f/50.0f	//即能量槽空时0.2，50时开始限制
+#define POWER_LIMIT_B	0.04f //0.21f
 u8 limit_power_statu=0;
 extern u8 SuperC_Output_Enable;	//电容是否能放电
 extern Error_check_t Error_Check;
@@ -150,20 +154,20 @@ float Limit_Power(float power,float powerbuffer,u32 outputsum)	//经调试 output=5
 {
 	float limit_k=1;
 
-	if(outputsum>700||AutoOperationData.real_remainbuffer<=50||powerbuffer<=50)//需要重新测试
+	if(outputsum>500||AutoOperationData.real_remainbuffer<=50||powerbuffer<=50)//需要重新测试
 	{
 		if(Error_Check.statu[LOST_REFEREE]==1)	//裁判lost
 		{
 			limit_power_statu=3;
-			limit_k=0.6;
+			limit_k=0.5;
 		}
 		else
 		{
-			powerbuffer-=AutoOperationData.real_remainbuffer;
+			//powerbuffer-=AutoOperationData.real_remainbuffer;
 
 			limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4
 			limit_k=limit_k>1?1:limit_k;
-			limit_k=limit_k<0.1f?0.1f:limit_k;
+			limit_k=limit_k<0.04f?0.04f:limit_k;
 		}
 	}
 
