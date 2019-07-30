@@ -730,7 +730,7 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 				Chassis_Vx=-EVADE_VX;
 			}
 			
-			if(abs(AutoOperationData.tar_chassispos-SensorData.encoderPos)<250)
+			if(ABS(AutoOperationData.tar_chassispos-SensorData.encoderPos)<250)
 			{
 				if(AutoOperationData.tar_chassispos==0)
 				{
@@ -811,7 +811,7 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 				}
 			}
 			
-			if(abs(SensorData.encoderSpeed)<40)
+			if(ABS(SensorData.encoderSpeed)<40)
 			{
 				move_evade_state=4;
 			}
@@ -822,12 +822,12 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 			srand(time_1ms_count);	//重置随机种子
 			//至少500距离
 			randagain:AutoOperationData.tar_chassispos=rand()%(AutoOperationData.limitX2-AutoOperationData.limitX1)+AutoOperationData.limitX1;	//得到X1-X2随机数
-			if(abs(AutoOperationData.tar_chassispos-SensorData.encoderPos)<500)
+			if(ABS(AutoOperationData.tar_chassispos-SensorData.encoderPos)<500)
 			{
 				goto randagain;
 			}
 			
-			if(abs(ORBIT_MAX_POS-AutoOperationData.tar_chassispos)<250)
+			if(ABS(ORBIT_MAX_POS-AutoOperationData.tar_chassispos)<250)
 			{
 				AutoOperationData.tar_chassispos=ORBIT_MAX_POS;
 			}

@@ -139,7 +139,6 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name></Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -358,6 +357,11 @@
           <count>37</count>
           <WinNumber>1</WinNumber>
           <ItemText>offset_tmp,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>38</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>frictionWheel_Data,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

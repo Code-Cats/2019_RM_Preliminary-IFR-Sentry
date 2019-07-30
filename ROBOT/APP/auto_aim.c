@@ -335,7 +335,7 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/
 
 u8 Auto_Shoot_Aimfdb(void)	//瞄准状态总	//
 {
-//	if(abs(VisionData.tar_y-VISION_TARY)<30&&abs(VisionData.tar_x-VISION_TARX)<5&&Error_Check.statu[LOST_VISION]==0&&abs(VisionData.angel_x_v)<40)
+//	if(ABS(VisionData.tar_y-VISION_TARY)<30&&ABS(VisionData.tar_x-VISION_TARX)<5&&Error_Check.statu[LOST_VISION]==0&&ABS(VisionData.angel_x_v)<40)
 //	{
 //		return 1;
 //	}
@@ -366,9 +366,9 @@ u8 Auto_Shoot_AimAppraisal_Static(void)	//静态瞄准评估函数
 	u8 state=0;
 	if(Error_Check.statu[LOST_VISION]==0)	//有反馈
 	{
-		if(abs(VisionData.tar_y-VISION_TARY)<30&&abs(VisionData.tar_x-VISION_TARX)<5)	//瞄准了
+		if(ABS(VisionData.tar_y-VISION_TARY)<30&&ABS(VisionData.tar_x-VISION_TARX)<5)	//瞄准了
 		{
-			if(abs(VisionData.angel_x_v)<40)	//目标速度较小
+			if(ABS(VisionData.angel_x_v)<40)	//目标速度较小
 			{
 				state=1;
 			}
@@ -411,30 +411,30 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 	{
 		if(dis_dm>41)
 		{
-			Auto_Shoot_Interval_Time=(s16)(1000+abs(relative_v)*4+(dis_dm-40)*80);	//大于4M无预测
+			Auto_Shoot_Interval_Time=(s16)(1000+ABS(relative_v)*4+(dis_dm-40)*80);	//大于4M无预测
 		}
 		else
 		{
-			Auto_Shoot_Interval_Time=(s16)(600+abs(relative_v)*2+(dis_dm-20)*40);	//大于2M
+			Auto_Shoot_Interval_Time=(s16)(600+ABS(relative_v)*2+(dis_dm-20)*40);	//大于2M
 		}
 	}
 	else	//即3m内
 	{
-		if(abs(relative_v)<40)
+		if(ABS(relative_v)<40)
 		{
 			Auto_Shoot_Interval_Time=300;
 		}
-		if(abs(relative_v)<60)
+		if(ABS(relative_v)<60)
 		{
 			Auto_Shoot_Interval_Time=500;
 		}
-		else if(abs(relative_v)<130)
+		else if(ABS(relative_v)<130)
 		{
 			Auto_Shoot_Interval_Time=700;
 		}
 		else
 		{
-			Auto_Shoot_Interval_Time=(s16)(700+abs(relative_v)*2);
+			Auto_Shoot_Interval_Time=(s16)(700+ABS(relative_v)*2);
 		}
 	}
 //	pre_angel_raw*=CORRECTION_FACTOR;
@@ -447,15 +447,15 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 	test_auto_shoot_angel_error=(s16)(angel_error*10);
 	test_auto_shoot_pre_angel_raw=(s16)(pre_angel_raw*10);
 	test_autoshoot_error=(s16)((pre_angel_raw+angel_error)*10);
-	if(abs(pre_angel_raw+angel_error)<Target_Range_Deal(dis_dm,0.35f))	//以度为单位	//待加入大小装甲区分	1.6f-dis_dm*0.24f/10		0.65
+	if(ABS(pre_angel_raw+angel_error)<Target_Range_Deal(dis_dm,0.35f))	//以度为单位	//待加入大小装甲区分	1.6f-dis_dm*0.24f/10		0.65
 	{
 		count++;
 		if(count>50)	count=50;
 		if(count>2)	//连续三帧有效
 		{
-			if(abs(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP)<23&&Error_Check.statu[LOST_VISION]==0)	//未丢帧、Y方向正常
+			if(ABS(yunMotorData.pitch_tarP-yunMotorData.pitch_fdbP)<23&&Error_Check.statu[LOST_VISION]==0)	//未丢帧、Y方向正常
 			{
-				if(abs(VisionData.angle_x_v_filter)<410&&dis_dm<=46)	//距离小于5m2，速度小于41
+				if(ABS(VisionData.angle_x_v_filter)<410&&dis_dm<=46)	//距离小于5m2，速度小于41
 				{
 					state=1;
 				}
@@ -474,7 +474,7 @@ u8 Auto_Shoot_AimAppraisal_Dynamic(float relative_v,s16 dis_dm,s16 pix_error)	//
 
 float Target_Range_Deal(s16 dis_dm,float armor_width)	//以分米为单位 正常是0.65f
 {
-	float angle_range=abs(atan(armor_width/dis_dm))*25;	//本来应该是57.3
+	float angle_range=ABS(atan(armor_width/dis_dm))*25;	//本来应该是57.3
 	return angle_range;
 }
 

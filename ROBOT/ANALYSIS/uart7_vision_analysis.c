@@ -88,7 +88,7 @@ void VisionData_Deal(volatile u8 *pData)	//传感器数据在除了帧头的第1帧
 	{
 		VisionData.tar_y=tem_tary;
 	}
-	if(VisionData.pix_x_v>1900)//&&abs(tem_speed-last_speed)<550
+	if(VisionData.pix_x_v>1900)//&&ABS(tem_speed-last_speed)<550
 	{
 		VisionData.pix_x_v=1900;
 	}

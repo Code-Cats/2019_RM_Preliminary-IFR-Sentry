@@ -3,7 +3,7 @@
 
 #include "sys.h"
 
-#define ABS(x)	( (x>0) ? (x) : (-x) )
+float ABS(float x);
 
 #define OFF 0
 #define ON 1

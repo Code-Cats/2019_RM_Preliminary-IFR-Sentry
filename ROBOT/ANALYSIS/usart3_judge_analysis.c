@@ -4,6 +4,8 @@
 #include "heat_limit.h"
 #include "brain.h"
 
+#include "friction_wheel.h"
+
 ext_game_state_t game_state_judge = {0};
 ext_game_result_t game_result_judge = {0};
 ext_game_robot_survivors_t game_robot_survivors_judge = {0};
@@ -34,7 +36,7 @@ static void judge_Process(u16 CmdID, u8 *Data, u8 len)
 		case RobotPosId	 		: memcpy(&robot_pos_judge, Data, 16); break;
 		case BuffMuskId	 		: memcpy(&buff_musk_judge, Data, 1); break;
 		case RobotHurtId	 	: robot_hurt_judge.armor_id = Data[0] & 0x0F;robot_hurt_judge.hurt_type = (Data[0]>>4) & 0x0F;RobotHurtCallback(robot_hurt_judge.armor_id,robot_hurt_judge.hurt_type);break;
-		case ShootDataId	 	: memcpy(&shoot_data_judge, Data, 6);BulletNum_Simu_ADD(); break;
+		case ShootDataId	 	: memcpy(&shoot_data_judge, Data, 6);BulletNum_Simu_ADD(); AutoAdjust_FrictionSpeed(shoot_data_judge.bullet_speed); break;
 		case RobotInteractiveId	: memcpy(&interactive_data_judge, Data, len); break;
 		default:break;
 	}

@@ -7,6 +7,12 @@
 #include "brain.h"
 #include "buzzer.h"
 
+////////
+volatile u16 testu16=4;
+volatile float testf=5.2f;
+volatile u32 iii=0;
+////////
+
 extern u8 led_start2normal;
 
 s8 led_num=0;
@@ -66,3 +72,10 @@ int main(void)//40-508-1289-1705
 	}
 	
 }
+
+
+float ABS(float x)
+{
+	x=x<0?-x:x;
+}
+

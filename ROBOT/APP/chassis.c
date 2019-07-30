@@ -79,7 +79,7 @@ void Chassis_Control_External_Solution(void)	//陀螺仪正常的底盘解决方案
 	}
 		
 	{	//功率限制块
-		u32 outputsum=abs(chassis_Data.lf_wheel_output)+abs(chassis_Data.rf_wheel_output);
+		u32 outputsum=ABS(chassis_Data.lf_wheel_output)+ABS(chassis_Data.rf_wheel_output);
 		chassis_limit_k=Limit_Power(heat_data_judge.chassis_power,heat_data_judge.chassis_power_buffer,outputsum);	//testPowerHeatData.chassisPowerBuffer
 		float output_limit_lf=chassis_Data.lf_wheel_output*chassis_limit_k;
 		float output_limit_rf=chassis_Data.rf_wheel_output*chassis_limit_k;

@@ -115,7 +115,7 @@ void Check_Task(void)
 		
 	}
 	
-	if(RC_Ctl.key.v_h!=0||RC_Ctl.key.v_l!=0||abs(RC_Ctl.mouse.x)>3)
+	if(RC_Ctl.key.v_h!=0||RC_Ctl.key.v_l!=0||ABS(RC_Ctl.mouse.x)>3)
 	{
 		Error_check_workstate=0;
 	}

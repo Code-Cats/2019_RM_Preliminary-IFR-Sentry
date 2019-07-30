@@ -38,7 +38,7 @@ brain.c : CHASSIS_AUTORUN
 
 重构功率控制方案
 
-加入主动重启功能
+加入主动重启功能  OK
 
 先测试无额外保护区时会不会超功率
 
@@ -47,4 +47,4 @@ brain.c : CHASSIS_AUTORUN
 2 364
 3 1864
 
-自动调整射速
+自动调整射速  OK

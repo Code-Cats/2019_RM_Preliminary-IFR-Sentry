@@ -34,6 +34,7 @@ extern float ZGyroModuleAngle;
 extern RC_Ctl_t RC_Ctl;
 extern SHOOT_MOTOR_DATA shoot_Motor_Data_Down;
 
+extern s16 fireRateOffset;
 
 void Control_Task()	//定时器总控制函数
 {
@@ -72,6 +73,8 @@ void Control_Task()	//定时器总控制函数
 		led_num--;
 		Green_LED_8_SetNum(led_num);	//A板LED闪烁函数
 	}
+	
+	Record_fireRateOffset(fireRateOffset);
 }
 
 
@@ -121,7 +124,7 @@ void Work_State_Change(void)
 		}
 		case ERROR_STATE:	//错误模式
 		{
-			if(RC_Ctl.key.v_h!=0||RC_Ctl.key.v_l!=0||abs(RC_Ctl.mouse.x)>3)	//退出该模式
+			if(RC_Ctl.key.v_h!=0||RC_Ctl.key.v_l!=0||ABS(RC_Ctl.mouse.x)>3)	//退出该模式
 			{
 				SetWorkState(NORMAL_STATE);
 			}
@@ -151,7 +154,7 @@ void Work_State_Change(void)
 		{
 			static u32 time_count=0;
 			time_count++;
-			if(Error_Check.statu[LOST_DBUS]==0&&abs(RC_Ctl.rc.ch0+RC_Ctl.rc.ch1+RC_Ctl.rc.ch2+RC_Ctl.rc.ch3-1024*4)<10)
+			if(Error_Check.statu[LOST_DBUS]==0&&ABS(RC_Ctl.rc.ch0+RC_Ctl.rc.ch1+RC_Ctl.rc.ch2+RC_Ctl.rc.ch3-1024*4)<10)
 			{
 				yunMotorData.yaw_tarP=(ZGyroModuleAngle*10);	//重置云台目标位置
 				SetWorkState(NORMAL_STATE);
@@ -205,8 +208,8 @@ void Work_Execute(void)	//工作执行2018.7.1
 		case PREPARE_STATE:	//预备模式
 		{	//等待车身状态稳定，并设置初值
 			Yun_Task();	//开启云台
-//			if(abs(Gyro_Data.angvel[0])<20&&abs(Gyro_Data.angvel[2])<20&&abs(yunMotorData.pitch_tarP-(Gyro_Data.angle[0]*8192/360.0f+PITCH_INIT))<50)	//云台已就位	//位置环情况下
-		//	if(abs(Gyro_Data.angvel[YAW])<2)	//云台已就位，且有反馈
+//			if(ABS(Gyro_Data.angvel[0])<20&&ABS(Gyro_Data.angvel[2])<20&&ABS(yunMotorData.pitch_tarP-(Gyro_Data.angle[0]*8192/360.0f+PITCH_INIT))<50)	//云台已就位	//位置环情况下
+		//	if(ABS(Gyro_Data.angvel[YAW])<2)	//云台已就位，且有反馈
 			{
 				SetWorkState(CALI_STATE);
 			}
@@ -326,10 +329,10 @@ void Motor_Send(void)
 //3 1864
 void Reset_Task(void)
 {
-	if(abs(1684-RC_Ctl.rc.ch0)<=1&&\
-		abs(1684-RC_Ctl.rc.ch1)<=1&&\
-	abs(RC_Ctl.rc.ch2-364)<=1&&\
-	abs(1684-RC_Ctl.rc.ch3)<=1)
+	if(ABS(1684-RC_Ctl.rc.ch0)<=1&&\
+		ABS(1684-RC_Ctl.rc.ch1)<=1&&\
+	ABS(RC_Ctl.rc.ch2-364)<=1&&\
+	ABS(1684-RC_Ctl.rc.ch3)<=1)
 	{
 		NVIC_SystemReset();
 	}
@@ -337,7 +340,7 @@ void Reset_Task(void)
 
 void RC_Calibration(void)	//上电检测遥控器接收值并与默认参数比较，判断是否正常，否则软复位
 {													//注：必须放在遥控器接收初始化后
-	if(abs(RC_Ctl.rc.ch0+RC_Ctl.rc.ch1+RC_Ctl.rc.ch2+RC_Ctl.rc.ch3-1024*4)>12)
+	if(ABS(RC_Ctl.rc.ch0+RC_Ctl.rc.ch1+RC_Ctl.rc.ch2+RC_Ctl.rc.ch3-1024*4)>12)
 	{
 		NVIC_SystemReset();
 	}
@@ -350,10 +353,10 @@ RC_Ctl_t RC_DATA_ERROR={0};	//记录错误帧数据
 void Teleconltroller_Data_protect(void)	//遥控器数据自保护 
 {
 	u8 protect_state=0xC0;	//按位表示当前遥控器数据是否正常	//最高2位为保留位，常为1	//364-1024-1684
-	protect_state|=(abs(RC_Ctl.rc.ch0-1024)<=662);
-	protect_state|=(abs(RC_Ctl.rc.ch1-1024)<=662)<<1;
-	protect_state|=(abs(RC_Ctl.rc.ch2-1024)<=662)<<2;
-	protect_state|=(abs(RC_Ctl.rc.ch3-1024)<=662)<<3;
+	protect_state|=(ABS(RC_Ctl.rc.ch0-1024)<=662);
+	protect_state|=(ABS(RC_Ctl.rc.ch1-1024)<=662)<<1;
+	protect_state|=(ABS(RC_Ctl.rc.ch2-1024)<=662)<<2;
+	protect_state|=(ABS(RC_Ctl.rc.ch3-1024)<=662)<<3;
 	protect_state|=(RC_Ctl.rc.switch_left==1||RC_Ctl.rc.switch_left==2||RC_Ctl.rc.switch_left==3)<<4;
 	protect_state|=(RC_Ctl.rc.switch_right==1||RC_Ctl.rc.switch_right==2||RC_Ctl.rc.switch_right==3)<<5;
 	

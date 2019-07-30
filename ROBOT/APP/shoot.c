@@ -79,7 +79,7 @@ u16 shoot_time_measure(const s16 tarP,const s16 fbdP,const u8 last_mouse_press_l
 		time_count_tem=time_1ms_count;
 		once_statu=0;
 	}
-	if(abs(tarP-fbdP)<2&&once_statu!=1)
+	if(ABS(tarP-fbdP)<2&&once_statu!=1)
 	{
 		once_statu=1;
 		time_count_end=time_1ms_count;
@@ -145,14 +145,14 @@ void RC_Control_Shoot(u8* fri_state)
 			
 			if(time_1ms_count%80==0&&RC_Ctl.rc.switch_left!=RC_SWITCH_MIDDLE&&RC_Ctl.rc.switch_right==RC_SWITCH_DOWN)
 			{
-//////				if(abs(RC_Ctl.rc.ch1-1024)>100)	//测试最高射频
+//////				if(ABS(RC_Ctl.rc.ch1-1024)>100)	//测试最高射频
 //////				{
 //////					shoot_Data_Down.count_float+=1;//2;
 //////				}
-				//shoot_Data_Down.count_float+=(abs(RC_Ctl.rc.ch1-1024))/400.0f;//2;
+				//shoot_Data_Down.count_float+=(ABS(RC_Ctl.rc.ch1-1024))/400.0f;//2;
 				//shoot_Data_Down.count=(s16)shoot_Data_Down.count_float;
 				
-				if(abs(RC_Ctl.rc.ch1-1024)>100)	//测试最高射频
+				if(ABS(RC_Ctl.rc.ch1-1024)>100)	//测试最高射频
 				{
 					AddBulletToShootingSystem();
 				}
@@ -232,7 +232,7 @@ void Prevent_Jam_Down(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Dat
 //	ferquency_last=shoot_data->frequency;	//迭代
 	
 	
-	if(abs(deviation)>6&&abs(shoot_motor_Data->fdbV)<10)	//期望速度不为0时位置未发生变化	//bug:频率刷新时需要刷新count	//手动射击将频率检测删除
+	if(ABS(deviation)>6&&ABS(shoot_motor_Data->fdbV)<10)	//期望速度不为0时位置未发生变化	//bug:频率刷新时需要刷新count	//手动射击将频率检测删除
 	{
 		shoot_data->Jam.count++;
 	}
@@ -264,7 +264,7 @@ void Prevent_Jam_Down(SHOOT_DATA * shoot_data,SHOOT_MOTOR_DATA * shoot_motor_Dat
 				case 2:
 				{
 					shoot_data->motor_tarP=jam_DownfdbP_record;
-					if(abs(shoot_motor_Data->fdbP-jam_DownfdbP_record)<40)	//认为已经执行了动作	//50
+					if(ABS(shoot_motor_Data->fdbP-jam_DownfdbP_record)<40)	//认为已经执行了动作	//50
 					{
 						jam_deal_state=3;
 					}

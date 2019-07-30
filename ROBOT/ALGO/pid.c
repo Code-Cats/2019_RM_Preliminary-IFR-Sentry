@@ -23,7 +23,7 @@ float PID_General(float target,float current,PID_GENERAL *pid)
 		if(target - current>pid->input_maxerror)pid->Data_Save[1]=pid->input_maxerror;
 		else if(target - current<-pid->input_maxerror)pid->Data_Save[1]=-pid->input_maxerror;
 		
-		if(abs(target - current)<=pid->tiny)pid->Data_Save[1]=0;
+		if(ABS(target - current)<=pid->tiny)pid->Data_Save[1]=0;
 		
 		pid->inte = 0.999f*pid->inte+pid->Data_Save[1];
 		pid->dire = pid->k_d * (pid->Data_Save[1] - pid->Data_Save[0]);
@@ -47,7 +47,7 @@ float PID_ChassisFollow_Variable_kp(float error)	//µ×ÅÌµç»ú8192Îª360¶È£¬15Îª341£
 	float kp=1;
 	if(ABS(error)<400)
 	{
-		kp=abs(error)/400+0.4f;
+		kp=ABS(error)/400+0.4f;
 		kp=kp>1?1:kp;
 		kp=kp<0?0:kp;
 	}
