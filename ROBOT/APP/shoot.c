@@ -41,8 +41,8 @@ void Shoot_Task(void)	//定时频率：1ms
 {
 	if(GetWorkState()==AUTO_STATE)
 	{
-		//LASER_SWITCH=0;
-		if(game_state_judge.game_progress==5)	//无发弹量或者比赛结束关闭摩擦轮  //bullet_remaining_judge.bullet_remaining_num==0||
+		LASER_SWITCH=0;
+		if(bullet_remaining_judge.bullet_remaining_num==0||game_state_judge.game_progress==5)	//无发弹量或者比赛结束关闭摩擦轮  //bullet_remaining_judge.bullet_remaining_num==0||
 		{
 			frictionWheel_Data.l_wheel_tarV=0;
 			Friction_State=0;

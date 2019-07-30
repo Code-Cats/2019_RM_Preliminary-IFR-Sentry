@@ -17,6 +17,8 @@ extern u8 led_start2normal;
 
 s8 led_num=0;
 
+
+//encoder  108  331-> 15  60
 int main(void)//40-508-1289-1705
 {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
