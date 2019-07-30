@@ -67,7 +67,7 @@ static void judge_Process(uint16_t CmdID, uint8_t *Data, uint8_t len)
 			break;
 		}
 		case Bullet_remainingID : memcpy(&bullet_remaining_judge, Data, 2); break;
-		case RobotInteractiveId	: memcpy(&interactive_data_judge, Data, len); break;
+		case RobotInteractiveId	: memcpy(&interactive_data_judge, Data, len);Avoid_drones_MsgDeal(&interactive_data_judge); break;
 		default:break;
 	}
 	

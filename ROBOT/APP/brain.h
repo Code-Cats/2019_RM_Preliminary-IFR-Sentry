@@ -2,6 +2,7 @@
 #define __BRAIN_H__
 
 #include "bsp.h"
+#include "usart3_judge_analysis.h"
 
 #define MAX_STROKE 2690
 
@@ -45,6 +46,9 @@ void RobotHurtCallback(uint8_t armorid,uint8_t hurttype);
 
 u8 Recognize_EncoderPosState(s16 pos);
 void Chassis_ORBITState_Run(u8 runstate);	//根据传入参数决定在轨道哪一段运行
+
+//友方信息回传
+void Avoid_drones_MsgDeal(robot_interactive_data_t* interactive_data_judge);
 
 void Auto_Operation_New(void);
 

@@ -3,7 +3,7 @@
 #include "auto_move.h"
 #include "friction_wheel.h"
 #include "yun.h"
-#include "usart3_judge_analysis.h"
+//#include "usart3_judge_analysis.h"
 #include "heat_limit.h"
 #include "usart6_viceboard_analysis.h"
 
@@ -30,10 +30,10 @@ extern VisionDataTypeDef	VisionData;
 extern YUN_MOTOR_DATA 			yunMotorData;
 
 #define ORBIT_MAX_POS 2390+40//1740
-#define ORBIT_EVADING_DRONES_POSLIMIT 1765//1280 //2000	//躲避无人机中止点
+#define ORBIT_EVADING_DRONES_POSLIMIT 1540//1280 //2000	//躲避无人机中止点
 #define ORBIT_ORIGIN_POS 0	//轨道起点
 #define ORBOT_INFLEXION1_POS 584//500	//第一个拐点
-#define ORBOT_INFLEXION2_POS 1765//1280	//第二个拐点
+#define ORBOT_INFLEXION2_POS 1634//1720//1280	//第二个拐点
 
 
 AUTO_OperationChassisStateTypeDef AutoOperationState=CHASSIS_FINDING_ENEMY_NORMAL;	//国赛弃用
@@ -472,7 +472,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 
 
 
-
+u8 Enemy_drone_state=0;	//0为不在线
 ///@bierf 国赛自动哨兵运行 新增随机运动 自动就近打击
 ///@parm void
 ///@return void
@@ -613,8 +613,8 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 //			PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
 //			PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
 //			PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
-			PID_PITCH_SPEED.input_max=160;	//18
-			PID_PITCH_SPEED.input_min=-160;
+			PID_PITCH_SPEED.input_max=170;	//18
+			PID_PITCH_SPEED.input_min=-170;
 			PID_YAW_SPEED.input_max=150;	//15
 			PID_YAW_SPEED.input_min=-150;
 			break;
@@ -654,6 +654,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 }
 
 
+
 //encoder_speed
 //extern u8 encoder_startsensor;
 //extern u8 encoder_endsensor;
@@ -668,7 +669,7 @@ void Auto_Move_Normal(void)	//普通模式全程轨道跑
 			{
 				Chassis_Vx=-800;
 			}
-			if(SensorData.switch_start==0)
+			if(SensorData.switch_start==0||SensorData.encoderPos<100)
 			{
 				AutoOperationData.chassis_enable=0;
 			}
@@ -677,9 +678,17 @@ void Auto_Move_Normal(void)	//普通模式全程轨道跑
 				AutoOperationData.chassis_enable=1;
 			} 
 			
-			if(SensorData.encoderSpeed>0)
+			if(SensorData.encoderSpeed>-10&&SensorData.encoderPos<200)
 			{
-				normal_move_flag=1;
+				if(Enemy_drone_state==0)
+				{
+					normal_move_flag=1;
+				}
+				else
+				{
+					normal_move_flag=2;
+				}
+				
 			}
 			//Auto_Move_Task(ORBIT_EVADING_DRONES_POSLIMIT,1000);//MAX_STROKE-40
 			break;
@@ -690,7 +699,7 @@ void Auto_Move_Normal(void)	//普通模式全程轨道跑
 			{
 				Chassis_Vx=800;
 			}
-			if(SensorData.switch_end==0)
+			if(SensorData.switch_end==0||SensorData.encoderPos>2330)
 			{
 				AutoOperationData.chassis_enable=0;
 			}
@@ -699,10 +708,32 @@ void Auto_Move_Normal(void)	//普通模式全程轨道跑
 				AutoOperationData.chassis_enable=1;
 			}
 			
-			if(SensorData.encoderSpeed<0)
+			if(SensorData.encoderSpeed<10&&SensorData.encoderPos>2230)
 			{
 				normal_move_flag=0;
 			}
+			break;
+		}
+		case 2:
+		{
+			if(SensorData.encoderPos<ORBIT_EVADING_DRONES_POSLIMIT-40)
+			{
+				Chassis_Vx=800;
+			}
+			
+			if(ORBIT_EVADING_DRONES_POSLIMIT-40-SensorData.encoderPos<300)
+			{
+				AutoOperationData.chassis_enable=0;
+				if(SensorData.encoderSpeed<40||ORBIT_EVADING_DRONES_POSLIMIT-40-SensorData.encoderPos<60)//||ABS(ORBIT_EVADING_DRONES_POSLIMIT-SensorData.encoderPos)<50
+				{
+					normal_move_flag=0;
+				}
+			}
+			else
+			{
+				AutoOperationData.chassis_enable=1;
+			}
+				
 			break;
 		}
 	}
@@ -712,7 +743,7 @@ void Auto_Move_Normal(void)	//普通模式全程轨道跑
 //encoder_speed
 //extern u8 encoder_startsensor;
 //extern u8 encoder_endsensor;
-#define EVADE_VX 1000
+#define EVADE_VX 900
 void Auto_Move_Evade(void)	//闪模式随机跑
 {
 	static u8 move_evade_state=4;
@@ -730,7 +761,7 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 				Chassis_Vx=-EVADE_VX;
 			}
 			
-			if(ABS(AutoOperationData.tar_chassispos-SensorData.encoderPos)<250)
+			if(ABS(AutoOperationData.tar_chassispos-SensorData.encoderPos)<350)
 			{
 				if(AutoOperationData.tar_chassispos==0)
 				{
@@ -757,14 +788,15 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 			{
 				Chassis_Vx=-EVADE_VX;
 			}
-			if(SensorData.switch_start==0)	//触发
-			{
-				AutoOperationData.chassis_enable=0;
-			}
-			else
-			{
-				AutoOperationData.chassis_enable=1;
-			}
+//			if(SensorData.switch_start==0)	//触发
+//			{
+//				AutoOperationData.chassis_enable=0;
+//			}
+//			else
+//			{
+//				AutoOperationData.chassis_enable=1;
+//			}
+			AutoOperationData.chassis_enable=0;
 			
 			if(SensorData.encoderSpeed>=-10)//0
 			{
@@ -774,18 +806,20 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 		}
 		case 2:	//尾减速  ORBIT_MAX_POS
 		{
+			
 			if(SensorData.encoderPos<ORBIT_MAX_POS)
 			{
 				Chassis_Vx=EVADE_VX;
 			}
-			if(SensorData.switch_end==0)	//触发
-			{
-				AutoOperationData.chassis_enable=0;
-			}
-			else
-			{
-				AutoOperationData.chassis_enable=1;
-			}
+//			if(SensorData.switch_end==0)	//触发
+//			{
+//				AutoOperationData.chassis_enable=0;
+//			}
+//			else
+//			{
+//				AutoOperationData.chassis_enable=1;
+//			}
+			AutoOperationData.chassis_enable=0;
 			
 			if(SensorData.encoderSpeed<=10)//0
 			{
@@ -822,7 +856,7 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 			srand(time_1ms_count);	//重置随机种子
 			//至少500距离
 			randagain:AutoOperationData.tar_chassispos=rand()%(AutoOperationData.limitX2-AutoOperationData.limitX1)+AutoOperationData.limitX1;	//得到X1-X2随机数
-			if(ABS(AutoOperationData.tar_chassispos-SensorData.encoderPos)<500)
+			if(ABS(AutoOperationData.tar_chassispos-SensorData.encoderPos)<600)
 			{
 				goto randagain;
 			}
@@ -852,6 +886,25 @@ void Auto_Move_Evade(void)	//闪模式随机跑
 }
 
 
+void Avoid_drones_MsgDeal(robot_interactive_data_t* interactive_data_judge)
+{
+	if(interactive_data_judge->frame_header.data_cmd_id==0x0200)
+	{
+		if(interactive_data_judge->data[0]==0xfe)
+		{
+			if(interactive_data_judge->data[1]==0x5a)	//敌方无人机起飞
+			{
+				Enemy_drone_state=1;
+				AutoOperationData.limitX2=ORBIT_EVADING_DRONES_POSLIMIT;
+			}
+			else if(interactive_data_judge->data[1]==0xa5)	//敌方无人机降落
+			{
+				Enemy_drone_state=0;
+				AutoOperationData.limitX2=ORBIT_MAX_POS;
+			}
+		}
+	}
+}
 
 /*
 uint8_t armor_id;  //当血量变化类型为装甲伤害，代表装甲 ID，其中数值为 0-4 号代表机器人的五个装甲片，其他血量变化类型，该变量数值为 0
