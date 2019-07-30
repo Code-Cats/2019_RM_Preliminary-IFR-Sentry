@@ -159,7 +159,11 @@ u8 sign_count=0;	//第三帧才开始动态识别
 #define VISION_TARY	610//590//570//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
-	AutoSetFrictionSpeed(VisionData.armor_dis);
+	if(GetWorkState()==AUTO_STATE)
+	{
+		AutoSetFrictionSpeed(VisionData.armor_dis);
+	}
+	
 	
 	if(frictionWheel_Data.l_wheel_tarV!=0)
 	{
@@ -237,11 +241,12 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 		//
 		last_tarx=VisionData.tar_x;
 		
-			if(VisionData.armor_dis<600)	//只预测6m以内
+			if(VisionData.armor_dis<400)	//只预测6m以内
 			{
 				Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//预测 待调节
+				Pitch_Move_Set(pitch_tarP,(float)(VisionData.armor_dis/100.0f),yunMotorData.pitch_tarV);//imu.angleV.y
 			}
-		Pitch_Move_Set(pitch_tarP,(float)(VisionData.armor_dis/100.0f),yunMotorData.pitch_tarV);//imu.angleV.y
+		
 		
 		//t_gravity_ballistic_set_angel_10=(s16)(t_gravity_ballistic_set_angel*10);
 		
@@ -385,7 +390,7 @@ void Tar_Move_Set(float* yaw_tarP,float dis_m,float tar_v)	//经过计算，只打35度/
 	{
 		dis_m=5.6;
 	}
-	float shoot_delay=dis_m/Shoot_V*1.13f+0.08f;	//以秒为单位	//加上出弹延时0.08
+	float shoot_delay=dis_m/Shoot_V*1.135f+0.07f;	//以秒为单位	//加上出弹延时0.08
 	float pre_angle=tar_v*shoot_delay;
 	
 

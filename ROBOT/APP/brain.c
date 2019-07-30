@@ -521,12 +521,24 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 			static u32 timeout=0;
 			timeout++;
 			Auto_Move_Evade();	//切换时需要重置位rand state
-			
-			if(timeout>10000)	//10s
+				
+			if(robot_state_judge.remain_HP>=400)
 			{
-				timeout=0;
-				AutoOperationData.chassis_state=CHASSIS_FINDING_ENEMY_NORMAL;	//
+				if(timeout>10000)	//10s
+				{
+					timeout=0;
+					AutoOperationData.chassis_state=CHASSIS_FINDING_ENEMY_NORMAL;	//
+				}
 			}
+			else
+			{
+				if(timeout>30000)	//30s
+				{
+					timeout=0;
+					AutoOperationData.chassis_state=CHASSIS_FINDING_ENEMY_NORMAL;	//
+				}
+			}
+			
 			break;
 		}
 	}
@@ -652,7 +664,21 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 			}
 			
 			///**********************************************************************************************************
-			if(time_1ms_count%80==0&&AutoOperationData.yun_lost_count<400&&Shoot_Heat_Limit()==1&&frictionWheel_Data.l_wheel_tarV!=0)
+			u32 bulletT=100;
+			if(frictionWheel_Data.l_wheel_tarV<18)
+			{
+				bulletT=60;
+			}
+			else if(frictionWheel_Data.l_wheel_tarV<23)
+			{
+				bulletT=100;
+			}
+			else
+			{
+				bulletT=120;
+			}
+			
+			if(time_1ms_count%bulletT==0&&AutoOperationData.yun_lost_count<400&&Shoot_Heat_Limit()==1&&frictionWheel_Data.l_wheel_tarV!=0)
 			{
 				AddBulletToShootingSystem();
 			}
