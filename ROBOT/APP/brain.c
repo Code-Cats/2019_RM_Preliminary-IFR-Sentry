@@ -470,7 +470,7 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 	}
 }
 
-
+extern ext_power_heat_data_t heat_data_judge;
 
 u8 Enemy_drone_state=0;	//0为不在线
 ///@bierf 国赛自动哨兵运行 新增随机运动 自动就近打击
@@ -535,7 +535,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 	if(AutoOperationData.robot_hits_count!=robot_hits_count_last)	//受到打击
 	{
 		speedout_time=3000;
-		AutoOperationData.tar_remainbuffer=40;
+		AutoOperationData.tar_remainbuffer=3;
 	}
 	robot_hits_count_last=AutoOperationData.robot_hits_count;
 	if(speedout_time>0)
@@ -546,12 +546,19 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 	{
 		AutoOperationData.tar_remainbuffer=160;
 	}
+	else if(speedout_time==1)
+	{
+		if(heat_data_judge.chassis_power_buffer>50)
+		{
+			AutoOperationData.real_remainbuffer=heat_data_judge.chassis_power_buffer-50;		//功率不浪费
+		}
+	}
 	
-	if(time_1ms_count%50)	//半边滤波
+	if(time_1ms_count%50==0)	//半边滤波
 	{
 		if(AutoOperationData.real_remainbuffer<AutoOperationData.tar_remainbuffer)
 		{
-			if(time_1ms_count%200)
+			if(time_1ms_count%200==0)
 			{
 				AutoOperationData.real_remainbuffer++;
 			}

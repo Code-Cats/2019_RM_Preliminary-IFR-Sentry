@@ -163,7 +163,7 @@ float Limit_Power(float power,float powerbuffer,u32 outputsum)	//¾­µ÷ÊÔ output=5
 		}
 		else
 		{
-			//powerbuffer-=AutoOperationData.real_remainbuffer;
+			powerbuffer-=AutoOperationData.real_remainbuffer;
 
 			limit_k=POWER_LIMIT_K*powerbuffer+POWER_LIMIT_B;	//0.4
 			limit_k=limit_k>1?1:limit_k;
