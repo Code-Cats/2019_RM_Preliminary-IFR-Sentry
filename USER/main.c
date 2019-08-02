@@ -79,5 +79,6 @@ int main(void)//40-508-1289-1705
 float ABS(float x)
 {
 	x=x<0?-x:x;
+	return x;
 }
 
