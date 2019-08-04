@@ -63,3 +63,10 @@ brain.c : CHASSIS_AUTORUN
          5.5m分界线  5.2--5.8   21m/s--26m/s
 		 射速调节放到 auto_aim中
 		 
+		 
+赛场外屏蔽：shoot.c的射速自动保护，auto_aim的自动设置射速  control的自动运行函数
+
+根据不同场景设置不同的反馈限幅
+
+
+设置当裁判丢失时直接将shooter=1

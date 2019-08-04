@@ -472,6 +472,10 @@ void Chassis_ORBITState_Run(u8 runstate)	//根据传入参数决定在轨道哪一段运行
 
 extern ext_game_state_t game_state_judge;
 extern ext_power_heat_data_t heat_data_judge;
+//extern ext_bullet_remaining_t bullet_remaining_judge;
+extern ext_game_robot_state_t robot_state_judge;
+
+extern  u32 shooter_enable_count;	//启动保护
 
 u8 Enemy_drone_state=0;	//0为不在线
 ///@bierf 国赛自动哨兵运行 新增随机运动 自动就近打击
@@ -486,7 +490,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 		case CHASSIS_FINDING_ENEMY_NORMAL:	//寻找敌人 
 		{
 			Auto_Move_Normal();
-			if(VisionData.armor_sign==1)
+			if(VisionData.armor_sign==1&&robot_state_judge.mains_power_shooter_output!=0)	//发弹量满后 取消静止状态
 			{
 				AutoOperationData.chassis_state=CHASSIS_HIT_ENEMY_NEARBY;
 			}
@@ -597,13 +601,13 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 			else	//没有目标，云台自动转
 			{
 				///*********************************************************************************
-				yunMotorData.yaw_tarP=ZGyroModuleAngle*10+160;//165
+				yunMotorData.yaw_tarP=ZGyroModuleAngle*10+155;//165
 				switch(yun_pitch_findstate)
 				{
 					case 0:
 					{
 						static u32 timecount=0;
-						yunMotorData.pitch_tarP=2800;
+						yunMotorData.pitch_tarP=3100;
 						timecount++;
 						if(timecount>250)
 						{
@@ -616,7 +620,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 					case 1:
 					{
 						static u32 timecount=0;
-						yunMotorData.pitch_tarP=2000;
+						yunMotorData.pitch_tarP=2300;
 						timecount++;
 						if(timecount>250)
 						{
@@ -634,17 +638,17 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 //			PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
 //			PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
 //			PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
-			PID_PITCH_SPEED.input_max=170;	//18
-			PID_PITCH_SPEED.input_min=-170;
-			PID_YAW_SPEED.input_max=150;	//15
-			PID_YAW_SPEED.input_min=-150;
+			PID_PITCH_SPEED.input_max=140;	//18
+			PID_PITCH_SPEED.input_min=-140;
+			PID_YAW_SPEED.input_max=140;	//15
+			PID_YAW_SPEED.input_min=-140;
 			break;
 		}
 		case YUN_FINDED_ENEMY:	//运行频率1000hz
 		{
 			
-			PID_PITCH_SPEED.input_max=80;
-			PID_PITCH_SPEED.input_min=-80;
+			PID_PITCH_SPEED.input_max=100;
+			PID_PITCH_SPEED.input_min=-100;
 			PID_YAW_SPEED.input_max=100;
 			PID_YAW_SPEED.input_min=-100;
 
@@ -678,7 +682,7 @@ void Auto_Operation_New(void)	//需要新增考虑剩余子弹，比赛结束自动关闭摩擦轮（触
 				bulletT=120;
 			}
 			
-			if(time_1ms_count%bulletT==0&&AutoOperationData.yun_lost_count<400&&Shoot_Heat_Limit()==1&&frictionWheel_Data.l_wheel_tarV!=0)
+			if(time_1ms_count%bulletT==0&&AutoOperationData.yun_lost_count<400&&Shoot_Heat_Limit()==1&&frictionWheel_Data.l_wheel_tarV!=0&&robot_state_judge.mains_power_shooter_output==1&&shooter_enable_count>4000)
 			{
 				AddBulletToShootingSystem();
 			}

@@ -5,6 +5,7 @@
 #include "quaternion.h"
 #include "protect.h"
 
+#include "brain.h"
 
 u8 mpu6500_id = 0;
 
@@ -349,6 +350,7 @@ void MPU_Device_Init(void)
 		
 }
 
+extern AutoOperationDataTypeDef AutoOperationData;
 void MPU_get_Data(void)
 {
 	extern Error_check_t Error_Check;
@@ -379,9 +381,31 @@ void MPU_get_Data(void)
 	imu.temp = 21 + mpu_data.temp / 333.87f;
 	/* 2000dps -> rad/s */
 	
+	if(AutoOperationData.yun_state==YUN_FINDED_ENEMY)	//发现目标
+	{
+		mpu_data.gyro.z=mpu_data.gyro.z>1800?1800:mpu_data.gyro.z;	//限幅
+		mpu_data.gyro.z=mpu_data.gyro.z<-1800?-1800:mpu_data.gyro.z;	//限幅
+	}
+	else
+	{
+		mpu_data.gyro.z=mpu_data.gyro.z>2800?2800:mpu_data.gyro.z;	//限幅
+		mpu_data.gyro.z=mpu_data.gyro.z<-2800?-2800:mpu_data.gyro.z;	//限幅
+	}
+	//mpu_data.gyro.x=mpu_data.gyro.x>2800?2800:mpu_data.gyro.x;	//限幅
+	//mpu_data.gyro.y=mpu_data.gyro.y>2800?2800:mpu_data.gyro.y;	//限幅
+	
+	
+	//mpu_data.gyro.x=mpu_data.gyro.x<-2800?-2800:mpu_data.gyro.x;	//限幅
+	//mpu_data.gyro.y=mpu_data.gyro.y<-2800?-2800:mpu_data.gyro.y;	//限幅
+	
+	
+//	imu.angleV.x = 0.3f*imu.angleV.x+0.7f*mpu_data.gyro.x / 16.384f; 														
+//    imu.angleV.y = 0.3f*imu.angleV.x+0.7f*mpu_data.gyro.y / 16.384f; 																	 
+    imu.angleV.z = 0.2f*imu.angleV.x+0.8f*mpu_data.gyro.z / 16.384f; 
+	
 	imu.angleV.x = mpu_data.gyro.x / 16.384f; 														
     imu.angleV.y = mpu_data.gyro.y / 16.384f; 																	 
-    imu.angleV.z = mpu_data.gyro.z / 16.384f; 
+    //imu.angleV.z = mpu_data.gyro.z / 16.384f; 
 	
 	if(!(mpu_data.acceler.x==0&&mpu_data.acceler.y&&mpu_data.acceler.z&&mpu_data.gyro.x&&mpu_data.gyro.y&&mpu_data.gyro.z))
 		LostCountFeed(&(Error_Check.count[LOST_IMU1]));

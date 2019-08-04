@@ -1,14 +1,33 @@
 #include "friction_wheel.h"
+#include "usart3_judge_analysis.h"
 
 FRICTIONWHEEL_DATA frictionWheel_Data=FRICTIONWHEEL_DATA_DEFAULT;
+extern ext_game_robot_state_t robot_state_judge;
 
 s16 fireRateOffset=0;	//射速动态补偿
 extern u32 time_1ms_count;
 extern s16 bulletSpeedSet;
+ u32 shooter_enable_count=0;
 //5000 16，16.3，15.7，16.5	；7000 25 6000 21.08 20.97
 //new:28-1200  7-1100 19-1150  15-1140  16-1145  19-1155  20.2-1160 22-1170
 void Friction_Speed_Set(void)	//设置射速，射速到摩擦轮速度的转换
 {
+	
+	
+	
+	if(robot_state_judge.mains_power_shooter_output==0)
+	{
+		shooter_enable_count=0;
+	}
+	else if(shooter_enable_count<5000)
+	{
+		shooter_enable_count++;
+	}
+	
+	if(shooter_enable_count<4000)
+	{
+		frictionWheel_Data.l_wheel_tarV=0;
+	}
 	
 	bulletSpeedSet=frictionWheel_Data.l_wheel_tarV;	//test
 	
@@ -63,7 +82,7 @@ void AutoAdjust_FrictionSpeed(float fdbv)
 {
 	bulletspeed_10=fdbv*10;
 	
-	if(ABS(fdbv-frictionWheel_Data.l_wheel_tarV)>1.1f&&frictionWheel_Data.l_wheel_tarV!=0)
+	if(ABS(fdbv-frictionWheel_Data.l_wheel_tarV)>1.0f&&frictionWheel_Data.l_wheel_tarV!=0)
 	{
 		adjust_flagcount++;
 	}
@@ -75,8 +94,8 @@ void AutoAdjust_FrictionSpeed(float fdbv)
 	if(adjust_flagcount>1)
 	{
 		fireRateOffset=(s16)(GetRecordfireRateOffset(120)+(frictionWheel_Data.l_wheel_tarV-fdbv)*2);
-		fireRateOffset=fireRateOffset>24?24:fireRateOffset;
-		fireRateOffset=fireRateOffset<-24?-24:fireRateOffset;
+		fireRateOffset=fireRateOffset>35?35:fireRateOffset;
+		fireRateOffset=fireRateOffset<-35?-35:fireRateOffset;
 	}
 }
 

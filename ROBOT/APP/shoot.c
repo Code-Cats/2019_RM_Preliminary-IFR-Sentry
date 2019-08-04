@@ -7,8 +7,10 @@
 //#include "vision.h"
 #include "usart3_judge_analysis.h"
 
-extern ext_bullet_remaining_t bullet_remaining_judge;
+//extern ext_bullet_remaining_t bullet_remaining_judge;
 extern ext_game_state_t game_state_judge;
+extern ext_game_robot_state_t robot_state_judge;
+
 
 SHOOT_DATA shoot_Data_Down=SHOOT_DATA_INIT;
 SHOOT_MOTOR_DATA shoot_Motor_Data_Down ={0};
@@ -20,7 +22,7 @@ PID_GENERAL   PID_Shoot_Down_Position=PID_SHOOT_POSITION_DEFAULT;
 PID_GENERAL   PID_Shoot_Down_Speed=PID_SHOOT_SPEED_DEFAULT;
 
 //PID_GENERAL   PID_Shoot_Up_Position=PID_SHOOT_POSITION_DEFAULT;
-//PID_GENERAL   PID_Shoot_Up_Speed=PID_SHOOT_SPEED_DEFAULT;
+//PID_GENERAL   PID_Shoot_Up_Speed=PID_SHOOT_SPEED_DEFAULbn T;
 
 extern RC_Ctl_t RC_Ctl;
 
@@ -41,12 +43,26 @@ void Shoot_Task(void)	//定时频率：1ms
 {
 	if(GetWorkState()==AUTO_STATE)
 	{
-		LASER_SWITCH=0;
-		if(bullet_remaining_judge.bullet_remaining_num==0||game_state_judge.game_progress==5)	//无发弹量或者比赛结束关闭摩擦轮  //bullet_remaining_judge.bullet_remaining_num==0||
+		 //LASER_SWITCH=0;
+		if(robot_state_judge.mains_power_shooter_output==0||game_state_judge.game_progress==5)	//无发弹量或者比赛结束关闭摩擦轮  //bullet_remaining_judge.bullet_remaining_num==0||
 		{
 			frictionWheel_Data.l_wheel_tarV=0;
-			Friction_State=0;
+			Friction_State=0; 
 		}
+		else if(robot_state_judge.mains_power_shooter_output==1&&game_state_judge.game_progress!=4)
+		{
+			if(Friction_State==1)
+			{
+				frictionWheel_Data.l_wheel_tarV=18;
+			}
+			else
+			{
+				frictionWheel_Data.l_wheel_tarV=0;
+			}
+			
+			//frictionWheel_Data.l_wheel_tarV=16;	//临时调试
+		}
+		
 	}
 	else
 	{

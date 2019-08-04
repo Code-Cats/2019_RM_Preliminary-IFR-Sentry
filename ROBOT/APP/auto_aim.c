@@ -3,6 +3,7 @@
 #include "yun.h"
 #include "protect.h"
 #include "friction_wheel.h"
+#include "usart3_judge_analysis.h"
 
 //#include "arm_math.h"
 
@@ -135,6 +136,9 @@ void AutoSetFrictionSpeed(u16 dis_cm)
 #define YUN_DOWN_DISLIMIT 1120	//正常的活动范围，DOWN为负
 
 extern FRICTIONWHEEL_DATA frictionWheel_Data;
+extern ext_game_state_t game_state_judge;
+// extern ext_bullet_remaining_t bullet_remaining_judge;
+extern ext_game_robot_state_t robot_state_judge;
 
 float Shoot_V=25;//18.0f;//15.5f	//14M/s
 float Shoot_V_2= 625;//324.0f;//(SHOOT_V*SHOOT_V)
@@ -155,11 +159,11 @@ s32 zgyro_int_z=0;
 u16 last_tarx=0;
 
 u8 sign_count=0;	//第三帧才开始动态识别
-#define VISION_TARX 966//970//990//1035//710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
-#define VISION_TARY	610//590//570//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
+#define VISION_TARX 965 //963//970//990//1035//710//640+105//1053//1035是修正安装偏差1020//580	//左上原点	640
+#define VISION_TARY	624//610//587//590//570//570//580//590//625//570//512+60//360//510//490//480//490//500//520//540//560//360//410//440	//左上原点	480	//打5米内目标：向上补偿518-360个像素点	//因为有阻力恒定静态误差，故补偿
 void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 {
-	if(GetWorkState()==AUTO_STATE)
+	if(GetWorkState()==AUTO_STATE&&robot_state_judge.mains_power_shooter_output!=0&&game_state_judge.game_progress==4)	//正常比赛模式 自动设置射速  //
 	{
 		AutoSetFrictionSpeed(VisionData.armor_dis);
 	}
@@ -176,21 +180,21 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 	if(Error_Check.statu[LOST_VISION]==1){	VisionData.armor_type=0;VisionData.armor_sign=0;	}//若无反馈=，该Task放在中断中主运行，及放在yun.c中以较慢频率保护运行
 	//t_yaw_angel_v=Pixel_V_to_angle_V(VisionData.pix_x_v,(s16)(VisionData.error_x-VISION_TARX));
 //	t_target_v=t_yaw_angel_v+Gyro_Data
-	if(RC_Ctl.rc.switch_left==RC_SWITCH_DOWN&&VisionData.armor_sign==1&&VisionData.armor_dis<=750)	//VisionData.armor_sign!=0
+	if(GetWorkState()==AUTO_STATE&&VisionData.armor_sign==1&&VisionData.armor_dis<=900)	//VisionData.armor_sign!=0
 	{
 		VisionData.vision_control_state=1;	//最终控制位
-		PID_PITCH_SPEED.input_max=180;
-		PID_PITCH_SPEED.input_min=-180;
-		PID_YAW_SPEED.input_max=150;
-		PID_YAW_SPEED.input_min=-150;
+		PID_PITCH_SPEED.input_max=100;
+		PID_PITCH_SPEED.input_min=-100;
+		PID_YAW_SPEED.input_max=100;
+		PID_YAW_SPEED.input_min=-100;//与自动运行函数有冲突
 	}
 	else
 	{
 		VisionData.vision_control_state=0;	//最终控制位
-		PID_PITCH_SPEED.input_max=PITCH_SPEED_PID_MAXINPUT;
-		PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
-		PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
-		PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
+//		PID_PITCH_SPEED.input_max=PITCH_SPEED_PID_MAXINPUT;
+//		PID_PITCH_SPEED.input_min=-PITCH_SPEED_PID_MAXINPUT;
+//		PID_YAW_SPEED.input_max=YAW_SPEED_PID_MAXINPUT;
+//		PID_YAW_SPEED.input_min=-YAW_SPEED_PID_MAXINPUT;
 	}
 	
 	if(VisionData.armor_sign==1)	//保护性输出，前几帧速度置0
@@ -244,7 +248,7 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 			if(VisionData.armor_dis<400)	//只预测6m以内
 			{
 				Tar_Move_Set(yaw_tarP,(float)(VisionData.armor_dis/100.0f),VisionData.angle_x_v_filter);	//预测 待调节
-				Pitch_Move_Set(pitch_tarP,(float)(VisionData.armor_dis/100.0f),yunMotorData.pitch_tarV);//imu.angleV.y
+				//Pitch_Move_Set(pitch_tarP,(float)(VisionData.armor_dis/100.0f),yunMotorData.pitch_tarV);//imu.angleV.y
 			}
 		
 		
@@ -263,9 +267,9 @@ void Vision_Task(float* yaw_tarP,float* pitch_tarP)	//处理目标角度
 #define G	9.8f	//重力加速度
 float Gravity_Ballistic_Set(float* pitch_tarP,float dis_m)	//重力补偿坐标系中，向下为正
 {
-	if(dis_m>8)	dis_m=8;
+	if(dis_m>9)	dis_m=9;
 	
-	dis_m-=0.10f;	//临时加的，因为经常打到装甲下方
+	//dis_m+=0.10f;	//临时加的，因为经常打到装甲下方
 //	static float tar_angle_rad_fliter=0;
 	float tar_angle_rad=(PITCH_GYRO_INIT-*pitch_tarP)*0.000767f;	//弧度制简化计算2pi/8192//////////////////////////////////////////
 //	tar_angle_rad_fliter=0.9f*tar_angle_rad_fliter+0.1f*tar_angle_rad;
